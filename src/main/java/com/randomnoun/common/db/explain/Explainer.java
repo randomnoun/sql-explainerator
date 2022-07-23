@@ -99,11 +99,11 @@ public class Explainer {
 	}
 	
 	
-	public static class Node implements Struct.ToJson {
+	public static abstract class Node implements Struct.ToJson {
 		private String t;
 		private boolean isArray;
-		private Map<String, Object> attributes = new HashMap<>();
-		private List<Node> children = new ArrayList<>();
+		protected Map<String, Object> attributes = new HashMap<>();
+		protected List<Node> children = new ArrayList<>();
 		
 		public Node(String t, boolean isArray) {
 			this.t = t;
@@ -169,8 +169,164 @@ public class Explainer {
 			}
 			return s;
 		}
-		
+		protected abstract void writeHtml(PrintWriter pw);
 	}
+	
+	public static class QueryBlockNode extends Node {
+		public QueryBlockNode() {
+			super("query_block", false);
+		}
+		@Override
+		protected void writeHtml(PrintWriter pw) {
+			// the things that a query block does
+			pw.println("<table display=\"display: inline-table;\">"); // of course it is
+			CostInfo ci = (CostInfo) this.attributes.get("costInfo");
+			if (ci != null) {
+				pw.println("<tr><td>Query cost: " + ci.getQueryCost() + "</td></tr>"); 
+			}
+			pw.println("<tr><td>[ query_block ]</td></tr>"); // tooltip = select ID & query cost
+			pw.println("<tr><td>   ^</td></tr>");
+			
+			// the thing inside the query block
+			if (this.children.size() > 0) {
+				pw.println("<tr>");
+				for (Node c : this.children) {
+					pw.println("<td>");
+					c.writeHtml(pw);
+					pw.println("</td>");
+				}
+				pw.println("</tr>");
+			}
+			pw.println("</td></tr>");
+			pw.println("</table>");
+		}
+	}
+	
+	public static class UnionResultNode extends Node {
+		public UnionResultNode() {
+			super("union_result", false); // TODO subtypes
+		}
+		protected void writeHtml(PrintWriter pw) {
+			pw.println("<table display=\"display: inline-table;\">"); // of course it is
+			pw.println("<tr><td style=\"background-color: #99999;\">UNION</td></tr>"); // tooltip: tableName, usingTemporaryTable: true
+			pw.println("<tr><td>" + attributes.get("tableName") + "</td></tr>");
+			QuerySpecificationsNode qsn = (QuerySpecificationsNode) this.children.get(0);
+			if (qsn.children.size() > 0) {
+				pw.println("<tr>");
+				for (Node c : qsn.children) {
+					pw.println("<td>");
+					pw.println("<div>^</div>");
+					c.writeHtml(pw);
+					pw.println("</td>");
+				}
+				pw.println("</tr>");
+			}
+			pw.println("</td></tr>");
+			pw.println("</table>");
+			
+		}
+	}
+	
+	// collection node
+	public static class QuerySpecificationsNode extends Node {
+		public QuerySpecificationsNode() {
+			super("query_specifications", true);
+		}
+		protected void writeHtml(PrintWriter pw) {
+			throw new IllegalStateException("didn't expect that");
+		}
+	}
+	
+	public static class QuerySpecificationNode extends Node {
+		public QuerySpecificationNode() {
+			super("query_specification", false);
+		}
+		protected void writeHtml(PrintWriter pw) {
+			// attributes of this node don't appear in the diagram
+			QueryBlockNode qbn = (QueryBlockNode) children.get(0);
+			qbn.writeHtml(pw);
+		}
+	}
+	
+	public static class DuplicatesRemovalNode extends Node {
+		public DuplicatesRemovalNode() {
+			super("duplicates_removal", false); 
+		}
+		protected void writeHtml(PrintWriter pw) {
+			pw.println("<table display=\"display: inline-table;\">"); // of course it is
+			pw.println("<tr><td style=\"background-color: yellow;\">DISTINCT</td></tr>"); // tooltip: tableName, usingTemporaryTable: true
+			pw.println("<tr><td>tmp table</td></tr>");
+			if (this.children.size() > 0) {
+				pw.println("<tr>");
+				for (Node c : this.children) {
+					pw.println("<td>");
+					pw.println("<div>^</div>");
+					c.writeHtml(pw);
+					pw.println("</td>");
+				}
+				pw.println("</tr>");
+			}
+			pw.println("</td></tr>");
+			pw.println("</table>");
+		}
+	}
+	
+	public static class NestedLoopNode extends Node {
+		public NestedLoopNode() {
+			super("nested_loop", true);
+		}
+		
+		protected void writeHtml(PrintWriter pw) {
+			pw.println("<table display=\"display: inline-table;\">"); // of course it is
+			if (this.children.size() > 0) {
+				pw.println("<tr>");
+				for (Node c : this.children) {
+					pw.println("<td>");
+					pw.println("<div>nested loop</div>"); // tooltip: prefix cost
+					pw.println("</td>");
+				}
+				pw.println("</tr>");
+			}
+			if (this.children.size() > 0) {
+				pw.println("<tr>");
+				for (Node c : this.children) {
+					pw.println("<td>");
+					pw.println("<div>^</div>");
+					c.writeHtml(pw);
+					pw.println("</td>");
+				}
+				pw.println("</tr>");
+			}
+			pw.println("</td></tr>");
+			pw.println("</table>");
+		}
+	}
+	
+	public static class TableNode extends Node {
+		public TableNode() {
+			super("table", false);
+		}
+		
+		protected void writeHtml(PrintWriter pw) {
+			pw.println("<table display=\"display: inline-table;\">"); // of course it is
+			pw.println("<tr><td style=\"background-color: red\">TABLE</td></tr>");
+			pw.println("</table>");
+			// @TODO attached subqueries
+		}
+	}
+	
+	public static class AttachedSubqueriesNode extends Node {
+		public AttachedSubqueriesNode() {
+			super("attached_subqueries", true);
+		}
+		
+		protected void writeHtml(PrintWriter pw) {
+			// @TODO this bit
+		}
+	}
+	
+	
+	
 	
 	public static class ExplainDiagram {
 		/* #
@@ -203,7 +359,7 @@ public class Explainer {
 
 		// query_block
 		private Node parseQueryBlock(JSONObject obj) {
-			Node n = new Node("query_block", false);
+			Node n = new QueryBlockNode();
 			n.attributes.put("selectId", obj.get("select_id"));
 			n.attributes.put("message", obj.get("message"));
 			if (obj.containsKey("cost_info")) { n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info"))); }
@@ -234,12 +390,12 @@ public class Explainer {
 
 		
 		private Node parseUnionResult(JSONObject obj) {
-			Node n = new Node("union_result", false); // TODO subtypes
+			Node n = new UnionResultNode();
 			n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table"));
 			n.attributes.put("tableName", obj.get("table_name"));
 			n.attributes.put("accessType", obj.get("access_type"));
 			if (obj.containsKey("query_specifications")) {
-				Node sn = new Node("query_specifications", true);
+				Node sn = new QuerySpecificationsNode();
 				n.addChild(sn);
 				JSONArray qs = (JSONArray) obj.get("query_specifications");
 				for (Object o : qs) {
@@ -254,7 +410,7 @@ public class Explainer {
 		}
 		
 		private Node parseQuerySpecification(JSONObject obj) {
-			Node n = new Node("query_specification", false);
+			Node n = new QuerySpecificationNode();
 			n.attributes.put("dependent", obj.get("dependent"));
 			n.attributes.put("cacheable", obj.get("cacheable"));
 			if (obj.containsKey("query_block")) {
@@ -267,14 +423,14 @@ public class Explainer {
 		}
 		
 		private Node parseDuplicatesRemoval(JSONObject obj) {
-			Node n = new Node("duplicates_removal", false); // TODO subtypes
+			Node n = new DuplicatesRemovalNode();
 			n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table"));
 			n.attributes.put("usingFilesort", obj.get("using_filesort"));
 			// n.attributes.put("selectId", obj.get("select_id"));
 			// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
-			// 
+			
 			if (obj.containsKey("nested_loop")) {
-				Node sn = new Node("nested_loop", true);
+				Node sn = new NestedLoopNode();
 				n.addChild(sn);
 				JSONArray loopItems = (JSONArray) obj.get("nested_loop");
 				for (Object o : loopItems) {
@@ -300,7 +456,7 @@ public class Explainer {
 		}
 		
 		private Node parseTable(JSONObject obj) {
-			Node n = new Node("table", false); // TODO subtypes
+			Node n = new TableNode();
 			n.attributes.put("tableName", obj.get("table_name"));
 			n.attributes.put("distinct", obj.get("distinct")); // boolean
 			n.attributes.put("accessType", obj.get("access_type")); // "ALL", "ref", "eq_ref"
@@ -320,7 +476,7 @@ public class Explainer {
 			if (obj.containsKey("cost_info")) { n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info"))); }
 			n.attributes.put("attachedCondition", obj.get("attached_condition"));
 			if (obj.containsKey("attached_subqueries")) {
-				Node sn = new Node("attached_subqueries", true);
+				Node sn = new AttachedSubqueriesNode();
 				n.addChild(sn);
 				JSONArray qs = (JSONArray) obj.get("attached_subqueries");
 				for (Object o : qs) {
@@ -336,6 +492,17 @@ public class Explainer {
 		public String toJson() {
 			
 			return "{ \"" + Text.escapeJavascript(topNode.t) + "\": " + topNode.toJson() + "}";
+		}
+
+		public void writeHtml(PrintWriter pw) {
+			pw.println("<html>");
+			pw.println("<head><title>Here we go</title></head>");
+			pw.println("<body>");
+			topNode.writeHtml(pw);
+			
+			pw.println("</body></html>");
+			
+			
 		}
 		
 	}
@@ -382,6 +549,15 @@ public class Explainer {
 		// System.out.println(out1.toString());
 		out2.close();
 		
+
+		
+		FileOutputStream outHtml = new FileOutputStream("c:\\temp\\out2.html");
+		pw = new PrintWriter(outHtml);
+		ec.writeHtml(pw);
+		pw.flush();
+		// System.out.println(out1.toString());
+		out2.close();
+
 		
 		
 		// @TODO roundtrip it and see what broke
