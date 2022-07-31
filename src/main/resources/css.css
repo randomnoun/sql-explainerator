@@ -10,8 +10,8 @@ TD {
 }
 div.queryBlock {
     display: inline-block;
-    width: 100px; height: 40px;
-    line-height: 40px;
+    width: 100px; height: 33px;
+    line-height: 33px;
     border: solid 1px black;
     text-align: center;
      
@@ -21,8 +21,8 @@ div.queryBlock.topNode {
 }	
 div.union {
     display: block;
-    width: 100%; height: 30px;
-    line-height: 30px;
+    width: 100%; height: 26px;
+    line-height: 26px;
     border: solid 1px black;
     text-align: center;
     background-color: #b3b3b3;
@@ -37,7 +37,7 @@ div.duplicatesRemoval { /* DISTINCT */
 }
 div.attachedSubqueries {
     display: inline-block;
-    width: 100px; height: 40px;
+    width: 150px; height: 40px;
     line-height: 40px;
     text-align: center;
     border: dotted 1px black;

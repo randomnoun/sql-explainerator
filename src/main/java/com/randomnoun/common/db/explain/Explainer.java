@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,6 @@ public class Explainer {
 	}
 
 	private static class NameList extends ArrayList<String> implements Struct.ToJson {
-
 		@Override
 		public String toJson() {
 			String s = "[";
@@ -63,7 +61,6 @@ public class Explainer {
 			s += "]";
 			return s;
 		}
-	
 	}
 	
 	private static class CostInfo implements Struct.ToJson {
@@ -130,7 +127,6 @@ public class Explainer {
 		public void addChild(Node c) {
 			children.add(c);
 		}
-		
 		public String toJson() {
 			String s;
 			if (isArray) {
@@ -187,6 +183,30 @@ public class Explainer {
 			}
 			return s;
 		}
+		
+		public long getHtmlBlockWidth() {
+			// assume each child is side-by-side, override when it isn't
+			long childBlockWidth = children.stream()
+				.reduce((long) 0, (w, c) -> { return w + c.getHtmlBlockWidth(); }, Long::sum);
+			return Math.max(1, childBlockWidth);
+		}
+		
+		public long getPixelWidth() {
+			// assume each child is side-by-side, override when it isn't
+			long childPixelWidth = children.stream()
+				.reduce((long) 0, (w, c) -> { return w + c.getPixelWidth(); }, Long::sum);
+			return Math.max(180, childPixelWidth);
+		}
+		
+		public long getLeftPaddingPixelWidth() {
+			// left padding on the first TD in the html for this node
+			// think this is probably over-engineering to the particular query I'm looking at right now
+			// override for nodes that don't have entry branches from the middle of the TD
+			long leftPaddingPixelWidth = children.stream()
+					.reduce((long) 0, (w, c) -> { return w + c.getPixelWidth(); }, Long::sum);
+			return Math.max(0, leftPaddingPixelWidth);
+		}
+		
 		protected abstract void writeHtml(PrintWriter pw);
 		
 		protected Stream<Node> reverseStream(List<Node> children) {
@@ -206,9 +226,17 @@ public class Explainer {
 		public QueryBlockNode() {
 			super("query_block", false);
 		}
+
+		@Override
+		public long getLeftPaddingPixelWidth() {
+			// so the theory is that I don't need to extend padding across query blocks
+			return 0;
+		}
+
+		
+		
 		@Override
 		protected void writeHtml(PrintWriter pw) {
-			// the things that a query block does
 			pw.println("<table display=\"display: inline-table;\">"); // of course it is
 			CostInfo ci = (CostInfo) this.attributes.get("costInfo");
 			if (ci != null) {
@@ -216,13 +244,16 @@ public class Explainer {
 			}
 			String label = "query_block" + (selectId == null ? "" : " #" + selectId);
 			String clazz = (selectId == null ? " topNode" : "");
-			pw.println("<tr><td><div class=\"queryBlock " + clazz + "\">" + label + "</div></td></tr>"); // tooltip = select ID & query cost
+			long lp = super.getLeftPaddingPixelWidth();
+			String leftPad = lp == 0 ? "" : " style=\"padding-left: " + lp + ";\"";
+			
+			pw.println("<tr><td" + leftPad + "><div class=\"queryBlock " + clazz + "\">" + label + "</div></td></tr>"); // tooltip = select ID & query cost
 			if (message != null) {
-				pw.println("<tr><td>" + message + "</td></tr>");
+				pw.println("<tr><td" + leftPad + ">" + message + "</td></tr>");
 			}
 			// the thing inside the query block
 			if (this.children.size() > 0) {
-				pw.println("<tr><td><div class=\"upArrow\"></div></td></tr>");
+				pw.println("<tr><td" + leftPad + "><div class=\"upArrow\"></div></td></tr>");
 				pw.println("<tr>");
 				reverseStream(children).forEach( c -> {
 					pw.println("<td>");
@@ -323,6 +354,15 @@ public class Explainer {
 		// probably need a getWidth() on nodes
 		// so that we can align things above them properly
 		
+		public long getLeftPaddingPixelWidth() {
+			// pixel width of child nodes 0 to n-1
+			int leftPad = 0; // should be getting this from npm really. boom boom.
+			for (int i = 0; i < this.children.size() - 1; i++) {
+				leftPad += this.children.get(i).getPixelWidth();
+			}
+			return leftPad;
+		}
+		
 		protected void writeHtml(PrintWriter pw) {
 			pw.println("<table display=\"display: inline-table;\">"); // of course it is
 			
@@ -345,8 +385,14 @@ public class Explainer {
 					} else {
 						pw.println("<td><div class=\"queryCost\">");
 						pw.println(c.costInfo==null || c.costInfo.prefixCost == null ? "" : c.costInfo.prefixCost);
-
-						pw.println("</div></td>");
+						pw.println("</div>");
+						if (i == this.children.size() - 1) {
+							pw.println("<div class=\"rhsQueryCost\">" +
+								(c.rowsProducedPerJoin == null ? "" : c.rowsProducedPerJoin + 
+									(c.rowsProducedPerJoin == 1 ? " row" : " rows")) +
+								"</div>"); // gap for right arrow
+						}						
+						pw.println("</td>");
 						if (i < this.children.size() - 1) {
 							pw.println("<td></td>"); // gap for right arrow
 						}
@@ -361,10 +407,7 @@ public class Explainer {
 					TableNode c = (TableNode) this.children.get(i);
 					if (i == 0) {
 						pw.println("<td>");
-						// probably going to have to use SVG here aren't I
-						// holy crap I can't believe that almost worked
 						pw.println("<svg width=\"60\" height=\"60\"></svg>");
-						// pw.println("<div>nested loop</div>"); // tooltip: prefix cost
 						pw.println("</td>");
 						pw.println("<td class=\"rightArrow\"><div class=\"rightArrow\"></div>");
 						pw.println("</td>");
@@ -404,7 +447,6 @@ public class Explainer {
 					} else {
 						// that bit.
 						pw.println("<td>"); // gap for right arrow
-						// pw.println("THE ATTACHED SUBQUERY");
 						c.attachedSubqueries.writeHtml(pw);
 						pw.println("</td>");
 					}
