@@ -28,11 +28,15 @@ import com.randomnoun.common.log4j.Log4jCliConfiguration;
  * 
  * TODO: run a bunch of query plans and see what kinds of images it produces.
  * 
+ * ok so I think I'm going to have to use SVG at some stage so let's do that
+ * also, roundtrip all the examples at https://github.com/joelsotelods/sakila-db-queries
+ * since I should be able to bundle all those into a unit test without tripping over any licensing issues 
+ * 
  */
 
-public class Explainer {
+public class ExplainerSvg {
 
-	static Logger logger = Logger.getLogger(Explainer.class);
+	static Logger logger = Logger.getLogger(ExplainerSvg.class);
 	
 	private static enum AccessTypeEnum {
 		FULL_TABLE_SCAN("ALL"),
@@ -184,6 +188,7 @@ public class Explainer {
 			return s;
 		}
 		
+		/*
 		public long getHtmlBlockWidth() {
 			// assume each child is side-by-side, override when it isn't
 			long childBlockWidth = children.stream()
@@ -208,6 +213,7 @@ public class Explainer {
 		}
 		
 		protected abstract void writeHtml(PrintWriter pw);
+		*/
 		
 		protected Stream<Node> reverseStream(List<Node> children) {
 			// why the hell isn't this on https://stackoverflow.com/questions/24010109/java-8-stream-reverse-order 
@@ -227,13 +233,11 @@ public class Explainer {
 			super("query_block", false);
 		}
 
+		/*
 		@Override
 		public long getLeftPaddingPixelWidth() {
-			// so the theory is that I don't need to extend padding across query blocks
 			return 0;
 		}
-
-		
 		
 		@Override
 		protected void writeHtml(PrintWriter pw) {
@@ -265,6 +269,7 @@ public class Explainer {
 			pw.println("</td></tr>");
 			pw.println("</table>");
 		}
+		*/
 	}
 	
 	public static class UnionResultNode extends Node {
@@ -272,6 +277,8 @@ public class Explainer {
 		public UnionResultNode() {
 			super("union_result", false); // TODO subtypes
 		}
+		
+		/*
 		protected void writeHtml(PrintWriter pw) {
 			QuerySpecificationsNode qsn = (QuerySpecificationsNode) this.children.get(0);
 			
@@ -294,6 +301,7 @@ public class Explainer {
 			pw.println("</table>");
 			
 		}
+		*/
 	}
 	
 	// collection node
@@ -310,11 +318,13 @@ public class Explainer {
 		public QuerySpecificationNode() {
 			super("query_specification", false);
 		}
+		/*
 		protected void writeHtml(PrintWriter pw) {
 			// attributes of this node don't appear in the diagram
 			QueryBlockNode qbn = (QueryBlockNode) children.get(0);
 			qbn.writeHtml(pw);
 		}
+		*/
 	}
 	
 	public static class DuplicatesRemovalNode extends Node {
@@ -322,6 +332,7 @@ public class Explainer {
 		public DuplicatesRemovalNode() {
 			super("duplicates_removal", false); 
 		}
+		/*
 		protected void writeHtml(PrintWriter pw) {
 			pw.println("<table display=\"display: inline-table;\">"); // of course it is
 			pw.println("<tr><td><div class=\"duplicatesRemoval\">DISTINCT</div></td></tr>"); // tooltip: tableName, usingTemporaryTable: true
@@ -344,6 +355,7 @@ public class Explainer {
 			pw.println("</td></tr>");
 			pw.println("</table>");
 		}
+		*/
 	}
 	
 	public static class NestedLoopNode extends Node {
@@ -353,7 +365,7 @@ public class Explainer {
 		
 		// probably need a getWidth() on nodes
 		// so that we can align things above them properly
-		
+		/*
 		public long getLeftPaddingPixelWidth() {
 			// pixel width of child nodes 0 to n-1
 			int leftPad = 0; // should be getting this from npm really. boom boom.
@@ -456,6 +468,7 @@ public class Explainer {
 			pw.println("</td></tr>");
 			pw.println("</table>");
 		}
+		*/
 	}
 	
 	public static class TableNode extends Node {
@@ -470,7 +483,7 @@ public class Explainer {
 		public TableNode() {
 			super("table", false);
 		}
-		
+		/*
 		protected void writeHtml(PrintWriter pw) {
 			pw.println("<table display=\"display: inline-table;\">"); // of course it is
 			pw.println("<tr><td><div class=\"lhsQueryCost\">");
@@ -504,6 +517,7 @@ public class Explainer {
 			pw.println("</table>");
 			// @TODO attached subqueries
 		}
+		*/
 	}
 	
 	public static class AttachedSubqueriesNode extends Node {
@@ -513,6 +527,7 @@ public class Explainer {
 			super("attached_subqueries", true);
 		}
 		
+		/*
 		protected void writeHtml(PrintWriter pw) {
 			pw.println("<table display=\"display: inline-table;\">"); // of course it is
 			pw.println("<tr><td><div class=\"leftArrow\"></div></td>");
@@ -531,6 +546,7 @@ public class Explainer {
 			pw.println("</table>");
 			
 		}
+		*/
 	}
 	
 
@@ -713,12 +729,13 @@ public class Explainer {
 			return "{ \"" + Text.escapeJavascript(topNode.t) + "\": " + topNode.toJson() + "}";
 		}
 
+		/*
 		public void writeHtml(PrintWriter pw) {
 			pw.println("<html>");
 			pw.println("<head><title>Here we go</title>");
 			pw.println("<style>");
 			
-			InputStream is = Explainer.class.getResourceAsStream("/css.css");
+			InputStream is = ExplainerSvg.class.getResourceAsStream("/css.css");
 			String s;
 			try {
 				s = new String(StreamUtil.getByteArray(is));
@@ -738,11 +755,12 @@ public class Explainer {
 			
 			
 		}
+		*/
 		
 	}
 	
 	
-	public Explainer() {
+	public ExplainerSvg() {
 		
 	}
 	
@@ -754,7 +772,7 @@ public class Explainer {
 		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
 		lcc.init("[explain-to-image]", null);
 		
-		InputStream is = Explainer.class.getResourceAsStream("/somequery.json");
+		InputStream is = ExplainerSvg.class.getResourceAsStream("/sakila-7g.json");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
 		StreamUtil.copyStream(is, baos);
 		String json = baos.toString();
@@ -784,13 +802,14 @@ public class Explainer {
 		out2.close();
 		
 
-		
+		/*
 		FileOutputStream outHtml = new FileOutputStream("c:\\temp\\out2.html");
 		pw = new PrintWriter(outHtml);
 		ec.writeHtml(pw);
 		pw.flush();
 		// System.out.println(out1.toString());
 		out2.close();
+		*/
 
 		
 		
