@@ -1208,8 +1208,17 @@ public class ExplainerSvg {
 		@Override
 		public void preVisit(Box b) {
 			String s = "";
+			if (indent==0) {
+				s = "<svg width=\"" + b.width + "\" height=\"" + b.height + "\">\n";
+				indent += 4;
+			}
 			for (int i=0; i<indent; i++) { s += " "; }
-			s += "<g>\n"; // SVG group
+			
+			// could use absolute pos instead of relative but this way it might be easier
+			// to cut out a snippet of the full diagram
+			// although still have to connect things inside the transform to outside the transform, so maybe not.
+			
+			s += "<g transform==\"translate(" + b.posX + ", " + b.posY+")\">\n"; // SVG group
 			pw.print(s);
 		}
 
@@ -1218,17 +1227,21 @@ public class ExplainerSvg {
 			// TODO Auto-generated method stub
 			String s = "";
 			for (int i=0; i<indent; i++) { s += " "; }
-			s += "  <the node>\n"; // node
+			s += "    <the node>\n"; // node
 			pw.print(s);
 			indent += 4;
 		}
 
 		@Override
 		public void postVisit(Box b) {
-			indent -= 4;
 			String s = "";
+			indent -= 4;
 			for (int i=0; i<indent; i++) { s += " "; }
 			s += "</g>\n"; // end SVG group
+			if (indent==4) {
+				indent -= 4;
+				s += "</svg>\n";
+			}
 			pw.print(s);
 		}
 		
