@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -21,6 +22,7 @@ import org.json.simple.parser.ParseException;
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Struct;
 import com.randomnoun.common.Text;
+import com.randomnoun.common.db.explain.ExplainerSvg.Box;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 /* Based on the explain renderer in MySQL Workbench, although it turns out that that code is GPLed
@@ -39,9 +41,10 @@ public class ExplainerSvg {
 	static Logger logger = Logger.getLogger(ExplainerSvg.class);
 	
 	private static enum AccessTypeEnum {
-		FULL_TABLE_SCAN("ALL"),
-		NON_UNIQUE_KEY("ref"),
-		UNIQUE_KEY("eq_ref");
+		FULL_TABLE_SCAN("ALL"), // red
+		FULL_INDEX_SCAN("index"), // red
+		NON_UNIQUE_KEY("ref"), // green
+		UNIQUE_KEY("eq_ref"); // green
 		private String jsonValue;
 		private AccessTypeEnum(String jsonValue) {
 			this.jsonValue = jsonValue;
@@ -119,17 +122,20 @@ public class ExplainerSvg {
 	
 	
 	public static abstract class Node implements Struct.ToJson {
-		private String t;
+		private String jsonType;
 		private boolean isArray;
 		protected Map<String, Object> attributes = new HashMap<>();
 		protected List<Node> children = new ArrayList<>();
 		
-		public Node(String t, boolean isArray) {
-			this.t = t;
+		public Node(String jsonType, boolean isArray) {
+			this.jsonType = jsonType;
 			this.isArray = isArray;
 		}
 		public void addChild(Node c) {
 			children.add(c);
+		}
+		public String getJsonType() { 
+			return jsonType;
 		}
 		public String toJson() {
 			String s;
@@ -142,7 +148,7 @@ public class ExplainerSvg {
 				for (int i=0; i<children.size(); i++) {
 					Node c = children.get(i);
 					s += (i==0 ? "" : ", ") + // children.get(i).toJson();
-						"{ \"" + Text.escapeJavascript(c.t) + "\": " + c.toJson() + "}";
+						"{ \"" + Text.escapeJavascript(c.jsonType) + "\": " + c.toJson() + "}";
 				}
 				s += "]";
 				
@@ -168,7 +174,7 @@ public class ExplainerSvg {
 				for (Object v : children) {
 					if (v instanceof Node) {
 						Node n = (Node) v;
-						s += (f == true ? "": ", ") + "\"" + Text.escapeJavascript(n.t) + "\": " + n.toJson(); // -CHILD 
+						s += (f == true ? "": ", ") + "\"" + Text.escapeJavascript(n.jsonType) + "\": " + n.toJson(); // -CHILD 
 					} else {
 						remaining.add(v);
 					}
@@ -228,6 +234,8 @@ public class ExplainerSvg {
 		
 		public Object selectId;
 		public Object message;
+		public CostInfo costInfo;
+		public Node queryNode;
 		
 		public QueryBlockNode() {
 			super("query_block", false);
@@ -274,6 +282,7 @@ public class ExplainerSvg {
 	
 	public static class UnionResultNode extends Node {
 		public String tableName;
+		public List<QuerySpecificationNode> querySpecifications;
 		public UnionResultNode() {
 			super("union_result", false); // TODO subtypes
 		}
@@ -304,13 +313,24 @@ public class ExplainerSvg {
 		*/
 	}
 	
+	/*
 	// collection node
-	public static class QuerySpecificationsNode extends Node {
+	public static class QuerySpecificationsNode extends ListNode {
 		public QuerySpecificationsNode() {
 			super("query_specifications", true);
 		}
 		protected void writeHtml(PrintWriter pw) {
 			throw new IllegalStateException("didn't expect that");
+		}
+	}
+	*/
+	
+	public static class ListNode extends Node {
+		public ListNode(String name, List<? extends Node> children) {
+			super(name, true);
+			for (Node n : children) {
+				this.children.add(n);
+			}
 		}
 	}
 	
@@ -329,6 +349,7 @@ public class ExplainerSvg {
 	
 	public static class DuplicatesRemovalNode extends Node {
 		public Boolean usingTemporaryTable;
+		public NestedLoopNode nestedLoop;
 		public DuplicatesRemovalNode() {
 			super("duplicates_removal", false); 
 		}
@@ -358,7 +379,27 @@ public class ExplainerSvg {
 		*/
 	}
 	
+	public static class OrderingOperationNode extends Node {
+		public boolean usingTemporaryTable = false;
+		public NestedLoopNode nestedLoop;
+		public OrderingOperationNode() {
+			super("ordering_operation", false); 
+		}
+	}
+	
+	public static class GroupingOperationNode extends Node {
+		public boolean usingFilesort = false;
+		public NestedLoopNode nestedLoop;
+		public GroupingOperationNode() {
+			super("gouping_operation", false); 
+		}
+	}
+
+	
 	public static class NestedLoopNode extends Node {
+		
+		public List<TableNode> tables = new ArrayList<>();
+		
 		public NestedLoopNode() {
 			super("nestedLoop", true);
 		}
@@ -479,6 +520,7 @@ public class ExplainerSvg {
 		public Long rowsExaminedPerScan;
 		public Long rowsProducedPerJoin;
 		public AttachedSubqueriesNode attachedSubqueries;
+		public MaterialisedFromSubqueryNode materialisedFromSubquery;
 
 		public TableNode() {
 			super("table", false);
@@ -549,26 +591,303 @@ public class ExplainerSvg {
 		*/
 	}
 	
+	public static class MaterialisedFromSubqueryNode extends Node {
+		public QuerySpecificationNode querySpecification;
 
+		public MaterialisedFromSubqueryNode() {
+			super("materialized_from_subquery", false);
+		}
+	}
 	
-	
-	
-	public static class ExplainDiagram {
 
-		private Node topNode;
+	public static class BoxVisitor {
+		
+		// before node or children have been traversed
+		public void preVisit(Box b) {
+			
+		};
+
+		// traverse a node
+		public void visit(Box b) {
+			
+		};
+
+		// after children have been traversed
+		public void postVisit(Box b) {
+			
+		};
+
+	}
+	
+	public static class Box {
+		Box parent;
+		
+		int posX = 0, posY = 0; // relative to parent
+		int width, height;
+		
+		String edgeType;
+		int edgeX, edgeY;
+		
+		List<Box> children = new ArrayList<Box>();
+		
+		public void setParent(Box parent, String edgeType, int edgeX, int edgeY) {
+			this.parent = parent;
+			this.edgeType = edgeType;
+			this.edgeX = edgeX;
+			this.edgeY = edgeY;
+			
+			// add child links at the same time
+			parent.children.add(this);
+		}
+		public void setParentAndPosition(Box parent, int posX, int posY) {
+			this.parent = parent;
+			this.posX = posX;
+			this.posY = posY;
+			// add child links at the same time
+			parent.children.add(this);
+		}
+		public void setPosition(int posX, int posY) {
+			this.posX = posX;
+			this.posY = posY;
+		}
+		public void setEdgeStartPosition(int edgeX, int edgeY) {
+			this.edgeX = edgeX;
+			this.edgeY = edgeY;
+		}
+		
+		public int getWidth() { 
+			return width; 
+		}
+		public int getHeight() { 
+			return height; 
+		}
+		
+		public void traverse(BoxVisitor visitor) {
+			visitor.preVisit(this);
+			visitor.visit(this);
+			for (Box c : children) {
+				c.traverse(visitor);
+			}
+			visitor.postVisit(this);
+		}
+		
+	}
+	
+	public static class ContainerBox extends Box {
+		int edgeStartX;
+		int edgeStartY;
+		public ContainerBox(int width, int height) {
+			this.width = width;
+			this.height = height;
+		}
+		public void addAll(List<Box> children) {
+			this.children.addAll(children);
+		}
+	}
+	
+	public static class LabelBox extends Box {
+		String label;
+		public LabelBox(String label, int width, int height) {
+			this.label = label;
+			this.width = width;
+			this.height = height;
+		}
+		
+		
+	}
+	
+	public static class Layout {
+		private QueryBlockNode topNode;
+		public Layout(QueryBlockNode topNode) {
+			this.topNode = topNode;
+			
+			// so I'm either going to be all the layout logic in here
+			// or split it across the parsed nodes.
+			// so which am I going to prefer
+			//   if (ThisKIndOfNode) { doThis }
+			// or
+			//   ThisKindOfNode.doThis
+			// how about
+			//   doThis(node)
+			
+			// let's see how we go
+			// layout(topNode);
+		}
+		
+		public Box getLayoutBox() {
+			Box b = layout(topNode);
+			// probably need to reposition everything so that it starts at 0,0
+			return b;
+		}
+
+		// make these all protected later
+		public Box layout(QueryBlockNode n) {
+			Box b = new LabelBox("query_node", 100, 30);
+			Node c = n.queryNode; // 1 child only
+			// Box cb = layout(c); // this should do the polymorphic thing shouldn't it ?
+			Box cb;
+			// not happy about this
+			if (c instanceof UnionResultNode) { cb = layout((UnionResultNode) c); }
+			else if (c instanceof DuplicatesRemovalNode) { cb = layout((DuplicatesRemovalNode) c); }
+			else if (c instanceof TableNode) { cb = layout((TableNode) c); }
+			else if (c instanceof OrderingOperationNode) { cb = layout((OrderingOperationNode) c); }
+			else if (c instanceof GroupingOperationNode) { cb = layout((GroupingOperationNode) c); }
+			else {
+				throw new IllegalStateException("unexpected class " + c.getClass().getName() + " in QueryBlockNode");
+			}
+			
+			cb.setParent(b, "up", 50, 30);
+			return b;
+		}
+		
+		public Box layout(UnionResultNode n) {
+			List<Box> boxes = new ArrayList<Box>();
+			List<QuerySpecificationNode> qsnList = n.querySpecifications;
+			
+			int totalWidth = reverseStream(qsnList)
+				.map(c -> layout(c))
+				.peek(b -> { boxes.add(b); })
+				.mapToInt(b -> b.getWidth() )
+				.sum();
+			
+			totalWidth += (boxes.size() - 1) * 20; // 20px padding
+			
+			Box b = new LabelBox("UNION", totalWidth, 30);
+			int offset = 0;
+			for (Box cb : boxes) {
+				int w = cb.getWidth();
+				cb.setParent(b, "up", offset + (w / 2), 30);
+				offset += w + 20;
+			}
+			
+			return b;
+		}
+		
+		public Box layout(DuplicatesRemovalNode n) {
+			// return null;
+			Box b = new LabelBox("DISTINCT", 80, 50);
+			if (n.usingTemporaryTable) {
+				Box ttBox = new LabelBox("tmp table", 80, 20);
+				ttBox.setParentAndPosition(b, 60, 55);
+			}
+			
+			NestedLoopNode nln = n.nestedLoop; // 1 child only
+			Box cb = layout(nln);
+			cb.setParent(b, "up", 40, 50);
+			return b;
+		}
+		
+		public Box layout(NestedLoopNode n) {
+			List<Box> nestedLoopBoxes = new ArrayList<Box>();
+			List<TableNode> qsnList = n.tables;
+			
+			List<Box> tableBoxes = reverseStream(qsnList)
+				.map(c -> layout(c))
+				.collect(Collectors.toList());
+			List<Integer> tableWidths = tableBoxes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
+			List<Integer> tableHeights = tableBoxes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+			
+			int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
+				+ (tableBoxes.size() - 1) * 20; // 20px padding
+			int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
+			
+			int offset = 0;
+			for (int i = 0; i < tableBoxes.size(); i++) {
+				Box tb = tableBoxes.get(i);
+				tb.setPosition(offset, 50);
+				offset += tableWidths.get(i) + 20;
+			}
+			 
+					
+			Box prevNestedLoopBox = null;
+			for (int i = 1 ; i < tableBoxes.size(); i++) {
+				Box tb = tableBoxes.get(i);
+				Box b = new LabelBox("nested loop", 30, 30); // diamond
+				b.setPosition(tb.posX + (tableWidths.get(i)/2) - 15, 0); // centered above table beneath it
+				nestedLoopBoxes.add(b);
+				if (i == 1) {
+					Box firstTableBox = tableBoxes.get(0);
+					firstTableBox.setParent(b, "upRight", 0, 15);
+				} else {
+					prevNestedLoopBox.setParent(b, "right", 0, 15);
+					prevNestedLoopBox.setEdgeStartPosition(30, 15);
+				}
+				Box tableBox = tableBoxes.get(i);
+				tableBox.setParent(b,  "up", 15, 30);
+				
+				prevNestedLoopBox = b;
+				// @TODO add costInfo labels onto those edges
+			}
+
+			// @TODO set offsets for all of those
+			ContainerBox bigBox = new ContainerBox(totalWidth, maxHeight + 200); // for the nested loop diamonds
+			bigBox.addAll(nestedLoopBoxes);
+			bigBox.addAll(tableBoxes);
+			bigBox.setEdgeStartPosition(prevNestedLoopBox.posX + 15, prevNestedLoopBox.posY); 
+			return bigBox;
+		}
+				
+		public Box layout(TableNode n) {
+			Box b = new LabelBox("table", 100, 30);
+			// TODO attached subqueries ( linked off rhs )
+			// TODO materialisedFromSubquery ( nested within table box )
+			
+			// Node c = n.queryNode; // 1 child only
+			// Box cb = layout(c);
+			// cb.setParent(b, "up", 50, 30);
+			return b;
+			
+		}
+		public Box layout(OrderingOperationNode n) {
+			Box b = new LabelBox("ORDER", 80, 50);
+			if (n.usingTemporaryTable) {
+				Box ttBox = new LabelBox("tmp table", 80, 20);
+				ttBox.setParentAndPosition(b, 60, 55);
+			}
+			
+			NestedLoopNode nln = n.nestedLoop; // 1 child only
+			Box cb = layout(nln);
+			cb.setParent(b, "up", 40, 50);
+			return b;
+		}
+		public Box layout(GroupingOperationNode n) {
+			Box b = new LabelBox("GROUP", 80, 50);
+			NestedLoopNode nln = n.nestedLoop; // 1 child only
+			Box cb = layout(nln);
+			cb.setParent(b, "up", 40, 50);
+			return b;
+		}
+		
+		public Box layout(Node n) {
+			throw new UnsupportedOperationException("layout for node " + n.getClass().getName() + " not implemented");
+		}
+		
+		protected <T> Stream<T> reverseStream(List<T> children) {
+			// why the hell isn't this on https://stackoverflow.com/questions/24010109/java-8-stream-reverse-order 
+			// ?
+			return IntStream.range(0, children.size())
+				.mapToObj(i -> children.get(children.size() - i - 1)); 
+		}
+
+		
+	}
+	
+	public static class PlanParser {
+
+		private QueryBlockNode topNode;
 		String json;
 		
-		public ExplainDiagram(String json, String server_version) throws ParseException {
+		public PlanParser(String json, String server_version) throws ParseException {
 			this.json = json;
 			this.topNode = getNode(json);
 		}
 		
-		public Node getNode(String json) throws ParseException {
+		public QueryBlockNode getNode(String json) throws ParseException {
 			JSONParser jp = new JSONParser();
 			JSONObject obj = (JSONObject) jp.parse(json);
 			
 			// ok then
-			Node n;
+			QueryBlockNode n;
 			if (obj.containsKey("query_block")) {
 				n = parseQueryBlock((JSONObject) obj.get("query_block"));
 			} else {
@@ -578,25 +897,44 @@ public class ExplainerSvg {
 		}
 
 		// query_block
-		private Node parseQueryBlock(JSONObject obj) {
+		private QueryBlockNode parseQueryBlock(JSONObject obj) {
 			QueryBlockNode n = new QueryBlockNode();
 			n.selectId = toLong(obj.get("select_id"));
 			n.message = obj.get("message");
 			
 			n.attributes.put("selectId", obj.get("select_id"));
 			n.attributes.put("message", obj.get("message"));
-			if (obj.containsKey("cost_info")) { n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info"))); }
+			if (obj.containsKey("cost_info")) {
+				n.costInfo = parseCostInfo((JSONObject) obj.get("cost_info"));
+				n.attributes.put("costInfo", n.costInfo); 
+			}
+			
+			// ok so my theory is that the qbn can contain exactly one of these things
+			// which is always drawn underneath the query block rectangle
 			
 			if (obj.containsKey("union_result")) {
 				Node cn = parseUnionResult((JSONObject) obj.get("union_result"));
+				n.queryNode = cn;
 				n.addChild(cn);
 			} else if (obj.containsKey("duplicates_removal")) { // DISTINCT node
 				Node cn = parseDuplicatesRemoval((JSONObject) obj.get("duplicates_removal"));
+				n.queryNode = cn;
 				n.addChild(cn);
 				// other nodes
 			} else if (obj.containsKey("table")) {
 				Node cn = parseTable((JSONObject) obj.get("table"));
+				n.queryNode = cn;
 				n.addChild(cn);
+			} else if (obj.containsKey("ordering_operation")) {
+				Node cn = parseOrderingOperation((JSONObject) obj.get("ordering_operation"));
+				n.queryNode = cn;
+				n.addChild(cn);
+			} else if (obj.containsKey("grouping_operation")) {
+				Node cn = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
+				n.queryNode = cn;
+				n.addChild(cn);
+			} else {
+				throw new IllegalStateException("Expected 'union_result', 'duplicates_removal', 'table', 'ordering_operation', 'grouping_operation'");
 			}
 			return n;
 		}
@@ -616,7 +954,7 @@ public class ExplainerSvg {
 		}
 
 		
-		private Node parseUnionResult(JSONObject obj) {
+		private UnionResultNode parseUnionResult(JSONObject obj) {
 			UnionResultNode n = new UnionResultNode();
 			n.tableName = (String) obj.get("table_name");
 			
@@ -624,18 +962,24 @@ public class ExplainerSvg {
 			n.attributes.put("tableName", obj.get("table_name"));
 			n.attributes.put("accessType", obj.get("access_type"));
 			if (obj.containsKey("query_specifications")) {
-				Node sn = new QuerySpecificationsNode();
-				n.addChild(sn);
-				JSONArray qs = (JSONArray) obj.get("query_specifications");
-				for (Object o : qs) {
-					JSONObject cobj = (JSONObject) o;
-					Node cn = parseQuerySpecification((JSONObject) o);
-					sn.addChild(cn);
-				}
+				List<QuerySpecificationNode> qsnList = parseQuerySpecifications((JSONArray) obj.get("query_specifications"));
+				n.querySpecifications = qsnList;
+				n.addChild(new ListNode("query_specifications", qsnList));
 			} else {
 				// other nodes
 			}
 			return n;
+		}
+		
+		private List<QuerySpecificationNode> parseQuerySpecifications(JSONArray qs) {
+			List<QuerySpecificationNode> qsnList = new ArrayList<>();
+			// QuerySpecificationsNode n = new QuerySpecificationsNode();
+			for (Object o : qs) {
+				JSONObject cobj = (JSONObject) o;
+				QuerySpecificationNode cn = parseQuerySpecification((JSONObject) o);
+				qsnList.add(cn);
+			}
+			return qsnList;
 		}
 		
 		private QuerySpecificationNode parseQuerySpecification(JSONObject obj) {
@@ -651,7 +995,24 @@ public class ExplainerSvg {
 			return n;
 		}
 		
-		private Node parseDuplicatesRemoval(JSONObject obj) {
+		private MaterialisedFromSubqueryNode parseMaterialisedFromSubquery(JSONObject obj) {
+			MaterialisedFromSubqueryNode n = new MaterialisedFromSubqueryNode();
+			n.attributes.put("dependent", obj.get("dependent"));
+			n.attributes.put("cacheable", obj.get("cacheable"));
+			n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table")); // boolean
+			if (obj.containsKey("query_block")) {
+				Node cn = parseQueryBlock((JSONObject) obj.get("query_block"));
+				n.addChild(cn);
+			} else {
+				throw new IllegalArgumentException("expected query_block in query_specification: " + obj.toString());
+			}
+			
+			return n;
+		}
+		 
+				
+		
+		private DuplicatesRemovalNode parseDuplicatesRemoval(JSONObject obj) {
 			DuplicatesRemovalNode n = new DuplicatesRemovalNode();
 			n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table");
 					
@@ -661,21 +1022,69 @@ public class ExplainerSvg {
 			// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
 			
 			if (obj.containsKey("nested_loop")) {
-				Node sn = new NestedLoopNode();
-				n.addChild(sn);
-				JSONArray loopItems = (JSONArray) obj.get("nested_loop");
-				for (Object o : loopItems) {
-					JSONObject cobj = (JSONObject) o;
-					if (cobj.containsKey("table")) {
-						TableNode cn = parseTable((JSONObject) cobj.get("table"));
-						sn.addChild(cn);
-					} else {
-						throw new IllegalArgumentException("expected table in nested_loop child");
-					}
+				NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
+				n.nestedLoop = nln;
+				n.addChild(nln);
+			} else {
+				throw new IllegalArgumentException("expected nested_loop");
+			}
+			return n;
+		}
+		
+		private NestedLoopNode parseNestedLoop(JSONArray loopItems) {
+			NestedLoopNode n = new NestedLoopNode();
+			
+			// JSONArray loopItems = (JSONArray) obj.get("nested_loop");
+			for (Object o : loopItems) {
+				JSONObject cobj = (JSONObject) o;
+				if (cobj.containsKey("table")) {
+					TableNode cn = parseTable((JSONObject) cobj.get("table"));
+					n.tables.add(cn);
+					n.addChild(cn);
+				} else {
+					throw new IllegalArgumentException("expected table in nested_loop child");
 				}
 			}
 			return n;
 		}
+		
+		private OrderingOperationNode parseOrderingOperation(JSONObject obj) {
+			OrderingOperationNode n = new OrderingOperationNode();
+			if (obj.containsKey("using_temporary_table")) { n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table"); }
+					
+			n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table"));
+			n.attributes.put("usingFilesort", obj.get("using_filesort"));
+			// n.attributes.put("selectId", obj.get("select_id"));
+			// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
+			
+			if (obj.containsKey("nested_loop")) {
+				NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
+				n.nestedLoop = nln;
+				n.addChild(nln);
+			}
+			return n;
+		}
+		
+		private GroupingOperationNode parseGroupingOperation(JSONObject obj) {
+			GroupingOperationNode n = new GroupingOperationNode();
+			// n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table");
+			// n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table"));
+			
+			if (obj.containsKey("using_filesort")) { n.usingFilesort = (Boolean) obj.get("using_filesort"); }
+			
+			n.attributes.put("usingFilesort", obj.get("using_filesort"));
+			// n.attributes.put("selectId", obj.get("select_id"));
+			// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
+			
+			if (obj.containsKey("nested_loop")) {
+				NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
+				n.nestedLoop = nln;
+				n.addChild(nln);
+			}
+			return n;
+		}
+		
+		
 		
 		private NameList parseNameList(JSONArray a) {
 			if (a==null) { return null; }
@@ -688,9 +1097,14 @@ public class ExplainerSvg {
 		
 		private TableNode parseTable(JSONObject obj) {
 			TableNode n = new TableNode();
+			
+			// either a table table, or a materialized_from_subquery table (tableName is the alias I guess)
 			n.tableName = (String) obj.get("table_name");
 			n.attributes.put("tableName", obj.get("table_name"));
+			
+			
 			n.attributes.put("distinct", obj.get("distinct")); // boolean
+			n.attributes.put("usingIndex", obj.get("using_index")); // boolean
 			
 			n.accessType = AccessTypeEnum.fromJsonValue((String) obj.get("access_type"));
 			n.attributes.put("accessType", obj.get("access_type")); // "ALL", "ref", "eq_ref"
@@ -706,9 +1120,14 @@ public class ExplainerSvg {
 			if (obj.containsKey("filtered")) { n.attributes.put("filtered", Double.parseDouble((String) obj.get("filtered"))); }
 			n.attributes.put("index_condition", obj.get("index_condition"));
 			
-			
-			if (obj.containsKey("cost_info")) { n.costInfo = parseCostInfo((JSONObject) obj.get("cost_info")); n.attributes.put("costInfo", n.costInfo); }
+			if (obj.containsKey("cost_info")) { 
+				n.costInfo = parseCostInfo((JSONObject) obj.get("cost_info")); 
+				n.attributes.put("costInfo", n.costInfo); 
+			}
+
+			// @TODO object form ?
 			n.attributes.put("attachedCondition", obj.get("attached_condition"));
+			
 			if (obj.containsKey("attached_subqueries")) {
 				AttachedSubqueriesNode sn = new AttachedSubqueriesNode();
 				n.attachedSubqueries = sn;
@@ -721,12 +1140,22 @@ public class ExplainerSvg {
 					sn.addChild(qsn);
 				}
 			}
+			
+			// can we have attached_subqueries and a materialised view at the same time ?
+			
+			if (obj.containsKey("materialized_from_subquery")) {
+				MaterialisedFromSubqueryNode sn = parseMaterialisedFromSubquery((JSONObject) obj.get("materialized_from_subquery"));
+				n.materialisedFromSubquery = sn;
+				n.addChild(sn);
+			}
+			
+			
 			return n;
 		}
 
 		public String toJson() {
 			
-			return "{ \"" + Text.escapeJavascript(topNode.t) + "\": " + topNode.toJson() + "}";
+			return "{ \"" + Text.escapeJavascript(topNode.getJsonType()) + "\": " + topNode.toJson() + "}";
 		}
 
 		/*
@@ -768,6 +1197,43 @@ public class ExplainerSvg {
 		
 	}
 	
+	public static class SvgBoxVisitor extends BoxVisitor {
+		int indent = 0;
+		PrintWriter pw;
+		
+		public SvgBoxVisitor(PrintWriter pw) {
+			this.pw = pw;
+		}
+		
+		@Override
+		public void preVisit(Box b) {
+			String s = "";
+			for (int i=0; i<indent; i++) { s += " "; }
+			s += "<g>\n"; // SVG group
+			pw.print(s);
+		}
+
+		@Override
+		public void visit(Box b) {
+			// TODO Auto-generated method stub
+			String s = "";
+			for (int i=0; i<indent; i++) { s += " "; }
+			s += "  <the node>\n"; // node
+			pw.print(s);
+			indent += 4;
+		}
+
+		@Override
+		public void postVisit(Box b) {
+			indent -= 4;
+			String s = "";
+			for (int i=0; i<indent; i++) { s += " "; }
+			s += "</g>\n"; // end SVG group
+			pw.print(s);
+		}
+		
+	}
+	
 	public static void main(String args[]) throws IOException, ParseException {
 		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
 		lcc.init("[explain-to-image]", null);
@@ -788,10 +1254,10 @@ public class ExplainerSvg {
 		out1.close();
 		
 		
-		ExplainDiagram ec = new ExplainDiagram(json, "1.2.3");
+		PlanParser pp = new PlanParser(json, "1.2.3");
 		
-		// roundtrip attemptt
-		json = ec.toJson();
+		// roundtrip attempt
+		json = pp.toJson();
 		System.out.println(json);
 		obj = (JSONObject) jp.parse(json);
 		FileOutputStream out2 = new FileOutputStream("c:\\temp\\out2.json");
@@ -800,6 +1266,16 @@ public class ExplainerSvg {
 		pw.flush();
 		// System.out.println(out1.toString());
 		out2.close();
+		
+		// diagram attempts
+		Layout layout = new Layout(pp.topNode);
+		Box b = layout.getLayoutBox();
+		PrintWriter sysPw = new PrintWriter(System.out);
+		SvgBoxVisitor sbv = new SvgBoxVisitor(sysPw);
+		b.traverse(sbv);
+		sysPw.flush();
+		
+		// String svg = d.toSvg();
 		
 
 		/*
