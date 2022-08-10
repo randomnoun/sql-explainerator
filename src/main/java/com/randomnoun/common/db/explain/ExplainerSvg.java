@@ -1,5 +1,6 @@
 package com.randomnoun.common.db.explain;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -120,6 +121,13 @@ public class ExplainerSvg {
 		}
 	}
 	
+	// a Node represents an object or array in the mysql-generated query plan json
+	// we subclass this object to more specific node types
+	// 
+	// a Node has two kinds of sub-nodes:
+	// attributes - a loosely-type collection of primitive datatypes and Nodes, used to roundtrip the json
+	// children - contains Nodes only, used to traverse the Node tree. 
+	//   Note that a concrete subclass also contain node-specific fields which may also be contained in children
 	
 	public static abstract class Node implements Struct.ToJson {
 		private String jsonType;
@@ -619,19 +627,38 @@ public class ExplainerSvg {
 
 	}
 	
+	// a box holds other boxes, and basically translates to a rectangle in the generated diagram
+	// a box may have a parent box which is outside the bounds of the box; all children are within the bounds of the box
+	
 	public static class Box {
-		Box parent;
+		Box parent;        // this box has a line drawn to it's parent
+		Box layoutParent;  // X and Y co-ordinates are relative to this box ( layoutParent can be null, or parent, or parent.parent ... )
 		
 		int posX = 0, posY = 0; // relative to parent
 		int width, height;
+		String label;
 		
 		String edgeType;
 		int edgeX, edgeY;
 		
+		Color stroke = Color.BLACK;
+		Color fill = new Color(0, 0, 0, 0);
+		
 		List<Box> children = new ArrayList<Box>();
+		
+		public void setLabel(String label) {
+			this.label = label;
+		}
+		public void setSize(int width, int height) {
+			this.width = width;
+			this.height = height;
+		}
+		public void setStroke(Color c) { this.stroke = c; }
+		public void setFill(Color c) { this.fill = c; }
 		
 		public void setParent(Box parent, String edgeType, int edgeX, int edgeY) {
 			this.parent = parent;
+			this.layoutParent = parent;
 			this.edgeType = edgeType;
 			this.edgeX = edgeX;
 			this.edgeY = edgeY;
@@ -641,6 +668,7 @@ public class ExplainerSvg {
 		}
 		public void setParentAndPosition(Box parent, int posX, int posY) {
 			this.parent = parent;
+			this.layoutParent = parent;
 			this.posX = posX;
 			this.posY = posY;
 			// add child links at the same time
@@ -654,6 +682,11 @@ public class ExplainerSvg {
 			this.edgeX = edgeX;
 			this.edgeY = edgeY;
 		}
+
+		public void addAll(List<Box> children) {
+			this.children.addAll(children);
+		}
+
 		
 		public int getWidth() { 
 			return width; 
@@ -662,6 +695,26 @@ public class ExplainerSvg {
 			return height; 
 		}
 		
+		public int getAbsoluteX() {
+			int x = posX;
+			Box rel = layoutParent;
+			while (rel != null && rel.layoutParent != null && rel.layoutParent != rel) {
+				x += rel.layoutParent.posX;
+				rel = rel.layoutParent;
+			}
+			return x;
+		}
+
+		public int getAbsoluteY() {
+			int y = posY;
+			Box rel = layoutParent;
+			while (rel != null && rel.layoutParent != null && rel.layoutParent != rel) {
+				y += rel.layoutParent.posY;
+				rel = rel.layoutParent;
+			}
+			return y;
+		}
+
 		public void traverse(BoxVisitor visitor) {
 			visitor.preVisit(this);
 			visitor.visit(this);
@@ -672,7 +725,8 @@ public class ExplainerSvg {
 		}
 		
 	}
-	
+
+	/*
 	public static class ContainerBox extends Box {
 		int edgeStartX;
 		int edgeStartY;
@@ -686,15 +740,14 @@ public class ExplainerSvg {
 	}
 	
 	public static class LabelBox extends Box {
-		String label;
 		public LabelBox(String label, int width, int height) {
 			this.label = label;
 			this.width = width;
 			this.height = height;
 		}
-		
-		
 	}
+	*/
+	
 	
 	public static class Layout {
 		private QueryBlockNode topNode;
@@ -722,7 +775,8 @@ public class ExplainerSvg {
 
 		// make these all protected later
 		public Box layout(QueryBlockNode n) {
-			Box b = new LabelBox("query_node", 100, 30);
+			Box b = new Box(); b.setLabel("query_node"); b.setSize(100, 30);
+			b.setFill(Color.LIGHT_GRAY);
 			Node c = n.queryNode; // 1 child only
 			// Box cb = layout(c); // this should do the polymorphic thing shouldn't it ?
 			Box cb;
@@ -752,7 +806,8 @@ public class ExplainerSvg {
 			
 			totalWidth += (boxes.size() - 1) * 20; // 20px padding
 			
-			Box b = new LabelBox("UNION", totalWidth, 30);
+			Box b = new Box(); b.setLabel("UNION");
+			b.setSize(totalWidth, 30);
 			int offset = 0;
 			for (Box cb : boxes) {
 				int w = cb.getWidth();
@@ -765,9 +820,11 @@ public class ExplainerSvg {
 		
 		public Box layout(DuplicatesRemovalNode n) {
 			// return null;
-			Box b = new LabelBox("DISTINCT", 80, 50);
+			Box b = new Box(); b.setLabel("DISTINCT");
+			b.setSize(80, 50);
 			if (n.usingTemporaryTable) {
-				Box ttBox = new LabelBox("tmp table", 80, 20);
+				Box ttBox = new Box(); b.setLabel("tmp table");
+				ttBox.setSize(80, 20);
 				ttBox.setParentAndPosition(b, 60, 55);
 			}
 			
@@ -802,7 +859,8 @@ public class ExplainerSvg {
 			Box prevNestedLoopBox = null;
 			for (int i = 1 ; i < tableBoxes.size(); i++) {
 				Box tb = tableBoxes.get(i);
-				Box b = new LabelBox("nested loop", 30, 30); // diamond
+				Box b = new Box(); b.setLabel("nested loop");
+				b.setSize(30, 30); // diamond
 				b.setPosition(tb.posX + (tableWidths.get(i)/2) - 15, 0); // centered above table beneath it
 				nestedLoopBoxes.add(b);
 				if (i == 1) {
@@ -820,7 +878,8 @@ public class ExplainerSvg {
 			}
 
 			// @TODO set offsets for all of those
-			ContainerBox bigBox = new ContainerBox(totalWidth, maxHeight + 200); // for the nested loop diamonds
+			Box bigBox = new Box();
+			bigBox.setSize(totalWidth, maxHeight + 200); // for the nested loop diamonds
 			bigBox.addAll(nestedLoopBoxes);
 			bigBox.addAll(tableBoxes);
 			bigBox.setEdgeStartPosition(prevNestedLoopBox.posX + 15, prevNestedLoopBox.posY); 
@@ -828,7 +887,8 @@ public class ExplainerSvg {
 		}
 				
 		public Box layout(TableNode n) {
-			Box b = new LabelBox("table", 100, 30);
+			Box b = new Box(); b.setLabel("table");
+			b.setSize(100, 30);
 			// TODO attached subqueries ( linked off rhs )
 			// TODO materialisedFromSubquery ( nested within table box )
 			
@@ -839,9 +899,11 @@ public class ExplainerSvg {
 			
 		}
 		public Box layout(OrderingOperationNode n) {
-			Box b = new LabelBox("ORDER", 80, 50);
+			Box b = new Box(); b.setLabel("ORDER");
+			b.setSize(80, 50);
 			if (n.usingTemporaryTable) {
-				Box ttBox = new LabelBox("tmp table", 80, 20);
+				Box ttBox = new Box(); b.setLabel("tmp table");
+				ttBox.setSize(80, 20);
 				ttBox.setParentAndPosition(b, 60, 55);
 			}
 			
@@ -851,7 +913,8 @@ public class ExplainerSvg {
 			return b;
 		}
 		public Box layout(GroupingOperationNode n) {
-			Box b = new LabelBox("GROUP", 80, 50);
+			Box b = new Box(); b.setLabel("GROUP");
+			b.setSize(80, 50);
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
 			Box cb = layout(nln);
 			cb.setParent(b, "up", 40, 50);
@@ -1197,6 +1260,40 @@ public class ExplainerSvg {
 		
 	}
 	
+	public static class RangeVisitor extends BoxVisitor {
+		
+		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+		int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+		
+		public RangeVisitor() {
+		}
+		public void visit(Box b) {
+			int x = b.getAbsoluteX();
+			int y = b.getAbsoluteY();
+			int w = b.getWidth();
+			int h = b.getHeight();
+			
+			minX = Math.min(minX, x);
+			minY = Math.min(minY, y);
+			maxX = Math.max(maxX, x + w);
+			maxY = Math.max(maxY, y + h);
+		}
+		
+		public int getMinX() {
+			return minX;
+		}
+		public int getMinY() {
+			return minY;
+		}
+		public int getMaxX() {
+			return maxX;
+		}
+		public int getMaxY() {
+			return maxY;
+		}
+		
+	}
+	
 	public static class SvgBoxVisitor extends BoxVisitor {
 		int indent = 0;
 		PrintWriter pw;
@@ -1209,25 +1306,55 @@ public class ExplainerSvg {
 		public void preVisit(Box b) {
 			String s = "";
 			if (indent==0) {
-				s = "<svg width=\"" + b.width + "\" height=\"" + b.height + "\">\n";
+				// get range
+				RangeVisitor rv = new RangeVisitor();
+				b.traverse(rv);
+				logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
+
+				
+				s = "<!DOCTYPE html>\r\n" +
+				  "<html>\r\n" +
+				  "<body>\r\n" +
+				  "<svg width=\"" + rv.getMaxX() + "\" height=\"" + rv.getMaxY() + "\">\n";
 				indent += 4;
 			}
 			for (int i=0; i<indent; i++) { s += " "; }
 			
-			// could use absolute pos instead of relative but this way it might be easier
-			// to cut out a snippet of the full diagram
-			// although still have to connect things inside the transform to outside the transform, so maybe not.
-			
-			s += "<g transform==\"translate(" + b.posX + ", " + b.posY+")\">\n"; // SVG group
+			// thinking of using relative positioning here 
+			//   s += "<g transform==\"translate(" + b.posX + ", " + b.posY+")\">\n"; // SVG group
+			// but that's going to make it more difficult to connect edges outside the transform
+			s += "<g>\n"; // SVG group
 			pw.print(s);
 		}
 
+		String toHex(Color c) {
+			if (c.getAlpha() == 0) { return "transparent"; }
+			String hex = String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+			if (c.getAlpha() != 255) {
+				hex += String.format("#%02x", c.getAlpha());
+			}
+			return hex;
+		}
+		
 		@Override
 		public void visit(Box b) {
 			// TODO Auto-generated method stub
-			String s = "";
-			for (int i=0; i<indent; i++) { s += " "; }
-			s += "    <the node>\n"; // node
+			String is = "";
+			for (int i=0; i<indent; i++) { is += " "; }
+			
+			String s = is + "    <rect x=\"" + b.getAbsoluteX() + "\"" +
+			    " y=\"" + b.getAbsoluteY() + "\"" +
+			    " width=\"" + b.getWidth() + "\"" +
+			    " height=\"" + b.getHeight() + "\"" +
+				" style=\"stroke:" + toHex(b.stroke) + "; fill:" + toHex(b.fill)+ "\"/>\n"; // node
+			if (b.label != null) {
+				s += is + "    <text x=\"" + (b.getAbsoluteX() + (b.getWidth()/2)) + "\"" +
+			      " y=\"" + (b.getAbsoluteY() + (b.getHeight()/2)) + "\"" +
+				  " style=\"text-anchor: middle; dominant-baseline: middle;\"" +
+				  ">" + 
+				  Text.escapeHtml(b.label) + "</text>\n";
+			}
+			
 			pw.print(s);
 			indent += 4;
 		}
@@ -1240,7 +1367,9 @@ public class ExplainerSvg {
 			s += "</g>\n"; // end SVG group
 			if (indent==4) {
 				indent -= 4;
-				s += "</svg>\n";
+				s += "</svg>\n" +
+				"</body>\n" +
+				"</html>\n";
 			}
 			pw.print(s);
 		}
@@ -1283,10 +1412,29 @@ public class ExplainerSvg {
 		// diagram attempts
 		Layout layout = new Layout(pp.topNode);
 		Box b = layout.getLayoutBox();
+		
+		
+		RangeVisitor rv = new RangeVisitor();
+		b.traverse(rv);
+		logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
+
+		// @TODO translate it so that it so minx, miny is 0, 0
+		
+		
+		FileOutputStream out3 = new FileOutputStream("c:\\temp\\out2.html");
+		pw = new PrintWriter(out3);
+		SvgBoxVisitor sbv = new SvgBoxVisitor(pw);
+		b.traverse(sbv);
+		pw.flush();
+		out3.close();
+		
+		
 		PrintWriter sysPw = new PrintWriter(System.out);
-		SvgBoxVisitor sbv = new SvgBoxVisitor(sysPw);
+		sbv = new SvgBoxVisitor(sysPw);
 		b.traverse(sbv);
 		sysPw.flush();
+		
+		
 		
 		// String svg = d.toSvg();
 		
