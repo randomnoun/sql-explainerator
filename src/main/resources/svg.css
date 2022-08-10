@@ -1,0 +1,44 @@
+BODY { 
+    font-family: Arial;
+    font-size: 14px;
+}
+/* svg */
+svg rect {
+    stroke: black;
+    fill: transparent;
+}    	
+svg text {
+	text-anchor: middle; 
+	dominant-baseline: middle;
+	fill: black;
+}
+
+svg g.queryBlock.topNode > rect { fill: #cccccc; }
+
+svg g.union > rect { fill: #b3b3b3; }
+
+svg g.duplicatesRemoval > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
+svg g.orderingOperation > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
+
+svg g.table.nonUniqueKey > rect { fill: #008000; }
+svg g.table.nonUniqueKey > text { fill: white; }
+
+svg g.table.uniqueKey > rect { fill: #008000; }
+svg g.table.uniqueKey > text { fill: white; }
+
+svg g.table.fullTableScan > rect { fill: #bf4040; }
+svg g.table.fullTableScan > text { fill: white; }
+
+svg g.table.fullIndexScan > rect { fill: #bf4040; }
+svg g.table.fullIndexScan > text { fill: white; }
+
+svg g.queryCost > text { font-size: 11px; } 
+svg g.lhsQueryCost > text { font-size: 11px; text-anchor: start; }
+svg g.rhsQueryCost > text { font-size: 11px; text-anchor: right; }
+
+svg g.tableName > text { font-size: 12px; } 
+svg g.tableKey > text { font-size: 12px; font-weight: bold; } 
+
+
+svg g.tempTableName > text { font-size: 10px; font-weight: bold; }
+

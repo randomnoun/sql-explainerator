@@ -240,7 +240,7 @@ public class ExplainerSvg {
 	
 	public static class QueryBlockNode extends Node {
 		
-		public Object selectId;
+		public Long selectId;
 		public Object message;
 		public CostInfo costInfo;
 		public Node queryNode;
@@ -533,41 +533,7 @@ public class ExplainerSvg {
 		public TableNode() {
 			super("table", false);
 		}
-		/*
-		protected void writeHtml(PrintWriter pw) {
-			pw.println("<table display=\"display: inline-table;\">"); // of course it is
-			pw.println("<tr><td><div class=\"lhsQueryCost\">");
-			pw.println(costInfo==null ? "" : (costInfo.evalCost == null ? (double) 0 : costInfo.evalCost) +
-					(costInfo.readCost == null ? (double) 0 : costInfo.readCost));
-			pw.println("</div><div class=\"rhsQueryCost\">");
-			pw.println(rowsExaminedPerScan == null ? "" : String.valueOf(rowsExaminedPerScan) + 
-					(rowsExaminedPerScan == 1 ? " row" : "rows")); 
-			pw.println("</div>");
-			
-			pw.println("</td></tr>");
-			
-			pw.println("<tr><td><div class=\"table " + 
-				(accessType==AccessTypeEnum.FULL_TABLE_SCAN ? " fullTableScan" :
-				(accessType==AccessTypeEnum.NON_UNIQUE_KEY ? " nonUniqueKey" :
-				(accessType==AccessTypeEnum.UNIQUE_KEY ? " uniqueKey" : ""))) + "\">");
-			pw.println(
-				(accessType==AccessTypeEnum.FULL_TABLE_SCAN ? "Full Table Scan" :
-				(accessType==AccessTypeEnum.NON_UNIQUE_KEY ? " Non-Unique Key Lookup" :
-				(accessType==AccessTypeEnum.UNIQUE_KEY ? "Unique Key Lookup" : ""))));
-			pw.println("</div></td></tr>");
-			
-			pw.println("<tr><td><div class=\"tableName\">");
-			pw.println(tableName);
-			pw.println("</td></tr>");
-
-			pw.println("<tr><td><div class=\"tableKey\">");
-			pw.println(key == null ? "" : key);
-			pw.println("</td></tr>");
-
-			pw.println("</table>");
-			// @TODO attached subqueries
-		}
-		*/
+		
 	}
 	
 	public static class AttachedSubqueriesNode extends Node {
@@ -631,19 +597,25 @@ public class ExplainerSvg {
 	// a box may have a parent box which is outside the bounds of the box; all children are within the bounds of the box
 	
 	public static class Box {
+
+
 		Box connectedTo;   // draw a line to this box
 		Box layoutParent;  // X and Y co-ordinates are relative to this box ( layoutParent can be null, or parent, or parent.parent ... )
 		
 		int posX = 0, posY = 0; // relative to parent
 		int width, height;
+		String shape = "rect";
 		String label;
 		
 		String targetPort;
 		int edgeStartX, edgeStartY; // draw edges from this box from this point
 		int edgeEndX, edgeEndY;     // draw edges to this box to this point
 		
-		Color stroke = Color.BLACK;
-		Color fill = new Color(0, 0, 0, 0);
+		String cssClass;
+		Color stroke = null; // Color.BLACK;
+		Color fill = null; // new Color(0, 0, 0, 0);
+		Color textColor = null; // Color.BLACK;
+		String textAnchor = null;
 		
 		List<Box> children = new ArrayList<Box>();
 		
@@ -656,6 +628,7 @@ public class ExplainerSvg {
 		}
 		public void setStroke(Color c) { this.stroke = c; }
 		public void setFill(Color c) { this.fill = c; }
+		public void setTextColor(Color c) { this.textColor = c; }
 		
 		public void connectTo(Box connectedTo, String targetPort) {
 			this.connectedTo = connectedTo;
@@ -734,6 +707,32 @@ public class ExplainerSvg {
 			visitor.postVisit(this);
 		}
 		
+		public String getShape() {
+			return shape;
+		}
+		public void setShape(String shape) {
+			this.shape = shape;
+		}
+		public String getTextAnchor() {
+			return textAnchor;
+		}
+		public void setTextAnchor(String textAnchor) {
+			this.textAnchor = textAnchor;
+		}
+		public String getCssClass() {
+			return cssClass;
+		}
+		public void setCssClass(String cssClass) {
+			this.cssClass = cssClass;
+		}
+		
+	}
+	
+	public static class CBox extends Box {
+		public CBox() {
+			super();
+			setStroke(new Color(0, 0, 0, 0)); // add class ?			
+		}
 	}
 
 	/*
@@ -801,14 +800,17 @@ public class ExplainerSvg {
 			int w = cb.getWidth();
 			int h = cb.getHeight();
 			
-			Box ob = new Box(); // outer box
-			ob.setStroke(new Color(0, 0, 0, 0));
+			Box ob = new CBox(); // outer box
 			ob.setSize(w, h + 50);
 			
+			String label = "query_block" + (n.selectId == null || n.selectId == 1 ? "" : " #" + n.selectId);
+			String clazz = (n.selectId == null || n.selectId == 1 ? " topNode" : "");
+			
 			Box lb = new Box(); // label box
+			lb.setCssClass("queryBlock" + clazz);
 			lb.setParentAndPosition(ob, cb.edgeStartX - 50, 0);
-			lb.setLabel("query_node"); lb.setSize(100, 30);
-			lb.setFill(Color.LIGHT_GRAY);
+			lb.setLabel(label); lb.setSize(100, 30);
+			// lb.setFill(Color.LIGHT_GRAY);
 			
 			cb.connectTo(lb, "s");
 			cb.setParentAndPosition(ob, 0, 50);
@@ -859,7 +861,7 @@ public class ExplainerSvg {
 			List<Box> nestedLoopBoxes = new ArrayList<Box>();
 			List<TableNode> qsnList = n.tables;
 			
-			List<Box> tableBoxes = reverseStream(qsnList)
+			List<Box> tableBoxes = qsnList.stream() // reverseStream(qsnList)
 				.map(c -> layout(c))
 				.collect(Collectors.toList());
 			List<Integer> tableWidths = tableBoxes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
@@ -869,14 +871,13 @@ public class ExplainerSvg {
 				+ (tableBoxes.size() - 1) * 20; // 20px padding
 			int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
 
-			Box ob = new Box(); // outer box
-			ob.setStroke(new Color(0, 0, 0, 0));
-			ob.setSize(totalWidth, maxHeight + 200); // for the nested loop diamonds
+			Box ob = new CBox(); // outer box
+			ob.setSize(totalWidth, maxHeight + 60 + 45); // for the nested loop diamonds
 			
 			int offset = 0;
 			for (int i = 0; i < tableBoxes.size(); i++) {
 				Box tb = tableBoxes.get(i);
-				tb.setParentAndPosition(ob, offset, 50);
+				tb.setParentAndPosition(ob, offset, 60 + 45);
 				offset += tableWidths.get(i) + 20;
 			}
 			 
@@ -884,16 +885,16 @@ public class ExplainerSvg {
 			Box prevNestedLoopBox = null;
 			for (int i = 1 ; i < tableBoxes.size(); i++) {
 				Box tb = tableBoxes.get(i);
-				Box b = new Box(); b.setLabel("nested loop");
-				b.setSize(30, 30); // diamond
-				b.setParentAndPosition(ob, tb.posX + (tableWidths.get(i)/2) - 15, 0); // centered above table beneath it
+				Box b = new Box(); b.setShape("nestedLoop");
+				b.setSize(60, 60); // diamond
+				b.setParentAndPosition(ob, tb.posX + (tableWidths.get(i)/2) - 30, 0); // centered above table beneath it
 				nestedLoopBoxes.add(b);
 				if (i == 1) {
 					Box firstTableBox = tableBoxes.get(0);
 					firstTableBox.connectTo(b, "w"); // "upRight", 0, 15
 				} else {
 					prevNestedLoopBox.connectTo(b, "w"); // "right", 0, 15
-					prevNestedLoopBox.setEdgeStartPosition(30, 15);
+					prevNestedLoopBox.setEdgeStartPosition(60, 30);
 				}
 				Box tableBox = tableBoxes.get(i);
 				tableBox.connectTo(b, "s"); // "up", 15, 30
@@ -905,47 +906,58 @@ public class ExplainerSvg {
 			// @TODO set offsets for all of those
 			ob.addAll(nestedLoopBoxes);
 			ob.addAll(tableBoxes);
-			ob.setEdgeStartPosition(prevNestedLoopBox.posX + 15, prevNestedLoopBox.posY); 
+			ob.setEdgeStartPosition(prevNestedLoopBox.posX + 30, prevNestedLoopBox.posY); 
 			return ob;
 		}
 				
 		public Box layout(TableNode n) {
+			
 			Box b = new Box(); b.setLabel("table");
-			b.setSize(100, 30);
-			b.setEdgeStartPosition(50, 0);
-			// TODO attached subqueries ( linked off rhs )
-			// TODO materialisedFromSubquery ( nested within table box )
+			int w = (n.accessType == AccessTypeEnum.FULL_TABLE_SCAN ? 100 : 150);
+			b.setSize(w, 40);
+			b.setEdgeStartPosition(w / 2, 0);
+			// b.setTextColor(Color.WHITE);
+			b.setCssClass("table" + (n.accessType==AccessTypeEnum.FULL_TABLE_SCAN ? " fullTableScan" :
+				(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? " fullIndexScan" :
+				(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? " nonUniqueKey" :
+				(n.accessType==AccessTypeEnum.UNIQUE_KEY ? " uniqueKey" : "")))));
+			b.setLabel((n.accessType==AccessTypeEnum.FULL_TABLE_SCAN ? "Full Table Scan" :
+				(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? "Full Index Scan" :
+				(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? " Non-Unique Key Lookup" :
+				(n.accessType==AccessTypeEnum.UNIQUE_KEY ? "Unique Key Lookup" : "")))));
 			
-			// Node c = n.queryNode; // 1 child only
-			// Box cb = layout(c);
-			// cb.setParent(b, "up", 50, 30);
-			return b;
-			
-		}
-		public Box layout(OrderingOperationNode n) {
-			/*
-			Box b = new Box(); b.setLabel("ORDER");
-			b.setSize(80, 50);
-			if (n.usingTemporaryTable) {
-				Box ttBox = new Box(); b.setLabel("tmp table");
-				ttBox.setSize(80, 20);
-				ttBox.setParentAndPosition(b, 60, 55);
+			CostInfo costInfo = n.costInfo;
+			if (costInfo != null) {
+				double cost= (costInfo.evalCost == null ? (double) 0 : costInfo.evalCost) +
+					(costInfo.readCost == null ? (double) 0 : costInfo.readCost);
+				Box lb = new CBox(); // label box
+				lb.setCssClass("lhsQueryCost"); lb.setTextAnchor("start");
+				lb.setParentAndPosition(b, 0, -10);
+				lb.setLabel(String.valueOf(cost)); 
+				lb.setSize(w/2, 10);
 			}
 			
-			NestedLoopNode nln = n.nestedLoop; // 1 child only
-			Box cb = layout(nln);
-			cb.connectTo(b, "up", 40, 50);
-			return b;
-			*/
-			NestedLoopNode nln = n.nestedLoop; // 1 child only
-			Box cb = layout(nln);
+			if (n.rowsExaminedPerScan != null) {
+				Box lb = new CBox(); // label box
+				lb.setCssClass("rhsQueryCost");  lb.setTextAnchor("end");
+				lb.setParentAndPosition(b, 50, -10);
+				lb.setLabel(String.valueOf(n.rowsExaminedPerScan) + 
+					(n.rowsExaminedPerScan == 1 ? " row" : "rows")); 
+				lb.setSize(w/2, 10);
+			}
+
+			// materialised view here
+			//NestedLoopNode nln = n.nestedLoop; // 1 child only
+			// Box cb = layout(nln);
+			// 
+			// int w = cb.getWidth();
+			// int h = cb.getHeight();
 			
-			int w = cb.getWidth();
-			int h = cb.getHeight();
-			
+			/*
 			Box ob = new Box(); // outer box 
 			ob.setStroke(new Color(0, 0, 0, 0));
-			ob.setSize(w, h + 50 + 20);
+			ob.setSize(100, 30);
+			
 			
 			Box lb = new Box(); // label box
 			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
@@ -955,6 +967,81 @@ public class ExplainerSvg {
 			
 			cb.connectTo(lb, "s"); // "up", 50, 30
 			cb.setParentAndPosition(ob, 0, 70);
+			return ob;
+			*/
+			
+			
+			// TODO attached subqueries ( linked off rhs )
+			// TODO materialisedFromSubquery ( nested within table box )
+			
+			// Node c = n.queryNode; // 1 child only
+			// Box cb = layout(c);
+			// cb.setParent(b, "up", 50, 30);
+			
+			/*
+			 * /*
+		protected void writeHtml(PrintWriter pw) {
+			pw.println("<table display=\"display: inline-table;\">"); // of course it is
+			pw.println("<tr><td><div class=\"lhsQueryCost\">");
+			pw.println(costInfo==null ? "" : (costInfo.evalCost == null ? (double) 0 : costInfo.evalCost) +
+					(costInfo.readCost == null ? (double) 0 : costInfo.readCost));
+			pw.println("</div><div class=\"rhsQueryCost\">");
+			pw.println(rowsExaminedPerScan == null ? "" : String.valueOf(rowsExaminedPerScan) + 
+					(rowsExaminedPerScan == 1 ? " row" : "rows")); 
+			pw.println("</div>");
+			
+			pw.println("</td></tr>");
+			
+			
+			pw.println("</div></td></tr>");
+			
+			pw.println("<tr><td><div class=\"tableName\">");
+			pw.println(tableName);
+			pw.println("</td></tr>");
+
+			pw.println("<tr><td><div class=\"tableKey\">");
+			pw.println(key == null ? "" : key);
+			pw.println("</td></tr>");
+
+			pw.println("</table>");
+			// @TODO attached subqueries
+		}
+		*/
+			 
+			
+			return b;
+			
+		}
+		public Box layout(OrderingOperationNode n) {
+
+			NestedLoopNode nln = n.nestedLoop; // 1 child only
+			Box cb = layout(nln);
+			
+			int w = cb.getWidth();
+			int h = cb.getHeight();
+			
+			Box ob = new CBox(); // outer box 
+			ob.setSize(w, h + 50 + 20);
+			ob.setEdgeStartPosition(cb.edgeStartX,  0);
+			
+			if (n.usingTemporaryTable) { 
+				Box tb = new CBox(); // label box
+				tb.setParentAndPosition(ob, cb.edgeStartX - 40, 50); 
+				tb.setSize(w, 10);
+				tb.setCssClass("tempTableName");
+				tb.setLabel("tmp table"); 
+			}
+			
+			Box lb = new Box(); // label box
+			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
+			lb.setCssClass("orderingOperation");
+			lb.setLabel("ORDER"); 
+			lb.setSize(80, 50);
+
+			cb.connectTo(lb, "s"); // "up", 50, 30
+			cb.setParentAndPosition(ob, 0, 70);
+			
+			
 			return ob;
 			
 		}
@@ -1048,7 +1135,7 @@ public class ExplainerSvg {
 			return n;
 		}
 		
-		private Object toLong(Object object) {
+		private Long toLong(Object object) {
 			return object == null ? null : ((Number) object).longValue();
 		}
 
@@ -1357,10 +1444,25 @@ public class ExplainerSvg {
 				b.traverse(rv);
 				logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 
+				InputStream is = ExplainerTable.class.getResourceAsStream("/svg.css");
+				String css;
+				try {
+					css = new String(StreamUtil.getByteArray(is));
+				} catch (IOException e) {
+					throw new IllegalStateException("IOException", e);
+				}
 				
-				s = "<!DOCTYPE html>\r\n" +
-				  "<html>\r\n" +
-				  "<body>\r\n" +
+				// pw.println("TD { vertical-align: top; }");
+				pw.println("</style>");
+				
+				s = "<!DOCTYPE html>\n" +
+				  "<html>\n" +
+				  "<head>\n" +
+				  "<style>\n" + 
+				  css + 
+				  "</style>\n" +
+				  "</head>\n" +
+				  "<body>\n" +
 				  "<svg width=\"" + rv.getMaxX() + "\" height=\"" + rv.getMaxY() + "\">\n";
 				indent += 4;
 			}
@@ -1369,7 +1471,7 @@ public class ExplainerSvg {
 			// thinking of using relative positioning here 
 			//   s += "<g transform==\"translate(" + b.posX + ", " + b.posY+")\">\n"; // SVG group
 			// but that's going to make it more difficult to connect edges outside the transform
-			s += "<g>\n"; // SVG group
+			s += "<g" + ( b.cssClass == null ? "" : " class=\"" + b.cssClass + "\"") + ">\n"; // SVG group
 			pw.print(s);
 		}
 
@@ -1387,27 +1489,58 @@ public class ExplainerSvg {
 			// TODO Auto-generated method stub
 			String is = "";
 			for (int i=0; i<indent; i++) { is += " "; }
+
+			int x = b.getAbsoluteX();
+			int y = b.getAbsoluteY();
 			
-			String s = is + "    <rect x=\"" + b.getAbsoluteX() + "\"" +
-			    " y=\"" + b.getAbsoluteY() + "\"" +
-			    " width=\"" + b.getWidth() + "\"" +
-			    " height=\"" + b.getHeight() + "\"" +
-				" style=\"stroke:" + toHex(b.stroke) + "; fill:" + toHex(b.fill)+ "\"/>\n"; // node
+			String s = "";
+			if (b.shape.equals("rect")) {
+				s += is + "    <rect x=\"" + x + "\"" +
+				    " y=\"" + y + "\"" +
+				    " width=\"" + b.getWidth() + "\"" +
+				    " height=\"" + b.getHeight() + "\"" +
+					" style=\"" + 
+				      (b.stroke == null ? "" : "stroke:" + toHex(b.stroke) + ";") +
+					  (b.fill == null ? "" : "fill:" + toHex(b.fill)+ ";") + 
+					"\"/>\n"; // node
+			} else if (b.shape.equals("nestedLoop")) {
+				// s += is + "<path fill=\"none\" stroke=\"black\" d=\"M 30,0 L 60 30 L 30 60 L 0 30 L 30 0\"></path>\n";
+				s += is + "<path fill=\"none\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\"></path>\n";
+				s += is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 25) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">nested</text>\n";
+				s += is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 35) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">loop</text>\n";
+
+			}
 			if (b.label != null) {
-				s += is + "    <text x=\"" + (b.getAbsoluteX() + (b.getWidth()/2)) + "\"" +
-			      " y=\"" + (b.getAbsoluteY() + (b.getHeight()/2)) + "\"" +
-				  " style=\"text-anchor: middle; dominant-baseline: middle;\"" +
-				  ">" + 
+				int tx = (b.textAnchor == null ? (x + (b.getWidth()/2)) :
+					(b.textAnchor.equals("start") ? (x) :
+					(b.textAnchor.equals("end") ? (x + b.getWidth()) : 0)));
+						
+				s += is + "    <text x=\"" + tx + "\"" +
+			      " y=\"" + (y + (b.getHeight()/2)) + "\"" +
+				  " style=\"" +
+			        (b.textColor == null ? "" : "fill:" + toHex(b.textColor)+ ";") + 
+			      "\">" + 
 				  Text.escapeHtml(b.label) + "</text>\n";
 			}
 			if (b.connectedTo != null) {
 				Box ctb = b.connectedTo;
 				String targetPort = b.targetPort;
 				int[] lineTo = ctb.getAbsolutePortPosition(targetPort);
-				
-				s += is + "    <path d=\"M " + (b.getAbsoluteX() + b.edgeStartX) + "," + (b.getAbsoluteY() + b.edgeStartY) + " " +
-			      "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
-				  " style=\"stroke:#000000;\"/>\n";
+				if ((x + b.edgeStartX) == lineTo[0] || (y + b.edgeStartY == lineTo[1])) {
+					s += is + "    <path d=\"M " + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
+				      "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
+					  " style=\"stroke:#000000;\"/>\n";
+				} else if (y + b.edgeStartY > lineTo[1]) { // up and horizontal
+					s += is + "    <path d=\"M " + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
+				      "L " + (x + b.edgeStartX) + "," + (lineTo[1]) + " " + 
+					  "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
+					  " style=\"stroke:#000000; fill:none;\"/>\n";
+				} else {  // horizontal and down 
+					s += is + "    <path d=\"M " + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
+				      "L " + (lineTo[0]) + "," + (y + b.edgeStartY) + " " + 
+					  "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
+					  " style=\"stroke:#000000; fill:none;\"/>\n";
+				}
 			}
 			
 			pw.print(s);
