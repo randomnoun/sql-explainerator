@@ -631,15 +631,16 @@ public class ExplainerSvg {
 	// a box may have a parent box which is outside the bounds of the box; all children are within the bounds of the box
 	
 	public static class Box {
-		Box parent;        // this box has a line drawn to it's parent
+		Box connectedTo;   // draw a line to this box
 		Box layoutParent;  // X and Y co-ordinates are relative to this box ( layoutParent can be null, or parent, or parent.parent ... )
 		
 		int posX = 0, posY = 0; // relative to parent
 		int width, height;
 		String label;
 		
-		String edgeType;
-		int edgeX, edgeY;
+		String targetPort;
+		int edgeStartX, edgeStartY; // draw edges from this box from this point
+		int edgeEndX, edgeEndY;     // draw edges to this box to this point
 		
 		Color stroke = Color.BLACK;
 		Color fill = new Color(0, 0, 0, 0);
@@ -656,18 +657,14 @@ public class ExplainerSvg {
 		public void setStroke(Color c) { this.stroke = c; }
 		public void setFill(Color c) { this.fill = c; }
 		
-		public void setParent(Box parent, String edgeType, int edgeX, int edgeY) {
-			this.parent = parent;
-			this.layoutParent = parent;
-			this.edgeType = edgeType;
-			this.edgeX = edgeX;
-			this.edgeY = edgeY;
-			
-			// add child links at the same time
-			parent.children.add(this);
+		public void connectTo(Box connectedTo, String targetPort) {
+			this.connectedTo = connectedTo;
+			this.targetPort = targetPort;
+		
+			//this.edgeStartX = edgeX;
+			//this.edgeStartY = edgeY;
 		}
 		public void setParentAndPosition(Box parent, int posX, int posY) {
-			this.parent = parent;
 			this.layoutParent = parent;
 			this.posX = posX;
 			this.posY = posY;
@@ -678,10 +675,15 @@ public class ExplainerSvg {
 			this.posX = posX;
 			this.posY = posY;
 		}
-		public void setEdgeStartPosition(int edgeX, int edgeY) {
-			this.edgeX = edgeX;
-			this.edgeY = edgeY;
+		public void setEdgeStartPosition(int edgeStartX, int edgeStartY) {
+			this.edgeStartX = edgeStartX;
+			this.edgeStartY = edgeStartY;
 		}
+		public void setEdgeEndPosition(int edgeEndX, int edgeEndY) {
+			this.edgeEndX = edgeEndX;
+			this.edgeEndY = edgeEndY;
+		}
+
 
 		public void addAll(List<Box> children) {
 			this.children.addAll(children);
@@ -694,12 +696,20 @@ public class ExplainerSvg {
 		public int getHeight() { 
 			return height; 
 		}
+		public int[] getAbsolutePortPosition(String d) {
+			if (d.equals("s")) { return new int[] { getAbsoluteX() + (getWidth() / 2), getAbsoluteY() + getHeight() }; }
+			else if  (d.equals("w")) { return new int[] { getAbsoluteX(), getAbsoluteY() + (getHeight() / 2) }; }
+			else {
+				throw new IllegalArgumentException("Unknown port '" + d + "'");
+			}
+			
+		}
 		
 		public int getAbsoluteX() {
 			int x = posX;
 			Box rel = layoutParent;
-			while (rel != null && rel.layoutParent != null && rel.layoutParent != rel) {
-				x += rel.layoutParent.posX;
+			while (rel != null) {
+				x += rel.posX;
 				rel = rel.layoutParent;
 			}
 			return x;
@@ -708,8 +718,8 @@ public class ExplainerSvg {
 		public int getAbsoluteY() {
 			int y = posY;
 			Box rel = layoutParent;
-			while (rel != null && rel.layoutParent != null && rel.layoutParent != rel) {
-				y += rel.layoutParent.posY;
+			while (rel != null) {
+				y += rel.posY;
 				rel = rel.layoutParent;
 			}
 			return y;
@@ -775,11 +785,9 @@ public class ExplainerSvg {
 
 		// make these all protected later
 		public Box layout(QueryBlockNode n) {
-			Box b = new Box(); b.setLabel("query_node"); b.setSize(100, 30);
-			b.setFill(Color.LIGHT_GRAY);
 			Node c = n.queryNode; // 1 child only
 			// Box cb = layout(c); // this should do the polymorphic thing shouldn't it ?
-			Box cb;
+			Box cb; // child box
 			// not happy about this
 			if (c instanceof UnionResultNode) { cb = layout((UnionResultNode) c); }
 			else if (c instanceof DuplicatesRemovalNode) { cb = layout((DuplicatesRemovalNode) c); }
@@ -789,9 +797,22 @@ public class ExplainerSvg {
 			else {
 				throw new IllegalStateException("unexpected class " + c.getClass().getName() + " in QueryBlockNode");
 			}
+
+			int w = cb.getWidth();
+			int h = cb.getHeight();
 			
-			cb.setParent(b, "up", 50, 30);
-			return b;
+			Box ob = new Box(); // outer box
+			ob.setStroke(new Color(0, 0, 0, 0));
+			ob.setSize(w, h + 50);
+			
+			Box lb = new Box(); // label box
+			lb.setParentAndPosition(ob, cb.edgeStartX - 50, 0);
+			lb.setLabel("query_node"); lb.setSize(100, 30);
+			lb.setFill(Color.LIGHT_GRAY);
+			
+			cb.connectTo(lb, "s");
+			cb.setParentAndPosition(ob, 0, 50);
+			return ob;
 		}
 		
 		public Box layout(UnionResultNode n) {
@@ -811,7 +832,7 @@ public class ExplainerSvg {
 			int offset = 0;
 			for (Box cb : boxes) {
 				int w = cb.getWidth();
-				cb.setParent(b, "up", offset + (w / 2), 30);
+				cb.connectTo(b, "s"); // , offset + (w / 2), 30
 				offset += w + 20;
 			}
 			
@@ -830,7 +851,7 @@ public class ExplainerSvg {
 			
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
 			Box cb = layout(nln);
-			cb.setParent(b, "up", 40, 50);
+			cb.connectTo(b, "s"); // , 40, 50
 			return b;
 		}
 		
@@ -847,11 +868,15 @@ public class ExplainerSvg {
 			int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
 				+ (tableBoxes.size() - 1) * 20; // 20px padding
 			int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
+
+			Box ob = new Box(); // outer box
+			ob.setStroke(new Color(0, 0, 0, 0));
+			ob.setSize(totalWidth, maxHeight + 200); // for the nested loop diamonds
 			
 			int offset = 0;
 			for (int i = 0; i < tableBoxes.size(); i++) {
 				Box tb = tableBoxes.get(i);
-				tb.setPosition(offset, 50);
+				tb.setParentAndPosition(ob, offset, 50);
 				offset += tableWidths.get(i) + 20;
 			}
 			 
@@ -861,34 +886,33 @@ public class ExplainerSvg {
 				Box tb = tableBoxes.get(i);
 				Box b = new Box(); b.setLabel("nested loop");
 				b.setSize(30, 30); // diamond
-				b.setPosition(tb.posX + (tableWidths.get(i)/2) - 15, 0); // centered above table beneath it
+				b.setParentAndPosition(ob, tb.posX + (tableWidths.get(i)/2) - 15, 0); // centered above table beneath it
 				nestedLoopBoxes.add(b);
 				if (i == 1) {
 					Box firstTableBox = tableBoxes.get(0);
-					firstTableBox.setParent(b, "upRight", 0, 15);
+					firstTableBox.connectTo(b, "w"); // "upRight", 0, 15
 				} else {
-					prevNestedLoopBox.setParent(b, "right", 0, 15);
+					prevNestedLoopBox.connectTo(b, "w"); // "right", 0, 15
 					prevNestedLoopBox.setEdgeStartPosition(30, 15);
 				}
 				Box tableBox = tableBoxes.get(i);
-				tableBox.setParent(b,  "up", 15, 30);
+				tableBox.connectTo(b, "s"); // "up", 15, 30
 				
 				prevNestedLoopBox = b;
 				// @TODO add costInfo labels onto those edges
 			}
 
 			// @TODO set offsets for all of those
-			Box bigBox = new Box();
-			bigBox.setSize(totalWidth, maxHeight + 200); // for the nested loop diamonds
-			bigBox.addAll(nestedLoopBoxes);
-			bigBox.addAll(tableBoxes);
-			bigBox.setEdgeStartPosition(prevNestedLoopBox.posX + 15, prevNestedLoopBox.posY); 
-			return bigBox;
+			ob.addAll(nestedLoopBoxes);
+			ob.addAll(tableBoxes);
+			ob.setEdgeStartPosition(prevNestedLoopBox.posX + 15, prevNestedLoopBox.posY); 
+			return ob;
 		}
 				
 		public Box layout(TableNode n) {
 			Box b = new Box(); b.setLabel("table");
 			b.setSize(100, 30);
+			b.setEdgeStartPosition(50, 0);
 			// TODO attached subqueries ( linked off rhs )
 			// TODO materialisedFromSubquery ( nested within table box )
 			
@@ -899,6 +923,7 @@ public class ExplainerSvg {
 			
 		}
 		public Box layout(OrderingOperationNode n) {
+			/*
 			Box b = new Box(); b.setLabel("ORDER");
 			b.setSize(80, 50);
 			if (n.usingTemporaryTable) {
@@ -909,15 +934,36 @@ public class ExplainerSvg {
 			
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
 			Box cb = layout(nln);
-			cb.setParent(b, "up", 40, 50);
+			cb.connectTo(b, "up", 40, 50);
 			return b;
+			*/
+			NestedLoopNode nln = n.nestedLoop; // 1 child only
+			Box cb = layout(nln);
+			
+			int w = cb.getWidth();
+			int h = cb.getHeight();
+			
+			Box ob = new Box(); // outer box 
+			ob.setStroke(new Color(0, 0, 0, 0));
+			ob.setSize(w, h + 50 + 20);
+			
+			Box lb = new Box(); // label box
+			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
+			lb.setLabel("ORDER"); lb.setSize(80, 50);
+			ob.setEdgeStartPosition(cb.edgeStartX,  0);
+			// lb.setFill(Color.LIGHT_GRAY);
+			
+			cb.connectTo(lb, "s"); // "up", 50, 30
+			cb.setParentAndPosition(ob, 0, 70);
+			return ob;
+			
 		}
 		public Box layout(GroupingOperationNode n) {
 			Box b = new Box(); b.setLabel("GROUP");
 			b.setSize(80, 50);
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
 			Box cb = layout(nln);
-			cb.setParent(b, "up", 40, 50);
+			cb.connectTo(b, "s"); // "up", 40, 50
 			return b;
 		}
 		
@@ -1354,6 +1400,15 @@ public class ExplainerSvg {
 				  ">" + 
 				  Text.escapeHtml(b.label) + "</text>\n";
 			}
+			if (b.connectedTo != null) {
+				Box ctb = b.connectedTo;
+				String targetPort = b.targetPort;
+				int[] lineTo = ctb.getAbsolutePortPosition(targetPort);
+				
+				s += is + "    <path d=\"M " + (b.getAbsoluteX() + b.edgeStartX) + "," + (b.getAbsoluteY() + b.edgeStartY) + " " +
+			      "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
+				  " style=\"stroke:#000000;\"/>\n";
+			}
 			
 			pw.print(s);
 			indent += 4;
@@ -1419,6 +1474,8 @@ public class ExplainerSvg {
 		logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 
 		// @TODO translate it so that it so minx, miny is 0, 0
+		b.posX -= rv.getMinX();
+		b.posY -= rv.getMinY();
 		
 		
 		FileOutputStream out3 = new FileOutputStream("c:\\temp\\out2.html");
