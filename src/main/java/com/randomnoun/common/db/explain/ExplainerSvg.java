@@ -390,6 +390,8 @@ public class ExplainerSvg {
 	
 	public static class OrderingOperationNode extends Node {
 		public boolean usingTemporaryTable = false;
+		public boolean usingFilesort = false;
+
 		public NestedLoopNode nestedLoop;
 		public OrderingOperationNode() {
 			super("ordering_operation", false); 
@@ -530,6 +532,7 @@ public class ExplainerSvg {
 		int width, height;
 		String shape = "rect";
 		String label;
+		String tooltip;
 		
 		String targetPort;
 		int edgeStartX, edgeStartY; // draw edges from this box from this point
@@ -666,6 +669,12 @@ public class ExplainerSvg {
 		public void setStrokeDashArray(List<String> strokeDashArray) {
 			this.strokeDashArray = strokeDashArray;
 		}
+		public String getTooltip() {
+			return tooltip;
+		}
+		public void setTooltip(String tooltip) {
+			this.tooltip = tooltip;
+		}
 		
 	}
 	
@@ -747,11 +756,16 @@ public class ExplainerSvg {
 			
 			String label = "query_block" + (n.selectId == null || n.selectId == 1 ? "" : " #" + n.selectId);
 			String clazz = (n.selectId == null || n.selectId == 1 ? " topNode" : "");
+			String tooltip = "Select ID: " + n.selectId + "\n" +
+			  "Query cost: " + n.costInfo.queryCost;
+			
 			
 			Box lb = new Box(); // label box
 			lb.setCssClass("queryBlock" + clazz);
 			lb.setParentAndPosition(ob, cb.edgeStartX - 50, 0);
-			lb.setLabel(label); lb.setSize(100, 30);
+			lb.setSize(100, 30);
+			lb.setLabel(label); 
+			lb.setTooltip(tooltip);
 			// lb.setFill(Color.LIGHT_GRAY);
 			
 			cb.connectTo(lb, "s");
@@ -788,7 +802,8 @@ public class ExplainerSvg {
 			Box b = new Box(); b.setLabel("DISTINCT");
 			b.setSize(80, 50);
 			if (n.usingTemporaryTable) {
-				Box ttBox = new Box(); b.setLabel("tmp table");
+				Box ttBox = new Box(); 
+				b.setLabel("tmp table");
 				ttBox.setSize(80, 20);
 				ttBox.setParentAndPosition(b, 60, 55);
 			}
@@ -827,10 +842,33 @@ public class ExplainerSvg {
 			Box prevNestedLoopBox = null;
 			for (int i = 1 ; i < tableBoxes.size(); i++) {
 				Box tb = tableBoxes.get(i);
-				Box b = new Box(); b.setShape("nestedLoop");
+				Box b = new Box(); 
+				TableNode qsn = n.tables.get(i);
+				b.setShape("nestedLoop");
 				b.setSize(60, 60); // diamond
 				b.setParentAndPosition(ob, tb.posX + (tableWidths.get(i)/2) - 30, 0); // centered above table beneath it
+				b.setTooltip("nested_loop\n\n" +
+				   "Prefix Cost: " + qsn.costInfo.prefixCost);
 				nestedLoopBoxes.add(b);
+				
+				Box lb = new CBox(); // label box
+				lb.setCssClass("queryCost");
+				lb.setParentAndPosition(b, -10, -10);
+				lb.setLabel(String.valueOf(qsn.costInfo.prefixCost)); 
+				lb.setTextAnchor("start");
+				lb.setSize(40, 10);
+
+				if (i == tableBoxes.size() - 1) {
+					lb = new CBox(); // label box
+					lb.setCssClass("queryCost");
+					lb.setParentAndPosition(b, 35, -10);
+					lb.setLabel(String.valueOf(qsn.rowsProducedPerJoin) +
+						(qsn.rowsProducedPerJoin == 1 ? " row" : " rows")); 
+					lb.setTextAnchor("start");
+					lb.setSize(25, 10);
+				}
+
+				
 				if (i == 1) {
 					Box firstTableBox = tableBoxes.get(0);
 					firstTableBox.connectTo(b, "w"); // "upRight", 0, 15
@@ -838,6 +876,7 @@ public class ExplainerSvg {
 					prevNestedLoopBox.connectTo(b, "w"); // "right", 0, 15
 					prevNestedLoopBox.setEdgeStartPosition(60, 30);
 				}
+				
 				Box tableBox = tableBoxes.get(i);
 				tableBox.connectTo(b, "s"); // "up", 15, 30
 				
@@ -888,10 +927,8 @@ public class ExplainerSvg {
 				// qb.posX -= rv.getMinX();
 				// qb.posY -= rv.getMinY();
 
-				qb.setParentAndPosition(ob, 5 - rv.getMinX(), 75); // hmm 
-				
-				h = 75 + qb.height + 5; // 5px padding bottom
-				w = Math.max(w, qb.width + 10); // 5px padding left and right
+				h = 75 + qb.height + 10; // 10px padding bottom
+				w = Math.max(w, qb.width + 20); // 10px padding left and right
 
 				Box lb = new CBox();
 				lb.setCssClass("dotted"); // dotted line box
@@ -899,6 +936,9 @@ public class ExplainerSvg {
 				lb.setStrokeDashArray(Arrays.asList(new String[] { "4" }));
 				lb.setParentAndPosition(ob, 0, 0);
 				lb.setSize(w, h);
+				
+				// qb after lb in the diagram so that tooltips work
+				qb.setParentAndPosition(ob, 10 - rv.getMinX(), 80);
 
 				if (n.tableName != null) {
 					lb = new CBox(); // label box
@@ -1048,6 +1088,8 @@ public class ExplainerSvg {
 			lb.setCssClass("orderingOperation");
 			lb.setLabel("ORDER"); 
 			lb.setSize(80, 50);
+			lb.setTooltip("Ordering operation\n\n" +
+				"Using Filesort: " + n.usingFilesort);
 
 			cb.connectTo(lb, "s"); // "up", 50, 30
 			cb.setParentAndPosition(ob, 0, 70);
@@ -1288,6 +1330,7 @@ public class ExplainerSvg {
 		private OrderingOperationNode parseOrderingOperation(JSONObject obj) {
 			OrderingOperationNode n = new OrderingOperationNode();
 			if (obj.containsKey("using_temporary_table")) { n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table"); }
+			n.usingFilesort = (Boolean) obj.get("using_filesort");
 					
 			n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table"));
 			n.attributes.put("usingFilesort", obj.get("using_filesort"));
@@ -1544,10 +1587,15 @@ public class ExplainerSvg {
 				      (b.stroke == null ? "" : "stroke:" + toHex(b.stroke) + "; ") +
 					  (b.fill == null ? "" : "fill:" + toHex(b.fill)+ "; ") +
 					  (b.strokeDashArray == null ? "" : "stroke-dasharray:" + Text.escapeHtml(Text.join(b.strokeDashArray, " ")) + "; ") +
-					"\"/>\n"; // node
+					"\"";
+				s += (b.tooltip == null ? "/>\n" : ">\n" +
+					is + "        <title>" + Text.escapeHtml(b.tooltip) + "</title>\n" +
+						 "    </rect>\n");
 			} else if (b.shape.equals("nestedLoop")) {
 				// s += is + "<path fill=\"none\" stroke=\"black\" d=\"M 30,0 L 60 30 L 30 60 L 0 30 L 30 0\"></path>\n";
-				s += is + "<path fill=\"none\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\"></path>\n";
+				s += is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\">";
+				s += is + "    <title>" + Text.escapeHtml(b.tooltip)+ "</title>\n"; 
+				s += is + "</path>\n";
 				s += is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 25) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">nested</text>\n";
 				s += is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 35) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">loop</text>\n";
 
@@ -1561,6 +1609,7 @@ public class ExplainerSvg {
 			      " y=\"" + (y + (b.getHeight()/2)) + "\"" +
 				  " style=\"" +
 			        (b.textColor == null ? "" : "fill:" + toHex(b.textColor)+ ";") + 
+			        (b.textAnchor == null ? "" : "text-anchor:" + b.textAnchor + ";") +
 			      "\">" + 
 				  Text.escapeHtml(b.label) + "</text>\n";
 			}
