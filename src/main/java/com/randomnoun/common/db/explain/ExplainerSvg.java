@@ -59,6 +59,10 @@ public class ExplainerSvg {
 	}
 
 	private static class NameList extends ArrayList<String> implements Struct.ToJson {
+
+		/** generated serialVersionUID */
+		private static final long serialVersionUID = -4398170610222717666L;
+
 		@Override
 		public String toJson() {
 			String s = "[";
@@ -102,11 +106,11 @@ public class ExplainerSvg {
 		public void setDataReadPerJoin(String dataReadPerJoin) {
 			this.dataReadPerJoin = dataReadPerJoin;
 		}
-		Double queryCost;
-		Double readCost;
-		Double evalCost;
-		Double prefixCost;
-		String dataReadPerJoin; // "96K"
+		private Double queryCost;
+		private Double readCost;
+		private Double evalCost;
+		private Double prefixCost;
+		private String dataReadPerJoin; // "96K"
 		public String toJson() {
 			// return "{ \"let's pretend\": \"this is the costInfo\" }";
 			String s = "{";
@@ -321,18 +325,6 @@ public class ExplainerSvg {
 		*/
 	}
 	
-	/*
-	// collection node
-	public static class QuerySpecificationsNode extends ListNode {
-		public QuerySpecificationsNode() {
-			super("query_specifications", true);
-		}
-		protected void writeHtml(PrintWriter pw) {
-			throw new IllegalStateException("didn't expect that");
-		}
-	}
-	*/
-	
 	public static class ListNode extends Node {
 		public ListNode(String name, List<? extends Node> children) {
 			super(name, true);
@@ -343,16 +335,11 @@ public class ExplainerSvg {
 	}
 	
 	public static class QuerySpecificationNode extends Node {
+		public QueryBlockNode queryBlock;
+
 		public QuerySpecificationNode() {
 			super("query_specification", false);
 		}
-		/*
-		protected void writeHtml(PrintWriter pw) {
-			// attributes of this node don't appear in the diagram
-			QueryBlockNode qbn = (QueryBlockNode) children.get(0);
-			qbn.writeHtml(pw);
-		}
-		*/
 	}
 	
 	public static class DuplicatesRemovalNode extends Node {
@@ -734,74 +721,107 @@ public class ExplainerSvg {
 		// make these all protected later
 		public Box layout(QueryBlockNode n, boolean drawQueryBlock) {
 			Node c = n.queryNode; // 1 child only
-			// Box cb = layout(c); // this should do the polymorphic thing shouldn't it ?
 			
 			Box ob = new CBox(); // outer box
-			Box cb; // child box
-			// not happy about this
-			if (c instanceof UnionResultNode) { cb = layout((UnionResultNode) c); }
-			else if (c instanceof DuplicatesRemovalNode) { cb = layout((DuplicatesRemovalNode) c); }
-			else if (c instanceof TableNode) { cb = layout((TableNode) c); }
-			else if (c instanceof OrderingOperationNode) { cb = layout((OrderingOperationNode) c); }
-			else if (c instanceof GroupingOperationNode) { cb = layout((GroupingOperationNode) c); }
-			else {
-				throw new IllegalStateException("unexpected class " + c.getClass().getName() + " in QueryBlockNode");
+			Box cb = null; // child box
+			int w = 100, h = 0;
+			if (c != null) {
+				if (c instanceof UnionResultNode) { cb = layout((UnionResultNode) c); }
+				else if (c instanceof DuplicatesRemovalNode) { cb = layout((DuplicatesRemovalNode) c); }
+				else if (c instanceof TableNode) { cb = layout((TableNode) c); }
+				else if (c instanceof OrderingOperationNode) { cb = layout((OrderingOperationNode) c); }
+				else if (c instanceof GroupingOperationNode) { cb = layout((GroupingOperationNode) c); }
+				else {
+					throw new IllegalStateException("unexpected class " + c.getClass().getName() + " in QueryBlockNode");
+				}
+	
+				w = cb.getWidth();
+				h = cb.getHeight();
 			}
-
-			int w = cb.getWidth();
-			int h = cb.getHeight();
-			
-			ob.setSize(w, h + (drawQueryBlock ? 60 : 0));
+			ob.setSize(w, h + (drawQueryBlock ? 30 + 30 : 0));
 			
 			if (drawQueryBlock) {
 				String label = "query_block" + (n.selectId == null || n.selectId == 1 ? "" : " #" + n.selectId);
 				String clazz = (n.selectId == null || n.selectId == 1 ? " topNode" : "");
 				String tooltip = "Select ID: " + n.selectId + "\n" +
-				  "Query cost: " + n.costInfo.queryCost;
+				  (n.costInfo == null ? "" :"Query cost: " + n.costInfo.getQueryCost() + "\n");
 				
 				
 				Box lb = new Box(); // label box
 				lb.setCssClass("queryBlock" + clazz);
-				lb.setParentAndPosition(ob, cb.edgeStartX - 50, 0);
+				if (cb == null) {
+					lb.setParentAndPosition(ob, 0, 0);
+					ob.setEdgeStartPosition(50, 0);
+				} else {
+					lb.setParentAndPosition(ob, cb.edgeStartX - 50, 0);
+					ob.setEdgeStartPosition(cb.edgeStartX, 0);
+				}
 				lb.setSize(100, 30);
 				lb.setLabel(label); 
 				lb.setTooltip(tooltip);
 				// lb.setFill(Color.LIGHT_GRAY);
 				
-				cb.connectTo(lb, "s");
-				cb.setParentAndPosition(ob, 0, 60);
-			} else {
+				if (cb == null) {
+					Box ntb = new CBox(); // label box
+					ntb.setCssClass("tableName" + clazz);
+					ntb.setParentAndPosition(ob, 0, 30);
+					ntb.setSize(100, 10);
+					ntb.setLabel("No tables used"); 
+					ntb.setTooltip(tooltip);
+					
+				} else {
+					cb.connectTo(lb, "s");
+					cb.setParentAndPosition(ob, 0, 60);
+				}
+			} else if (cb != null) {
 				cb.setParentAndPosition(ob, 0, 0);
+			} else {
+				throw new IllegalStateException("drawQueryBlock = false and no child block present");
 			}
 			return ob;
 		}
 		
 		public Box layout(UnionResultNode n) {
-			List<Box> boxes = new ArrayList<Box>();
 			List<QuerySpecificationNode> qsnList = n.querySpecifications;
 			
-			int totalWidth = reverseStream(qsnList)
+			Box ob = new CBox(); // outer box
+			Box cb = new CBox(); // connector box
+			
+			List<Box> qsBoxes = reverseStream(qsnList)
 				.map(c -> layout(c))
-				.peek(b -> { boxes.add(b); })
-				.mapToInt(b -> b.getWidth() )
-				.sum();
+				.collect(Collectors.toList());
 			
-			totalWidth += (boxes.size() - 1) * 20; // 20px padding
+			List<Integer> tableWidths = qsBoxes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
+			List<Integer> tableHeights = qsBoxes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+			int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
+				+ (qsBoxes.size() - 1) * 50; // 50px padding
+			int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
+
+			ob.setSize(totalWidth,  50 + maxHeight);
 			
-			Box b = new Box(); b.setLabel("UNION");
+			cb.setParentAndPosition(ob, 0, 0);
+			cb.setSize(totalWidth,  60); 
+			
+			Box b = new Box();
+			b.setParentAndPosition(cb,  0,  0);
+			b.setLabel("UNION");
+			b.setFill(new Color(179, 179, 179)); // #b3b3b3
 			b.setSize(totalWidth, 30);
 			int offset = 0;
-			for (Box cb : boxes) {
-				int w = cb.getWidth();
-				cb.connectTo(b, "s"); // , offset + (w / 2), 30
+			for (Box qsb : qsBoxes) {
+				qsb.setParentAndPosition(ob, offset, 50);
+				int w = qsb.getWidth();
+				qsb.connectTo(cb, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
 				offset += w + 20;
 			}
+			ob.setEdgeStartPosition(totalWidth / 2, 0);
 			
-			return b;
+			return ob;
 		}
 		
 		public Box layout(DuplicatesRemovalNode n) {
 			// return null;
+			/*
 			Box b = new Box(); b.setLabel("DISTINCT");
 			b.setSize(80, 50);
 			if (n.usingTemporaryTable) {
@@ -815,6 +835,29 @@ public class ExplainerSvg {
 			Box cb = layout(nln);
 			cb.connectTo(b, "s"); // , 40, 50
 			return b;
+			*/
+			
+			NestedLoopNode nln = n.nestedLoop; // 1 child only
+			Box cb = layout(nln);
+			
+			int w = cb.getWidth();
+			int h = cb.getHeight();
+			
+			Box ob = new CBox(); // outer box 
+			ob.setSize(w, h + 40);
+			ob.setEdgeStartPosition(cb.edgeStartX,  0);
+			
+			Box lb = new Box(); // label box
+			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
+			lb.setCssClass("duplicatesRemoval");
+			lb.setLabel("DISTINCT"); 
+			lb.setSize(80, 40);
+
+			cb.connectTo(lb, "s"); // "up", 50, 30
+			cb.setParentAndPosition(ob, 0, 40);
+			
+			return ob;
+
 		}
 		
 		public Box layout(NestedLoopNode n) {
@@ -851,13 +894,13 @@ public class ExplainerSvg {
 				b.setSize(60, 60); // diamond
 				b.setParentAndPosition(ob, tb.posX + (tableWidths.get(i)/2) - 30, 50); // centered above table beneath it
 				b.setTooltip("nested_loop\n\n" +
-				   "Prefix Cost: " + qsn.costInfo.prefixCost);
+				   "Prefix Cost: " + qsn.costInfo.getPrefixCost());
 				nestedLoopBoxes.add(b);
 				
 				Box lb = new CBox(); // label box
 				lb.setCssClass("queryCost");
 				lb.setParentAndPosition(b, -10, -10);
-				lb.setLabel(String.valueOf(qsn.costInfo.prefixCost)); 
+				lb.setLabel(String.valueOf(qsn.costInfo.getPrefixCost())); 
 				lb.setTextAnchor("start");
 				lb.setSize(40, 10);
 
@@ -979,8 +1022,8 @@ public class ExplainerSvg {
 			
 			CostInfo costInfo = n.costInfo;
 			if (costInfo != null) {
-				double cost= (costInfo.evalCost == null ? (double) 0 : costInfo.evalCost) +
-					(costInfo.readCost == null ? (double) 0 : costInfo.readCost);
+				double cost= (costInfo.getEvalCost() == null ? (double) 0 : costInfo.getEvalCost()) +
+					(costInfo.getReadCost() == null ? (double) 0 : costInfo.getReadCost());
 				Box lb = new CBox(); // label box
 				lb.setCssClass("lhsQueryCost"); lb.setTextAnchor("start");
 				lb.setParentAndPosition(ob, 0, -10);
@@ -1128,6 +1171,34 @@ public class ExplainerSvg {
 			
 		}
 		
+		public Box layout(QuerySpecificationNode n ) {
+
+			QueryBlockNode qb = n.queryBlock;
+			
+			Box cb = layout(qb, true);
+			
+			int w = cb.getWidth();
+			int h = cb.getHeight();
+			
+			Box ob = new CBox(); 
+			ob.setSize(w, h + 40);
+			ob.setEdgeStartPosition(cb.edgeStartX,  40);
+
+			/*
+			Box lb = new Box(); // label box
+			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
+			lb.setCssClass("orderingOperation");
+			lb.setLabel(""); 
+			lb.setSize(80, 40);
+			lb.setTooltip("Ordering operation\n\n" +
+				"Using Filesort: " + n.usingFilesort);
+			cb.connectTo(lb, "s"); // "up", 50, 30
+				*/
+			
+			cb.setParentAndPosition(ob, 0, 40);
+			return ob;
+		}
+		
 		public Box layout(Node n) {
 			throw new UnsupportedOperationException("layout for node " + n.getClass().getName() + " not implemented");
 		}
@@ -1204,7 +1275,9 @@ public class ExplainerSvg {
 				n.queryNode = cn;
 				n.addChild(cn);
 			} else {
-				throw new IllegalStateException("Expected 'union_result', 'duplicates_removal', 'table', 'ordering_operation', 'grouping_operation'");
+				// can have 'no tables used' if this is a SELECT without a table
+				
+				// throw new IllegalStateException("Expected 'union_result', 'duplicates_removal', 'table', 'ordering_operation', 'grouping_operation' in query block " + n.selectId);
 			}
 			return n;
 		}
@@ -1246,7 +1319,7 @@ public class ExplainerSvg {
 			// QuerySpecificationsNode n = new QuerySpecificationsNode();
 			for (Object o : qs) {
 				JSONObject cobj = (JSONObject) o;
-				QuerySpecificationNode cn = parseQuerySpecification((JSONObject) o);
+				QuerySpecificationNode cn = parseQuerySpecification((JSONObject) cobj);
 				qsnList.add(cn);
 			}
 			return qsnList;
@@ -1257,7 +1330,8 @@ public class ExplainerSvg {
 			n.attributes.put("dependent", obj.get("dependent"));
 			n.attributes.put("cacheable", obj.get("cacheable"));
 			if (obj.containsKey("query_block")) {
-				Node cn = parseQueryBlock((JSONObject) obj.get("query_block"));
+				QueryBlockNode cn = parseQueryBlock((JSONObject) obj.get("query_block"));
+				n.queryBlock = cn;
 				n.addChild(cn);
 			} else {
 				throw new IllegalArgumentException("expected query_block in query_specification: " + obj.toString());
@@ -1411,7 +1485,7 @@ public class ExplainerSvg {
 				JSONArray qs = (JSONArray) obj.get("attached_subqueries");
 				for (Object o : qs) {
 					JSONObject cobj = (JSONObject) o;
-					QuerySpecificationNode qsn = parseQuerySpecification((JSONObject) o);
+					QuerySpecificationNode qsn = parseQuerySpecification((JSONObject) cobj);
 					sn.querySpecification = qsn;
 					sn.addChild(qsn);
 				}
@@ -1586,7 +1660,7 @@ public class ExplainerSvg {
 					"\"";
 				s += (b.tooltip == null ? "/>\n" : ">\n" +
 					is + "        <title>" + Text.escapeHtml(b.tooltip) + "</title>\n" +
-						 "    </rect>\n");
+					is + "    </rect>\n");
 			} else if (b.shape.equals("nestedLoop")) {
 				// s += is + "<path fill=\"none\" stroke=\"black\" d=\"M 30,0 L 60 30 L 30 60 L 0 30 L 30 0\"></path>\n";
 				s += is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\">";
@@ -1611,8 +1685,14 @@ public class ExplainerSvg {
 			}
 			if (b.connectedTo != null) {
 				Box ctb = b.connectedTo;
-				String targetPort = b.targetPort;
-				int[] lineTo = ctb.getAbsolutePortPosition(targetPort);
+				int[] lineTo;
+				if (b.targetPort.equals("sv")) {
+					lineTo = ctb.getAbsolutePortPosition("s");
+					lineTo[0] = x + b.edgeStartX;
+				} else {
+					lineTo = ctb.getAbsolutePortPosition(b.targetPort);
+				}
+				
 				if ((x + b.edgeStartX) == lineTo[0] || (y + b.edgeStartY == lineTo[1])) {
 					s += is + "    <path d=\"M " + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
 				      "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
@@ -1655,7 +1735,8 @@ public class ExplainerSvg {
 		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
 		lcc.init("[explain-to-image]", null);
 		
-		InputStream is = ExplainerSvg.class.getResourceAsStream("/sakila-7g.json");
+		// InputStream is = ExplainerSvg.class.getResourceAsStream("/sakila-7g.json");
+		InputStream is = ExplainerSvg.class.getResourceAsStream("/somequery.json");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
 		StreamUtil.copyStream(is, baos);
 		String json = baos.toString();
