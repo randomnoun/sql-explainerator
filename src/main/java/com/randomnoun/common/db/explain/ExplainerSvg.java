@@ -24,7 +24,6 @@ import org.json.simple.parser.ParseException;
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Struct;
 import com.randomnoun.common.Text;
-import com.randomnoun.common.db.explain.ExplainerSvg.Box;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 /* Based on the explain renderer in MySQL Workbench, although it turns out that that code is GPLed
@@ -727,13 +726,13 @@ public class ExplainerSvg {
 		}
 		
 		public Box getLayoutBox() {
-			Box b = layout(topNode);
+			Box b = layout(topNode, true);
 			// probably need to reposition everything so that it starts at 0,0
 			return b;
 		}
 
 		// make these all protected later
-		public Box layout(QueryBlockNode n) {
+		public Box layout(QueryBlockNode n, boolean drawQueryBlock) {
 			Node c = n.queryNode; // 1 child only
 			// Box cb = layout(c); // this should do the polymorphic thing shouldn't it ?
 			
@@ -752,24 +751,28 @@ public class ExplainerSvg {
 			int w = cb.getWidth();
 			int h = cb.getHeight();
 			
-			ob.setSize(w, h + 50);
+			ob.setSize(w, h + (drawQueryBlock ? 60 : 0));
 			
-			String label = "query_block" + (n.selectId == null || n.selectId == 1 ? "" : " #" + n.selectId);
-			String clazz = (n.selectId == null || n.selectId == 1 ? " topNode" : "");
-			String tooltip = "Select ID: " + n.selectId + "\n" +
-			  "Query cost: " + n.costInfo.queryCost;
-			
-			
-			Box lb = new Box(); // label box
-			lb.setCssClass("queryBlock" + clazz);
-			lb.setParentAndPosition(ob, cb.edgeStartX - 50, 0);
-			lb.setSize(100, 30);
-			lb.setLabel(label); 
-			lb.setTooltip(tooltip);
-			// lb.setFill(Color.LIGHT_GRAY);
-			
-			cb.connectTo(lb, "s");
-			cb.setParentAndPosition(ob, 0, 50);
+			if (drawQueryBlock) {
+				String label = "query_block" + (n.selectId == null || n.selectId == 1 ? "" : " #" + n.selectId);
+				String clazz = (n.selectId == null || n.selectId == 1 ? " topNode" : "");
+				String tooltip = "Select ID: " + n.selectId + "\n" +
+				  "Query cost: " + n.costInfo.queryCost;
+				
+				
+				Box lb = new Box(); // label box
+				lb.setCssClass("queryBlock" + clazz);
+				lb.setParentAndPosition(ob, cb.edgeStartX - 50, 0);
+				lb.setSize(100, 30);
+				lb.setLabel(label); 
+				lb.setTooltip(tooltip);
+				// lb.setFill(Color.LIGHT_GRAY);
+				
+				cb.connectTo(lb, "s");
+				cb.setParentAndPosition(ob, 0, 60);
+			} else {
+				cb.setParentAndPosition(ob, 0, 0);
+			}
 			return ob;
 		}
 		
@@ -825,17 +828,17 @@ public class ExplainerSvg {
 			List<Integer> tableHeights = tableBoxes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
 			
 			int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
-				+ (tableBoxes.size() - 1) * 20; // 20px padding
+				+ (tableBoxes.size() - 1) * 50; // 50px padding
 			int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
 
 			Box ob = new CBox(); // outer box
-			ob.setSize(totalWidth, maxHeight + 60 + 45); // for the nested loop diamonds
+			ob.setSize(totalWidth, 50 + 60 + 50 + maxHeight); // arrow + diamond + arrow + tables
 			
 			int offset = 0;
 			for (int i = 0; i < tableBoxes.size(); i++) {
 				Box tb = tableBoxes.get(i);
-				tb.setParentAndPosition(ob, offset, 60 + 45);
-				offset += tableWidths.get(i) + 20;
+				tb.setParentAndPosition(ob, offset, 50 + 60 + 50);
+				offset += tableWidths.get(i) + 50;
 			}
 			 
 					
@@ -846,7 +849,7 @@ public class ExplainerSvg {
 				TableNode qsn = n.tables.get(i);
 				b.setShape("nestedLoop");
 				b.setSize(60, 60); // diamond
-				b.setParentAndPosition(ob, tb.posX + (tableWidths.get(i)/2) - 30, 0); // centered above table beneath it
+				b.setParentAndPosition(ob, tb.posX + (tableWidths.get(i)/2) - 30, 50); // centered above table beneath it
 				b.setTooltip("nested_loop\n\n" +
 				   "Prefix Cost: " + qsn.costInfo.prefixCost);
 				nestedLoopBoxes.add(b);
@@ -887,7 +890,7 @@ public class ExplainerSvg {
 			// @TODO set offsets for all of those
 			// ob.addAll(nestedLoopBoxes);
 			// ob.addAll(tableBoxes);
-			ob.setEdgeStartPosition(prevNestedLoopBox.posX + 30, prevNestedLoopBox.posY); 
+			ob.setEdgeStartPosition(prevNestedLoopBox.posX + 30, 50); // although the edge has already been drawn, so this is the edge end position really. maybe not. 
 			return ob;
 		}
 				
@@ -897,28 +900,29 @@ public class ExplainerSvg {
 				(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
 				(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? 150 :
 				(n.accessType==AccessTypeEnum.UNIQUE_KEY ? 125 : 100)))); 
-			int h = 68;
+			int h = 58;
 			Box ob = new CBox(); // outer box
 			
 			if (n.materialisedFromSubquery == null) {
 				if (n.tableName != null) {
 					Box lb = new CBox(); // label box
 					lb.setCssClass("tableName");
-					lb.setParentAndPosition(ob, 0, 40);
+					lb.setParentAndPosition(ob, 0, 30);
 					lb.setLabel(n.tableName); 
 					lb.setSize(w, 14);
 				}
 				if (n.key != null) {
 					Box lb = new CBox(); // label box
 					lb.setCssClass("tableKey"); 
-					lb.setParentAndPosition(ob, 0, 54);
+					lb.setParentAndPosition(ob, 0, 44);
 					lb.setLabel(n.key); 
 					lb.setSize(w, 14);
 				}
 			} else {
-				// QuerySpecificationNode querySpec = n.materialisedFromSubquery.querySpecification;
 				QueryBlockNode queryBlock = n.materialisedFromSubquery.queryBlock;
-				Box qb = layout(queryBlock);
+				Box qb;
+				boolean drawQueryBlockInMaterialisedSubquery = false;
+				qb = layout(queryBlock, drawQueryBlockInMaterialisedSubquery);
 				// reset to 0,0
 
 				RangeVisitor rv = new RangeVisitor();
@@ -927,7 +931,7 @@ public class ExplainerSvg {
 				// qb.posX -= rv.getMinX();
 				// qb.posY -= rv.getMinY();
 
-				h = 75 + qb.height + 10; // 10px padding bottom
+				h = 80 + qb.height + 20; // 20px padding bottom
 				w = Math.max(w, qb.width + 20); // 10px padding left and right
 
 				Box lb = new CBox();
@@ -938,20 +942,20 @@ public class ExplainerSvg {
 				lb.setSize(w, h);
 				
 				// qb after lb in the diagram so that tooltips work
-				qb.setParentAndPosition(ob, 10 - rv.getMinX(), 80);
+				qb.setParentAndPosition(ob, 10 - rv.getMinX(), 85);
 
 				if (n.tableName != null) {
 					lb = new CBox(); // label box
 					lb.setCssClass("materialisedTableName");
 					lb.setFill(new Color(232, 232, 232));
-					lb.setParentAndPosition(ob, 0, 40);
+					lb.setParentAndPosition(ob, 0, 30);
 					lb.setLabel(n.tableName + " (materialised)"); 
 					lb.setSize(w, 20);
 				}
 				if (n.key != null) {
 					lb = new CBox(); // label box
 					lb.setCssClass("tableKey"); 
-					lb.setParentAndPosition(ob, 0, 60);
+					lb.setParentAndPosition(ob, 0, 50);
 					lb.setLabel(n.key); 
 					lb.setSize(w, 14);
 				}
@@ -962,7 +966,7 @@ public class ExplainerSvg {
 			
 			Box b = new Box(); 
 			b.setParentAndPosition(ob, 0, 0);
-			b.setSize(w, 40);
+			b.setSize(w, 30);
 			// b.setTextColor(Color.WHITE);
 			b.setCssClass("table" + (n.accessType==AccessTypeEnum.FULL_TABLE_SCAN ? " fullTableScan" :
 				(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? " fullIndexScan" :
@@ -1071,13 +1075,13 @@ public class ExplainerSvg {
 			int w = cb.getWidth();
 			int h = cb.getHeight();
 			
-			Box ob = new CBox(); // outer box 
-			ob.setSize(w, h + 50 + 20);
+			Box ob = new CBox(); // outer box, nestedLoop exit edge is drawn inside the nestedLoop box
+			ob.setSize(w, h + 40);
 			ob.setEdgeStartPosition(cb.edgeStartX,  0);
 			
 			if (n.usingTemporaryTable) { 
 				Box tb = new CBox(); // label box
-				tb.setParentAndPosition(ob, cb.edgeStartX - 40, 50); 
+				tb.setParentAndPosition(ob, cb.edgeStartX - 40, 40); 
 				tb.setSize(w, 10);
 				tb.setCssClass("tempTableName");
 				tb.setLabel("tmp table"); 
@@ -1087,26 +1091,18 @@ public class ExplainerSvg {
 			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
 			lb.setCssClass("orderingOperation");
 			lb.setLabel("ORDER"); 
-			lb.setSize(80, 50);
+			lb.setSize(80, 40);
 			lb.setTooltip("Ordering operation\n\n" +
 				"Using Filesort: " + n.usingFilesort);
 
 			cb.connectTo(lb, "s"); // "up", 50, 30
-			cb.setParentAndPosition(ob, 0, 70);
+			cb.setParentAndPosition(ob, 0, 40);
 			
 			
 			return ob;
 			
 		}
 		public Box layout(GroupingOperationNode n) {
-			/*
-			Box b = new Box(); b.setLabel("GROUP");
-			b.setSize(80, 50);
-			NestedLoopNode nln = n.nestedLoop; // 1 child only
-			Box cb = layout(nln);
-			cb.connectTo(b, "s"); // "up", 40, 50
-			return b;
-			*/
 			
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
 			Box cb = layout(nln);
@@ -1115,17 +1111,17 @@ public class ExplainerSvg {
 			int h = cb.getHeight();
 			
 			Box ob = new CBox(); // outer box 
-			ob.setSize(w, h + 50 + 20);
+			ob.setSize(w, h + 40);
 			ob.setEdgeStartPosition(cb.edgeStartX,  0);
 			
 			Box lb = new Box(); // label box
 			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
 			lb.setCssClass("groupingOperation");
 			lb.setLabel("GROUP"); 
-			lb.setSize(80, 50);
+			lb.setSize(80, 40);
 
 			cb.connectTo(lb, "s"); // "up", 50, 30
-			cb.setParentAndPosition(ob, 0, 70);
+			cb.setParentAndPosition(ob, 0, 40);
 			
 			return ob;
 			
