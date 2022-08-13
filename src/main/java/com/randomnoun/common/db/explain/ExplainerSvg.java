@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -538,7 +539,9 @@ public class ExplainerSvg {
 		Color stroke = null; // Color.BLACK;
 		Color fill = null; // new Color(0, 0, 0, 0);
 		Color textColor = null; // Color.BLACK;
+		List<String> strokeDashArray = null;
 		String textAnchor = null;
+		
 		
 		List<Box> children = new ArrayList<Box>();
 		
@@ -561,6 +564,9 @@ public class ExplainerSvg {
 			//this.edgeStartY = edgeY;
 		}
 		public void setParentAndPosition(Box parent, int posX, int posY) {
+			if (this.layoutParent!=null) {
+				throw new IllegalStateException("twice");
+			}
 			this.layoutParent = parent;
 			this.posX = posX;
 			this.posY = posY;
@@ -582,7 +588,13 @@ public class ExplainerSvg {
 
 
 		public void addAll(List<Box> children) {
-			this.children.addAll(children);
+			for (Box c : children) {
+				if (c.layoutParent!=null) {
+					throw new IllegalStateException("twice");
+				}
+				this.children.add(c);
+			}
+			// this.children.addAll(children);
 		}
 
 		
@@ -647,6 +659,12 @@ public class ExplainerSvg {
 		}
 		public void setCssClass(String cssClass) {
 			this.cssClass = cssClass;
+		}
+		public List<String> getStrokeDashArray() {
+			return strokeDashArray;
+		}
+		public void setStrokeDashArray(List<String> strokeDashArray) {
+			this.strokeDashArray = strokeDashArray;
 		}
 		
 	}
@@ -828,15 +846,18 @@ public class ExplainerSvg {
 			}
 
 			// @TODO set offsets for all of those
-			ob.addAll(nestedLoopBoxes);
-			ob.addAll(tableBoxes);
+			// ob.addAll(nestedLoopBoxes);
+			// ob.addAll(tableBoxes);
 			ob.setEdgeStartPosition(prevNestedLoopBox.posX + 30, prevNestedLoopBox.posY); 
 			return ob;
 		}
 				
 		public Box layout(TableNode n) {
 			
-			int w = (n.accessType == AccessTypeEnum.FULL_TABLE_SCAN ? 100 : 150);
+			int w = (n.accessType==AccessTypeEnum.FULL_TABLE_SCAN ? 100 :
+				(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
+				(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? 150 :
+				(n.accessType==AccessTypeEnum.UNIQUE_KEY ? 125 : 100)))); 
 			int h = 68;
 			Box ob = new CBox(); // outer box
 			
@@ -872,8 +893,15 @@ public class ExplainerSvg {
 				h = 75 + qb.height + 5; // 5px padding bottom
 				w = Math.max(w, qb.width + 10); // 5px padding left and right
 
+				Box lb = new CBox();
+				lb.setCssClass("dotted"); // dotted line box
+				lb.setStroke(new Color(140, 140, 140)); // #8c8c8c
+				lb.setStrokeDashArray(Arrays.asList(new String[] { "4" }));
+				lb.setParentAndPosition(ob, 0, 0);
+				lb.setSize(w, h);
+
 				if (n.tableName != null) {
-					Box lb = new CBox(); // label box
+					lb = new CBox(); // label box
 					lb.setCssClass("materialisedTableName");
 					lb.setFill(new Color(232, 232, 232));
 					lb.setParentAndPosition(ob, 0, 40);
@@ -881,7 +909,7 @@ public class ExplainerSvg {
 					lb.setSize(w, 20);
 				}
 				if (n.key != null) {
-					Box lb = new CBox(); // label box
+					lb = new CBox(); // label box
 					lb.setCssClass("tableKey"); 
 					lb.setParentAndPosition(ob, 0, 60);
 					lb.setLabel(n.key); 
@@ -918,7 +946,7 @@ public class ExplainerSvg {
 			if (n.rowsExaminedPerScan != null) {
 				Box lb = new CBox(); // label box
 				lb.setCssClass("rhsQueryCost");  lb.setTextAnchor("end");
-				lb.setParentAndPosition(ob, 50, -10);
+				lb.setParentAndPosition(ob, w/2, -10);
 				lb.setLabel(String.valueOf(n.rowsExaminedPerScan) + 
 					(n.rowsExaminedPerScan == 1 ? " row" : " rows")); 
 				lb.setSize(w/2, 10);
@@ -1466,7 +1494,7 @@ public class ExplainerSvg {
 				}
 				
 				// pw.println("TD { vertical-align: top; }");
-				pw.println("</style>");
+				// add 1 to max as 1px lines on the border have 0.5px of that line outside the max co-ordinates
 				
 				s = "<!DOCTYPE html>\n" +
 				  "<html>\n" +
@@ -1476,7 +1504,7 @@ public class ExplainerSvg {
 				  "</style>\n" +
 				  "</head>\n" +
 				  "<body>\n" +
-				  "<svg width=\"" + rv.getMaxX() + "\" height=\"" + rv.getMaxY() + "\">\n";
+				  "<svg width=\"" + (rv.getMaxX()+1) + "\" height=\"" + (rv.getMaxY()+1) + "\">\n";
 				indent += 4;
 			}
 			for (int i=0; i<indent; i++) { s += " "; }
@@ -1513,8 +1541,9 @@ public class ExplainerSvg {
 				    " width=\"" + b.getWidth() + "\"" +
 				    " height=\"" + b.getHeight() + "\"" +
 					" style=\"" + 
-				      (b.stroke == null ? "" : "stroke:" + toHex(b.stroke) + ";") +
-					  (b.fill == null ? "" : "fill:" + toHex(b.fill)+ ";") + 
+				      (b.stroke == null ? "" : "stroke:" + toHex(b.stroke) + "; ") +
+					  (b.fill == null ? "" : "fill:" + toHex(b.fill)+ "; ") +
+					  (b.strokeDashArray == null ? "" : "stroke-dasharray:" + Text.escapeHtml(Text.join(b.strokeDashArray, " ")) + "; ") +
 					"\"/>\n"; // node
 			} else if (b.shape.equals("nestedLoop")) {
 				// s += is + "<path fill=\"none\" stroke=\"black\" d=\"M 30,0 L 60 30 L 30 60 L 0 30 L 30 0\"></path>\n";
@@ -1618,7 +1647,7 @@ public class ExplainerSvg {
 		// @TODO translate diagram so that top-left is 0, 0
 		RangeVisitor rv = new RangeVisitor();
 		b.traverse(rv);
-		logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
+		// logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 		b.posX -= rv.getMinX();
 		b.posY -= rv.getMinY();
 		
