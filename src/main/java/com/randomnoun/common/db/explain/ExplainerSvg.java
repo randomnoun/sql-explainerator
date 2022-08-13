@@ -412,88 +412,8 @@ public class ExplainerSvg {
 			super("nestedLoop", true);
 		}
 		
-		// probably need a getWidth() on nodes
-		// so that we can align things above them properly
-		/*
-		public long getLeftPaddingPixelWidth() {
-			// pixel width of child nodes 0 to n-1
-			int leftPad = 0; // should be getting this from npm really. boom boom.
-			for (int i = 0; i < this.children.size() - 1; i++) {
-				leftPad += this.children.get(i).getPixelWidth();
-			}
-			return leftPad;
-		}
-		
-		protected void writeHtml(PrintWriter pw) {
-			pw.println("<table display=\"display: inline-table;\">"); // of course it is
+			/*	
 			
-			// OK so my theory is that the 'prefixCost' is a cumulative cost of all the costs leading up to this node ( before = prefix )
-			
-			// on mysql workbench, the cost value leading out of the nestedLoop is the prefixCost of the last node
-			// and the row count leading out of the nestedLoop is the rowsProducedPerJoin of the last node
-			
-			// and the values above each table node is the evalCost + readCost of that table
-			
-			
-			if (this.children.size() > 0) {
-				for (int i = 0; i < this.children.size(); i++) {
-					TableNode c = (TableNode) this.children.get(i);
-					if (i == 0) {
-						pw.println("<td>");
-						pw.println("</td>");
-						pw.println("<td></td>"); // gap for right arrow
-						
-					} else {
-						pw.println("<td><div class=\"queryCost\">");
-						pw.println(c.costInfo==null || c.costInfo.prefixCost == null ? "" : c.costInfo.prefixCost);
-						pw.println("</div>");
-						if (i == this.children.size() - 1) {
-							pw.println("<div class=\"rhsQueryCost\">" +
-								(c.rowsProducedPerJoin == null ? "" : c.rowsProducedPerJoin + 
-									(c.rowsProducedPerJoin == 1 ? " row" : " rows")) +
-								"</div>"); // gap for right arrow
-						}						
-						pw.println("</td>");
-						if (i < this.children.size() - 1) {
-							pw.println("<td></td>"); // gap for right arrow
-						}
-					}
-				}
-				pw.println("</tr>");
-
-				
-				
-				pw.println("<tr>");
-				for (int i = 0; i < this.children.size(); i++) {
-					TableNode c = (TableNode) this.children.get(i);
-					if (i == 0) {
-						pw.println("<td>");
-						pw.println("<svg width=\"60\" height=\"60\"></svg>");
-						pw.println("</td>");
-						pw.println("<td class=\"rightArrow\"><div class=\"rightArrow\"></div>");
-						pw.println("</td>");
-						
-					} else {
-						pw.println("<td>");
-						// probably going to have to use SVG here aren't I
-						// holy crap I can't believe that almost worked
-						pw.println("<svg width=\"60\" height=\"60\"><g><path fill=\"none\" stroke=\"black\" d=\"M 30,0 L 60 30 L 30 60 L 0 30 L 30 0\"></path>");
-						pw.println("<text x=\"30\" y=\"25\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">nested</text>");
-						pw.println("<text x=\"30\" y=\"35\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">loop</text>");
-						pw.println("</g></svg>");
-						// pw.println("<div>nested loop</div>"); // tooltip: prefix cost
-						pw.println("</td>");
-						if (i < this.children.size() - 1) {
-							pw.println("<td class=\"rightArrow\">");
-							pw.println("<div class=\"nestedLoopRightArrowLabel\">" + (c.rowsProducedPerJoin == null ? "" :
-								c.rowsProducedPerJoin + (c.rowsProducedPerJoin == 1 ? " row" : " rows")) + "</div>");
-							pw.println("<div class=\"rightArrow\"></div>");
-							pw.println("</td>");
-						}
-					}
-				}
-				pw.println("</tr>");
-			}
 			if (this.children.size() > 0) {
 				pw.println("<tr>");
 				for (Node n : this.children) {
@@ -566,7 +486,10 @@ public class ExplainerSvg {
 	}
 	
 	public static class MaterialisedFromSubqueryNode extends Node {
-		public QuerySpecificationNode querySpecification;
+		public QueryBlockNode queryBlock;
+		public boolean dependent;
+		public boolean cacheable;
+		public boolean usingTemporaryTable;
 
 		public MaterialisedFromSubqueryNode() {
 			super("materialized_from_subquery", false);
@@ -786,6 +709,8 @@ public class ExplainerSvg {
 		public Box layout(QueryBlockNode n) {
 			Node c = n.queryNode; // 1 child only
 			// Box cb = layout(c); // this should do the polymorphic thing shouldn't it ?
+			
+			Box ob = new CBox(); // outer box
 			Box cb; // child box
 			// not happy about this
 			if (c instanceof UnionResultNode) { cb = layout((UnionResultNode) c); }
@@ -800,7 +725,6 @@ public class ExplainerSvg {
 			int w = cb.getWidth();
 			int h = cb.getHeight();
 			
-			Box ob = new CBox(); // outer box
 			ob.setSize(w, h + 50);
 			
 			String label = "query_block" + (n.selectId == null || n.selectId == 1 ? "" : " #" + n.selectId);
@@ -912,10 +836,65 @@ public class ExplainerSvg {
 				
 		public Box layout(TableNode n) {
 			
-			Box b = new Box(); b.setLabel("table");
 			int w = (n.accessType == AccessTypeEnum.FULL_TABLE_SCAN ? 100 : 150);
+			int h = 68;
+			Box ob = new CBox(); // outer box
+			
+			if (n.materialisedFromSubquery == null) {
+				if (n.tableName != null) {
+					Box lb = new CBox(); // label box
+					lb.setCssClass("tableName");
+					lb.setParentAndPosition(ob, 0, 40);
+					lb.setLabel(n.tableName); 
+					lb.setSize(w, 14);
+				}
+				if (n.key != null) {
+					Box lb = new CBox(); // label box
+					lb.setCssClass("tableKey"); 
+					lb.setParentAndPosition(ob, 0, 54);
+					lb.setLabel(n.key); 
+					lb.setSize(w, 14);
+				}
+			} else {
+				// QuerySpecificationNode querySpec = n.materialisedFromSubquery.querySpecification;
+				QueryBlockNode queryBlock = n.materialisedFromSubquery.queryBlock;
+				Box qb = layout(queryBlock);
+				// reset to 0,0
+
+				RangeVisitor rv = new RangeVisitor();
+				qb.traverse(rv);
+				logger.info("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
+				// qb.posX -= rv.getMinX();
+				// qb.posY -= rv.getMinY();
+
+				qb.setParentAndPosition(ob, 5 - rv.getMinX(), 75); // hmm 
+				
+				h = 75 + qb.height + 5; // 5px padding bottom
+				w = Math.max(w, qb.width + 10); // 5px padding left and right
+
+				if (n.tableName != null) {
+					Box lb = new CBox(); // label box
+					lb.setCssClass("materialisedTableName");
+					lb.setFill(new Color(232, 232, 232));
+					lb.setParentAndPosition(ob, 0, 40);
+					lb.setLabel(n.tableName + " (materialised)"); 
+					lb.setSize(w, 20);
+				}
+				if (n.key != null) {
+					Box lb = new CBox(); // label box
+					lb.setCssClass("tableKey"); 
+					lb.setParentAndPosition(ob, 0, 60);
+					lb.setLabel(n.key); 
+					lb.setSize(w, 14);
+				}
+
+			}
+
+			ob.setEdgeStartPosition(w / 2, 0);
+			
+			Box b = new Box(); 
+			b.setParentAndPosition(ob, 0, 0);
 			b.setSize(w, 40);
-			b.setEdgeStartPosition(w / 2, 0);
 			// b.setTextColor(Color.WHITE);
 			b.setCssClass("table" + (n.accessType==AccessTypeEnum.FULL_TABLE_SCAN ? " fullTableScan" :
 				(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? " fullIndexScan" :
@@ -932,19 +911,23 @@ public class ExplainerSvg {
 					(costInfo.readCost == null ? (double) 0 : costInfo.readCost);
 				Box lb = new CBox(); // label box
 				lb.setCssClass("lhsQueryCost"); lb.setTextAnchor("start");
-				lb.setParentAndPosition(b, 0, -10);
+				lb.setParentAndPosition(ob, 0, -10);
 				lb.setLabel(String.valueOf(cost)); 
 				lb.setSize(w/2, 10);
 			}
-			
 			if (n.rowsExaminedPerScan != null) {
 				Box lb = new CBox(); // label box
 				lb.setCssClass("rhsQueryCost");  lb.setTextAnchor("end");
-				lb.setParentAndPosition(b, 50, -10);
+				lb.setParentAndPosition(ob, 50, -10);
 				lb.setLabel(String.valueOf(n.rowsExaminedPerScan) + 
-					(n.rowsExaminedPerScan == 1 ? " row" : "rows")); 
+					(n.rowsExaminedPerScan == 1 ? " row" : " rows")); 
 				lb.setSize(w/2, 10);
 			}
+			
+			ob.setSize(w, h);
+			return ob;
+			
+			
 
 			// materialised view here
 			//NestedLoopNode nln = n.nestedLoop; // 1 child only
@@ -1009,7 +992,7 @@ public class ExplainerSvg {
 		*/
 			 
 			
-			return b;
+			
 			
 		}
 		public Box layout(OrderingOperationNode n) {
@@ -1046,12 +1029,37 @@ public class ExplainerSvg {
 			
 		}
 		public Box layout(GroupingOperationNode n) {
+			/*
 			Box b = new Box(); b.setLabel("GROUP");
 			b.setSize(80, 50);
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
 			Box cb = layout(nln);
 			cb.connectTo(b, "s"); // "up", 40, 50
 			return b;
+			*/
+			
+			NestedLoopNode nln = n.nestedLoop; // 1 child only
+			Box cb = layout(nln);
+			
+			int w = cb.getWidth();
+			int h = cb.getHeight();
+			
+			Box ob = new CBox(); // outer box 
+			ob.setSize(w, h + 50 + 20);
+			ob.setEdgeStartPosition(cb.edgeStartX,  0);
+			
+			Box lb = new Box(); // label box
+			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
+			lb.setCssClass("groupingOperation");
+			lb.setLabel("GROUP"); 
+			lb.setSize(80, 50);
+
+			cb.connectTo(lb, "s"); // "up", 50, 30
+			cb.setParentAndPosition(ob, 0, 70);
+			
+			return ob;
+			
+			
 		}
 		
 		public Box layout(Node n) {
@@ -1193,11 +1201,16 @@ public class ExplainerSvg {
 		
 		private MaterialisedFromSubqueryNode parseMaterialisedFromSubquery(JSONObject obj) {
 			MaterialisedFromSubqueryNode n = new MaterialisedFromSubqueryNode();
+			n.dependent = (Boolean) obj.get("dependent");
+			n.cacheable = (Boolean) obj.get("cacheable");
+			n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table");
+			
 			n.attributes.put("dependent", obj.get("dependent"));
 			n.attributes.put("cacheable", obj.get("cacheable"));
 			n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table")); // boolean
 			if (obj.containsKey("query_block")) {
-				Node cn = parseQueryBlock((JSONObject) obj.get("query_block"));
+				QueryBlockNode cn = parseQueryBlock((JSONObject) obj.get("query_block"));
+				n.queryBlock = cn;
 				n.addChild(cn);
 			} else {
 				throw new IllegalArgumentException("expected query_block in query_specification: " + obj.toString());
@@ -1602,11 +1615,10 @@ public class ExplainerSvg {
 		Box b = layout.getLayoutBox();
 		
 		
+		// @TODO translate diagram so that top-left is 0, 0
 		RangeVisitor rv = new RangeVisitor();
 		b.traverse(rv);
 		logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
-
-		// @TODO translate it so that it so minx, miny is 0, 0
 		b.posX -= rv.getMinX();
 		b.posY -= rv.getMinY();
 		

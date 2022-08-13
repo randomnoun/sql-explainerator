@@ -19,8 +19,9 @@ svg g.union > rect { fill: #b3b3b3; }
 
 svg g.duplicatesRemoval > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
 svg g.orderingOperation > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
+svg g.groupingOperation > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
 
-svg g.table.nonUniqueKey > rect { fill: #008000; }
+svg g.table.nonUniqueKey > rect { fill: #339933; }
 svg g.table.nonUniqueKey > text { fill: white; }
 
 svg g.table.uniqueKey > rect { fill: #008000; }
