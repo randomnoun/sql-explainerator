@@ -594,7 +594,7 @@ public class ExplainerSvg {
 				if (cb == null) {
 					Box ntb = new CBox(); // label box
 					ntb.setCssClass("tableName" + clazz);
-					ntb.setParentAndPosition(ob, 0, 30);
+					ntb.setParentAndPosition(ob, 0, 35);
 					ntb.setSize(100, 10);
 					ntb.setLabel("No tables used"); 
 					ntb.setTooltip(tooltip);
@@ -692,17 +692,21 @@ public class ExplainerSvg {
 		
 		public Box layout(DuplicatesRemovalNode n) {
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
-			Box cb = layout(nln);
+			Box qb = layout(nln);
 			
-			int w = cb.getWidth();
-			int h = cb.getHeight();
+			int w = qb.getWidth();
+			int h = qb.getHeight();
 			
-			Box ob = new CBox(); // outer box 
-			ob.setSize(w, h + 40);
-			ob.setEdgeStartPosition(cb.edgeStartX,  0);
+			Box ob = new CBox(); // outer box
+			ob.setSize(w, h + 10 + 45);
+			ob.setEdgeStartPosition(qb.edgeStartX,  0);
+
+			Box cb = new CBox(); // container box
+			cb.setParentAndPosition(ob,  qb.edgeStartX - 40, 0);
+			cb.setSize(80, n.usingTemporaryTable ? 55 : 40);
 			
 			Box lb = new Box(); // label box
-			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
+			lb.setParentAndPosition(ob, qb.edgeStartX - 40, 0);
 			lb.setCssClass("duplicatesRemoval");
 			lb.setLabel("DISTINCT"); 
 			lb.setSize(80, 40);
@@ -713,11 +717,11 @@ public class ExplainerSvg {
 				ttBox.setSize(80, 10);
 				ttBox.setCssClass("tempTableName");
 				ttBox.setTextAnchor("start");
-				ttBox.setParentAndPosition(ob, cb.edgeStartX - 40, 40);
+				ttBox.setParentAndPosition(ob, qb.edgeStartX - 40, 45);
 			}
 
-			cb.connectTo(lb, "s"); // "up", 50, 30
-			cb.setParentAndPosition(ob, 0, 40);
+			qb.connectTo(cb, "s"); // "up", 50, 30
+			qb.setParentAndPosition(ob, 0, 40);
 			
 			return ob;
 
@@ -762,7 +766,7 @@ public class ExplainerSvg {
 				
 				Box lb = new CBox(); // label box
 				lb.setCssClass("queryCost");
-				lb.setParentAndPosition(b, -10, -10);
+				lb.setParentAndPosition(b, -10, -15);
 				lb.setLabel(String.valueOf(qsn.costInfo.getPrefixCost())); 
 				lb.setTextAnchor("start");
 				lb.setSize(40, 10);
@@ -770,7 +774,7 @@ public class ExplainerSvg {
 				if (i == tableBoxes.size() - 1) {
 					lb = new CBox(); // label box
 					lb.setCssClass("queryCost");
-					lb.setParentAndPosition(b, 35, -10);
+					lb.setParentAndPosition(b, 40, -10);
 					lb.setLabel(String.valueOf(qsn.rowsProducedPerJoin) +
 						(qsn.rowsProducedPerJoin == 1 ? " row" : " rows")); 
 					lb.setTextAnchor("start");
@@ -813,21 +817,21 @@ public class ExplainerSvg {
 				(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
 				(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? 150 :
 				(n.accessType==AccessTypeEnum.UNIQUE_KEY ? 125 : 100)))); 
-			int h = 58;
+			int h = 60;
 			Box ob = new CBox(); // outer box
 			
 			if (n.materialisedFromSubquery == null) {
 				if (n.tableName != null) {
 					Box lb = new CBox(); // label box
 					lb.setCssClass("tableName");
-					lb.setParentAndPosition(ob, 0, 30);
+					lb.setParentAndPosition(ob, 0, 32);
 					lb.setLabel(n.tableName); 
 					lb.setSize(w, 14);
 				}
 				if (n.key != null) {
 					Box lb = new CBox(); // label box
 					lb.setCssClass("tableKey"); 
-					lb.setParentAndPosition(ob, 0, 44);
+					lb.setParentAndPosition(ob, 0, 46);
 					lb.setLabel(n.key); 
 					lb.setSize(w, 14);
 				}
@@ -860,14 +864,14 @@ public class ExplainerSvg {
 					lb = new CBox(); // label box
 					lb.setCssClass("materialisedTableName");
 					lb.setFill(new Color(232, 232, 232));
-					lb.setParentAndPosition(ob, 0, 30);
+					lb.setParentAndPosition(ob, 0, 32);
 					lb.setLabel(n.tableName + " (materialised)"); 
 					lb.setSize(w, 20);
 				}
 				if (n.key != null) {
 					lb = new CBox(); // label box
 					lb.setCssClass("tableKey"); 
-					lb.setParentAndPosition(ob, 0, 50);
+					lb.setParentAndPosition(ob, 0, 52);
 					lb.setLabel(n.key); 
 					lb.setSize(w, 14);
 				}
@@ -895,14 +899,14 @@ public class ExplainerSvg {
 					(costInfo.getReadCost() == null ? (double) 0 : costInfo.getReadCost());
 				Box lb = new CBox(); // label box
 				lb.setCssClass("lhsQueryCost"); lb.setTextAnchor("start");
-				lb.setParentAndPosition(ob, 0, -10);
+				lb.setParentAndPosition(ob, 0, -15);
 				lb.setLabel(String.valueOf(cost)); 
 				lb.setSize(w/2, 10);
 			}
 			if (n.rowsExaminedPerScan != null) {
 				Box lb = new CBox(); // label box
 				lb.setCssClass("rhsQueryCost");  lb.setTextAnchor("end");
-				lb.setParentAndPosition(ob, w/2, -10);
+				lb.setParentAndPosition(ob, w/2, -15);
 				lb.setLabel(String.valueOf(n.rowsExaminedPerScan) + 
 					(n.rowsExaminedPerScan == 1 ? " row" : " rows")); 
 				lb.setSize(w/2, 10);
@@ -935,7 +939,7 @@ public class ExplainerSvg {
 			
 			if (n.usingTemporaryTable) { 
 				Box tb = new CBox(); // label box
-				tb.setParentAndPosition(ob, cb.edgeStartX - 40, 40); 
+				tb.setParentAndPosition(ob, cb.edgeStartX - 40, 45); 
 				tb.setSize(w, 10);
 				tb.setCssClass("tempTableName");
 				tb.setLabel("tmp table"); 
