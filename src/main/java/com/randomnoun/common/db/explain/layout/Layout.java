@@ -38,13 +38,21 @@ public class Layout {
 	public Layout(QueryBlockNode topNode) {
 		this.topNode = topNode;
 	}
-	
+
 	public Box getLayoutBox() {
 		Box b = layout(topNode, "query_block", true);
 		// probably need to reposition everything so that it starts at 0,0
 		return b;
 	}
-	
+
+	private <T> Stream<T> reverseStream(List<T> children) {
+		// this is the sort of thing I would have expected to find on 
+		//   https://stackoverflow.com/questions/24010109/java-8-stream-reverse-order 
+		// but didn't
+		return IntStream.range(0, children.size())
+			.mapToObj(i -> children.get(children.size() - i - 1)); 
+	}
+
 
 	private Box layout(QueryBlockNode n, String queryBlockLabel) {
 		return layout(n, queryBlockLabel, false);
@@ -508,12 +516,5 @@ public class Layout {
 		throw new UnsupportedOperationException("layout for node " + n.getClass().getName() + " not implemented");
 	}
 	
-	protected <T> Stream<T> reverseStream(List<T> children) {
-		// why the hell isn't this on https://stackoverflow.com/questions/24010109/java-8-stream-reverse-order 
-		// ?
-		return IntStream.range(0, children.size())
-			.mapToObj(i -> children.get(children.size() - i - 1)); 
-	}
-
 	
 }
