@@ -98,7 +98,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 				is + "    </rect>\n");
 		} else if (b.getShape().equals("nestedLoop")) {
 			// s += is + "<path fill=\"none\" stroke=\"black\" d=\"M 30,0 L 60 30 L 30 60 L 0 30 L 30 0\"></path>\n";
-			s += is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\">";
+			s += is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\">\n";
 			s += is + "    <title>" + Text.escapeHtml(b.getTooltip())+ "</title>\n"; 
 			s += is + "</path>\n";
 			s += is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 25) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">nested</text>\n";
