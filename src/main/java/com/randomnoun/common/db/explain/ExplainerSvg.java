@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -401,32 +402,6 @@ public class ExplainerSvg {
 			super("nestedLoop", true);
 		}
 		
-			/*	
-			
-			if (this.children.size() > 0) {
-				pw.println("<tr>");
-				for (Node n : this.children) {
-					TableNode c = (TableNode) n;
-					pw.println("<td>");
-					pw.println("<div><div class=\"upArrow\"></div>");
-					c.writeHtml(pw);
-					pw.println("</td>");
-					if (c.attachedSubqueries == null) {
-						pw.println("<td>"); // gap for right arrow
-						pw.println("</td>");
-					} else {
-						// that bit.
-						pw.println("<td>"); // gap for right arrow
-						c.attachedSubqueries.writeHtml(pw);
-						pw.println("</td>");
-					}
-				}
-				pw.println("</tr>");
-			}
-			pw.println("</td></tr>");
-			pw.println("</table>");
-		}
-		*/
 	}
 	
 	public static class TableNode extends Node {
@@ -452,26 +427,7 @@ public class ExplainerSvg {
 			super("attached_subqueries", true);
 		}
 		
-		/*
-		protected void writeHtml(PrintWriter pw) {
-			pw.println("<table display=\"display: inline-table;\">"); // of course it is
-			pw.println("<tr><td><div class=\"leftArrow\"></div></td>");
-			pw.println("    <td><div class=\"attachedSubqueries\">attached_subqueries</div></td>");
-			pw.println("</tr>");
-			pw.println("<tr><td></td>"); // gap for leftArrow
-			pw.println("    <td><div class=\"upArrow\"></div></td>");
-			pw.println("</tr>");
-			pw.println("<tr><td></td>");
-			pw.println("    <td>");
-			querySpecification.writeHtml(pw);
-			// the attached subquery
-			pw.println("    </td>");
-			pw.println("</tr>");
-			
-			pw.println("</table>");
-			
-		}
-		*/
+
 	}
 	
 	public static class MaterialisedFromSubqueryNode extends Node {
@@ -596,6 +552,7 @@ public class ExplainerSvg {
 		public int[] getAbsolutePortPosition(String d) {
 			if (d.equals("s")) { return new int[] { getAbsoluteX() + (getWidth() / 2), getAbsoluteY() + getHeight() }; }
 			else if  (d.equals("w")) { return new int[] { getAbsoluteX(), getAbsoluteY() + (getHeight() / 2) }; }
+			else if  (d.equals("e")) { return new int[] { getAbsoluteX() + getWidth(), getAbsoluteY() + (getHeight() / 2) }; }
 			else {
 				throw new IllegalArgumentException("Unknown port '" + d + "'");
 			}
@@ -713,13 +670,17 @@ public class ExplainerSvg {
 		}
 		
 		public Box getLayoutBox() {
-			Box b = layout(topNode, true);
+			Box b = layout(topNode, "query_block", true);
 			// probably need to reposition everything so that it starts at 0,0
 			return b;
 		}
 
 		// make these all protected later
-		public Box layout(QueryBlockNode n, boolean drawQueryBlock) {
+		public Box layout(QueryBlockNode n, String queryBlockLabel) {
+			return layout(n, queryBlockLabel, false);
+		}
+		
+		public Box layout(QueryBlockNode n, String queryBlockLabel, boolean topNode) {
 			Node c = n.queryNode; // 1 child only
 			
 			Box ob = new CBox(); // outer box
@@ -738,11 +699,11 @@ public class ExplainerSvg {
 				w = cb.getWidth();
 				h = cb.getHeight();
 			}
-			ob.setSize(w, h + (drawQueryBlock ? 30 + 30 : 0));
+			ob.setSize(w, h + (queryBlockLabel == null ? 0 : 30 + 30));
 			
-			if (drawQueryBlock) {
-				String label = "query_block" + (n.selectId == null || n.selectId == 1 ? "" : " #" + n.selectId);
-				String clazz = (n.selectId == null || n.selectId == 1 ? " topNode" : "");
+			if (queryBlockLabel != null) {
+				String label = queryBlockLabel + (topNode ? "" : " #" + n.selectId); // n.selectId == null || n.selectId == 1
+				String clazz = (topNode ? " topNode" : ""); // n.selectId == null || n.selectId == 1
 				String tooltip = "Select ID: " + n.selectId + "\n" +
 				  (n.costInfo == null ? "" :"Query cost: " + n.costInfo.getQueryCost() + "\n");
 				
@@ -788,7 +749,7 @@ public class ExplainerSvg {
 			Box cb = new CBox(); // connector box
 			
 			List<Box> qsBoxes = reverseStream(qsnList)
-				.map(c -> layout(c))
+				.map(c -> layout(c, "query_block"))
 				.collect(Collectors.toList());
 			
 			List<Integer> tableWidths = qsBoxes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
@@ -819,17 +780,53 @@ public class ExplainerSvg {
 			return ob;
 		}
 		
+		public Box layout(AttachedSubqueriesNode n) {
+			// @TODO multiple qsns
+			List<QuerySpecificationNode> qsnList = Collections.singletonList(n.querySpecification);
+			
+			Box ob = new CBox(); // outer box
+			Box cb = new CBox(); // connector box
+			
+			List<Box> qsBoxes = reverseStream(qsnList)
+				.map(c -> layout(c, "subquery"))
+				.collect(Collectors.toList());
+			
+			List<Integer> tableWidths = qsBoxes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
+			List<Integer> tableHeights = qsBoxes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+			int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
+				+ (qsBoxes.size() - 1) * 50; // 50px padding
+			int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
+
+			ob.setSize(totalWidth,  30 + maxHeight);
+			
+			cb.setParentAndPosition(ob, 0, 0);
+			cb.setSize(totalWidth,  30); 
+			
+			Box b = new Box();
+			b.setParentAndPosition(cb,  0,  0);
+			b.setLabel("attached_subqueries");
+			// b.setFill(new Color(0, 0, 0)); // #b3b3b3
+			b.setSize(totalWidth, 30);
+			b.setStrokeDashArray(Arrays.asList(new String[] { "2" }));
+			int offset = 0;
+			for (Box qsb : qsBoxes) {
+				qsb.setParentAndPosition(ob, offset, 30);
+				int w = qsb.getWidth();
+				qsb.connectTo(cb, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
+				offset += w + 20;
+			}
+			ob.setEdgeStartPosition(0, 15);
+			
+			return ob;
+		}
+		
+		
 		public Box layout(DuplicatesRemovalNode n) {
 			// return null;
 			/*
 			Box b = new Box(); b.setLabel("DISTINCT");
 			b.setSize(80, 50);
-			if (n.usingTemporaryTable) {
-				Box ttBox = new Box(); 
-				b.setLabel("tmp table");
-				ttBox.setSize(80, 20);
-				ttBox.setParentAndPosition(b, 60, 55);
-			}
+			
 			
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
 			Box cb = layout(nln);
@@ -852,6 +849,15 @@ public class ExplainerSvg {
 			lb.setCssClass("duplicatesRemoval");
 			lb.setLabel("DISTINCT"); 
 			lb.setSize(80, 40);
+			
+			if (n.usingTemporaryTable) {
+				Box ttBox = new CBox(); 
+				ttBox.setLabel("tmp table");
+				ttBox.setSize(80, 10);
+				ttBox.setCssClass("tempTableName");
+				ttBox.setTextAnchor("start");
+				ttBox.setParentAndPosition(ob, cb.edgeStartX - 40, 40);
+			}
 
 			cb.connectTo(lb, "s"); // "up", 50, 30
 			cb.setParentAndPosition(ob, 0, 40);
@@ -892,7 +898,7 @@ public class ExplainerSvg {
 				TableNode qsn = n.tables.get(i);
 				b.setShape("nestedLoop");
 				b.setSize(60, 60); // diamond
-				b.setParentAndPosition(ob, tb.posX + (tableWidths.get(i)/2) - 30, 50); // centered above table beneath it
+				b.setParentAndPosition(ob, tb.posX + tb.edgeStartX /*(tableWidths.get(i)/2)*/ - 30, 50); // centered above table beneath it
 				b.setTooltip("nested_loop\n\n" +
 				   "Prefix Cost: " + qsn.costInfo.getPrefixCost());
 				nestedLoopBoxes.add(b);
@@ -964,8 +970,7 @@ public class ExplainerSvg {
 			} else {
 				QueryBlockNode queryBlock = n.materialisedFromSubquery.queryBlock;
 				Box qb;
-				boolean drawQueryBlockInMaterialisedSubquery = false;
-				qb = layout(queryBlock, drawQueryBlockInMaterialisedSubquery);
+				qb = layout(queryBlock, null); // query_blocks in materialised queries aren't drawn for some reason
 				// reset to 0,0
 
 				RangeVisitor rv = new RangeVisitor();
@@ -1037,6 +1042,18 @@ public class ExplainerSvg {
 				lb.setLabel(String.valueOf(n.rowsExaminedPerScan) + 
 					(n.rowsExaminedPerScan == 1 ? " row" : " rows")); 
 				lb.setSize(w/2, 10);
+			}
+			
+			if (n.attachedSubqueries != null) {
+				// @TODO may be more than one attached subquery
+				// QueryBlockNode queryBlock = n.attachedSubqueries.querySpecification.queryBlock;
+				
+				Box qb = layout(n.attachedSubqueries);
+				qb.setParentAndPosition(ob, w + 50, 0);
+				qb.connectTo(b, "e");
+				w = w + 50 + qb.getWidth();
+				h = Math.max(h,  qb.getHeight());
+			
 			}
 			
 			ob.setSize(w, h);
@@ -1171,11 +1188,11 @@ public class ExplainerSvg {
 			
 		}
 		
-		public Box layout(QuerySpecificationNode n ) {
+		public Box layout(QuerySpecificationNode n, String queryBlockLabel) {
 
 			QueryBlockNode qb = n.queryBlock;
 			
-			Box cb = layout(qb, true);
+			Box cb = layout(qb, queryBlockLabel);
 			
 			int w = cb.getWidth();
 			int h = cb.getHeight();
@@ -1617,7 +1634,13 @@ public class ExplainerSvg {
 				  "</style>\n" +
 				  "</head>\n" +
 				  "<body>\n" +
-				  "<svg width=\"" + (rv.getMaxX()+1) + "\" height=\"" + (rv.getMaxY()+1) + "\">\n";
+				  "<svg width=\"" + (rv.getMaxX()+1) + "\" height=\"" + (rv.getMaxY()+1) + "\">\n" +
+				  // svg arrowhead modified from http://thenewcode.com/1068/Making-Arrows-in-SVG
+				  "<defs>\n" +
+				  "    <marker id=\"arrowhead\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n" +
+				  "      <polygon points=\"0 0, 10 3.5, 0 7\" />\n" +
+				  "    </marker>\n" +
+				  "  </defs>";
 				indent += 4;
 			}
 			for (int i=0; i<indent; i++) { s += " "; }
@@ -1694,19 +1717,21 @@ public class ExplainerSvg {
 				}
 				
 				if ((x + b.edgeStartX) == lineTo[0] || (y + b.edgeStartY == lineTo[1])) {
-					s += is + "    <path d=\"M " + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
-				      "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
-					  " style=\"stroke:#000000;\"/>\n";
+					// marker-end="url(#arrowhead)"
+					
+					s += is + "    <polyline points=\"" + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
+				      (lineTo[0]) + "," + (lineTo[1]) + "\"" +
+					  " style=\"stroke:#000000;\" marker-end=\"url(#arrowhead)\"/>\n";
 				} else if (y + b.edgeStartY > lineTo[1]) { // up and horizontal
-					s += is + "    <path d=\"M " + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
-				      "L " + (x + b.edgeStartX) + "," + (lineTo[1]) + " " + 
-					  "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
-					  " style=\"stroke:#000000; fill:none;\"/>\n";
+					s += is + "    <polyline points=\"" + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
+				      (x + b.edgeStartX) + "," + (lineTo[1]) + " " + 
+					  (lineTo[0]) + "," + (lineTo[1]) + "\"" +
+					  " style=\"stroke:#000000; fill:none;\" marker-end=\"url(#arrowhead)\"/>\n";
 				} else {  // horizontal and down 
-					s += is + "    <path d=\"M " + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
-				      "L " + (lineTo[0]) + "," + (y + b.edgeStartY) + " " + 
-					  "L " + (lineTo[0]) + "," + (lineTo[1]) + "\"" +
-					  " style=\"stroke:#000000; fill:none;\"/>\n";
+					s += is + "    <polyline points=\"" + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
+				      (lineTo[0]) + "," + (y + b.edgeStartY) + " " + 
+					  (lineTo[0]) + "," + (lineTo[1]) + "\"" +
+					  " style=\"stroke:#000000; fill:none;\" marker-end=\"url(#arrowhead)\"/>\n";
 				}
 			}
 			
