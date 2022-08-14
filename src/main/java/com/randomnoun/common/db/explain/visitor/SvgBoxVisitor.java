@@ -11,6 +11,10 @@ import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.graph.Box;
 
+/** Converts a box layout into an SVG diagram 
+ * 
+ * @author knoxg
+ */
 public class SvgBoxVisitor extends BoxVisitor {
 	
 	Logger logger = Logger.getLogger(SvgBoxVisitor.class);

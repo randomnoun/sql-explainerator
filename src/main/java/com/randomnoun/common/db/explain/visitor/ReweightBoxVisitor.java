@@ -2,6 +2,10 @@ package com.randomnoun.common.db.explain.visitor;
 
 import com.randomnoun.common.db.explain.graph.Box;
 
+/** A BoxVisitor that will rescale connection weights from 'number of rows' values to pixel values
+ * 
+ * @author knoxg
+ */
 public class ReweightBoxVisitor extends BoxVisitor {
 	private double minWeight = Double.MAX_VALUE;
 	private double maxWeight = Double.MIN_VALUE;

@@ -2,6 +2,12 @@ package com.randomnoun.common.db.explain.visitor;
 
 import com.randomnoun.common.db.explain.graph.Box;
 
+/** A BoxVisitor that captures the minimum and maximum X and Y co-ordinates of the boxes in this layout.
+ * 
+ * It also captures the minimum and maximum weight of connection lines, which are rescaled in ReweightBoxVisitor
+ * 
+ * @author knoxg
+ */
 public class RangeBoxVisitor extends BoxVisitor {
 	
 	int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
