@@ -34,6 +34,7 @@ public class Layout {
 	Logger logger = Logger.getLogger(Layout.class);
 	
 	private QueryBlockNode topNode;
+	
 	public Layout(QueryBlockNode topNode) {
 		this.topNode = topNode;
 	}
@@ -43,13 +44,13 @@ public class Layout {
 		// probably need to reposition everything so that it starts at 0,0
 		return b;
 	}
+	
 
-	// make these all protected later
-	public Box layout(QueryBlockNode n, String queryBlockLabel) {
+	private Box layout(QueryBlockNode n, String queryBlockLabel) {
 		return layout(n, queryBlockLabel, false);
 	}
 	
-	public Box layout(QueryBlockNode n, String queryBlockLabel, boolean topNode) {
+	private Box layout(QueryBlockNode n, String queryBlockLabel, boolean topNode) {
 		Node c = n.getQueryNode(); // 1 child only
 		
 		Box ob = new CBox(); // outer box
@@ -111,7 +112,7 @@ public class Layout {
 		return ob;
 	}
 	
-	public Box layout(UnionResultNode n) {
+	private Box layout(UnionResultNode n) {
 		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
 		
 		Box ob = new CBox(); // outer box
@@ -149,7 +150,7 @@ public class Layout {
 		return ob;
 	}
 	
-	public Box layout(AttachedSubqueriesNode n) {
+	private Box layout(AttachedSubqueriesNode n) {
 		// @TODO multiple qsns
 		List<QuerySpecificationNode> qsnList = Collections.singletonList(n.getQuerySpecification());
 		
@@ -190,7 +191,7 @@ public class Layout {
 	}
 	
 	
-	public Box layout(DuplicatesRemovalNode n) {
+	private Box layout(DuplicatesRemovalNode n) {
 		NestedLoopNode nln = n.getNestedLoop(); // 1 child only
 		Box qb = layout(nln);
 		
@@ -227,7 +228,7 @@ public class Layout {
 
 	}
 	
-	public Box layout(NestedLoopNode n) {
+	private Box layout(NestedLoopNode n) {
 		List<Box> nestedLoopBoxes = new ArrayList<Box>();
 		List<TableNode> qsnList = n.getTables();
 		
@@ -311,7 +312,7 @@ public class Layout {
 		return ob;
 	}
 			
-	public Box layout(TableNode n) {
+	private Box layout(TableNode n) {
 		
 		int w = (n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? 100 :
 			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
@@ -425,7 +426,7 @@ public class Layout {
 		return ob;
 		
 	}
-	public Box layout(OrderingOperationNode n) {
+	private Box layout(OrderingOperationNode n) {
 
 		NestedLoopNode nln = n.nestedLoop; // 1 child only
 		Box cb = layout(nln);
@@ -460,7 +461,7 @@ public class Layout {
 		return ob;
 		
 	}
-	public Box layout(GroupingOperationNode n) {
+	private Box layout(GroupingOperationNode n) {
 		
 		NestedLoopNode nln = n.getNestedLoop(); // 1 child only
 		Box cb = layout(nln);
@@ -486,7 +487,7 @@ public class Layout {
 		
 	}
 	
-	public Box layout(QuerySpecificationNode n, String queryBlockLabel) {
+	private Box layout(QuerySpecificationNode n, String queryBlockLabel) {
 
 		QueryBlockNode qb = n.getQueryBlock();
 		
@@ -503,7 +504,7 @@ public class Layout {
 		return ob;
 	}
 	
-	public Box layout(Node n) {
+	private Box layout(Node n) {
 		throw new UnsupportedOperationException("layout for node " + n.getClass().getName() + " not implemented");
 	}
 	
