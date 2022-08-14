@@ -2,11 +2,11 @@ package com.randomnoun.common.db.explain.visitor;
 
 import com.randomnoun.common.db.explain.graph.Box;
 
-public class ReweightVisitor extends BoxVisitor {
+public class ReweightBoxVisitor extends BoxVisitor {
 	private double minWeight = Double.MAX_VALUE;
 	private double maxWeight = Double.MIN_VALUE;
 	
-	public ReweightVisitor(double minWeight, double maxWeight) {
+	public ReweightBoxVisitor(double minWeight, double maxWeight) {
 		this.minWeight = minWeight;
 		this.maxWeight = maxWeight;
 	}

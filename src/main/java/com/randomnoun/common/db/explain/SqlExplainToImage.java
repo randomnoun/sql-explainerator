@@ -16,7 +16,7 @@ import com.randomnoun.common.db.explain.graph.Box;
 import com.randomnoun.common.db.explain.layout.Layout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.visitor.RangeBoxVisitor;
-import com.randomnoun.common.db.explain.visitor.ReweightVisitor;
+import com.randomnoun.common.db.explain.visitor.ReweightBoxVisitor;
 import com.randomnoun.common.db.explain.visitor.SvgBoxVisitor;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
@@ -85,7 +85,7 @@ public class SqlExplainToImage {
 		b.setPosX(b.getPosX() - rv.getMinX());
 		b.setPosY(b.getPosY() - rv.getMinY());
 		
-		ReweightVisitor rwv = new ReweightVisitor(rv.getMinWeight(), rv.getMaxWeight());
+		ReweightBoxVisitor rwv = new ReweightBoxVisitor(rv.getMinWeight(), rv.getMaxWeight());
 		b.traverse(rwv);
 
 		
