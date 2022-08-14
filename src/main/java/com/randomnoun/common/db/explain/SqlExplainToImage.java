@@ -14,6 +14,7 @@ import org.json.simple.parser.ParseException;
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.db.explain.graph.Box;
 import com.randomnoun.common.db.explain.layout.Layout;
+import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.visitor.RangeVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightVisitor;
 import com.randomnoun.common.db.explain.visitor.SvgBoxVisitor;
@@ -73,7 +74,7 @@ public class SqlExplainToImage {
 		out2.close();
 		
 		// diagram attempts
-		Layout layout = new Layout(pp.topNode);
+		Layout layout = new Layout(pp.getTopNode());
 		Box b = layout.getLayoutBox();
 		
 		

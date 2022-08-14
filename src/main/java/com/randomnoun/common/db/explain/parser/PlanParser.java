@@ -1,4 +1,4 @@
-package com.randomnoun.common.db.explain;
+package com.randomnoun.common.db.explain.parser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +25,10 @@ import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
 
+/** Convert JSON to a hierarchy of Nodes */
 public class PlanParser {
 
-	QueryBlockNode topNode;
+	private QueryBlockNode topNode;
 	String json;
 	
 	public PlanParser(String json, String server_version) throws ParseException {
@@ -318,6 +319,14 @@ public class PlanParser {
 	public String toJson() {
 		
 		return "{ \"" + Text.escapeJavascript(topNode.getJsonType()) + "\": " + topNode.toJson() + "}";
+	}
+
+	public QueryBlockNode getTopNode() {
+		return topNode;
+	}
+
+	public void setTopNode(QueryBlockNode topNode) {
+		this.topNode = topNode;
 	}
 
 }
