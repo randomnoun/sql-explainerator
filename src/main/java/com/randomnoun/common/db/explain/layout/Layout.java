@@ -1,4 +1,4 @@
-package com.randomnoun.common.db.explain.graph;
+package com.randomnoun.common.db.explain.layout;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 import org.apache.log4j.Logger;
 
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
+import com.randomnoun.common.db.explain.graph.Box;
+import com.randomnoun.common.db.explain.graph.CBox;
 import com.randomnoun.common.db.explain.json.AttachedSubqueriesNode;
 import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
@@ -25,6 +27,8 @@ import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
 import com.randomnoun.common.db.explain.visitor.RangeVisitor;
 
+/** Converts a hierarchy of Nodes into a hierarchy of Boxes */
+
 public class Layout {
 
 	Logger logger = Logger.getLogger(Layout.class);
@@ -32,18 +36,6 @@ public class Layout {
 	private QueryBlockNode topNode;
 	public Layout(QueryBlockNode topNode) {
 		this.topNode = topNode;
-		
-		// so I'm either going to be all the layout logic in here
-		// or split it across the parsed nodes.
-		// so which am I going to prefer
-		//   if (ThisKIndOfNode) { doThis }
-		// or
-		//   ThisKindOfNode.doThis
-		// how about
-		//   doThis(node)
-		
-		// let's see how we go
-		// layout(topNode);
 	}
 	
 	public Box getLayoutBox() {

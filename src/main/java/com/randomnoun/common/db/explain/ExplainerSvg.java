@@ -13,7 +13,7 @@ import org.json.simple.parser.ParseException;
 
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.db.explain.graph.Box;
-import com.randomnoun.common.db.explain.graph.Layout;
+import com.randomnoun.common.db.explain.layout.Layout;
 import com.randomnoun.common.db.explain.visitor.RangeVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightVisitor;
 import com.randomnoun.common.db.explain.visitor.SvgBoxVisitor;
