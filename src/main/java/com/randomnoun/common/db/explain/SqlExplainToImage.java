@@ -30,11 +30,11 @@ import com.randomnoun.common.log4j.Log4jCliConfiguration;
  * 
  */
 
-public class ExplainerSvg {
+public class SqlExplainToImage {
 
-	static Logger logger = Logger.getLogger(ExplainerSvg.class);
+	static Logger logger = Logger.getLogger(SqlExplainToImage.class);
 	
-	public ExplainerSvg() {
+	public SqlExplainToImage() {
 		
 	}
 	
@@ -43,7 +43,7 @@ public class ExplainerSvg {
 		lcc.init("[explain-to-image]", null);
 		
 		// InputStream is = ExplainerSvg.class.getResourceAsStream("/sakila-7g.json");
-		InputStream is = ExplainerSvg.class.getResourceAsStream("/somequery.json");
+		InputStream is = SqlExplainToImage.class.getResourceAsStream("/somequery.json");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
 		StreamUtil.copyStream(is, baos);
 		String json = baos.toString();

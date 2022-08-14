@@ -1,6 +1,6 @@
 package com.randomnoun.common.db.explain;
 
 /** All the CLI options */
-public class ExplainerCli {
+public class SqlExplainToImageCli {
 
 }
