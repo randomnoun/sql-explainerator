@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
-import com.randomnoun.common.db.explain.ExplainerTable;
 import com.randomnoun.common.db.explain.graph.Box;
 
 public class SvgBoxVisitor extends BoxVisitor {
@@ -32,7 +31,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 			b.traverse(rv);
 			logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 
-			InputStream is = ExplainerTable.class.getResourceAsStream("/svg.css");
+			InputStream is = SvgBoxVisitor.class.getResourceAsStream("/svg.css");
 			String css;
 			try {
 				css = new String(StreamUtil.getByteArray(is));
