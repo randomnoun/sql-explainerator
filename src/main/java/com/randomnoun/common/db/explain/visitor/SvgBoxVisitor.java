@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
-import com.randomnoun.common.db.explain.ExplainerSvg;
 import com.randomnoun.common.db.explain.ExplainerTable;
 import com.randomnoun.common.db.explain.graph.Box;
 

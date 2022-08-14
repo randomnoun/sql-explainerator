@@ -31,8 +31,6 @@ public class Box {
 	private String targetPort;
 	private int edgeStartX; // draw edges from this box from this point
 	private int edgeStartY;
-	private int edgeEndX;     // draw edges to this box to this point
-	private int edgeEndY;
 	
 	private String cssClass;
 	private Color stroke = null; // Color.BLACK;
@@ -80,10 +78,7 @@ public class Box {
 		this.edgeStartX = edgeStartX;
 		this.edgeStartY = edgeStartY;
 	}
-	public void setEdgeEndPosition(int edgeEndX, int edgeEndY) {
-		this.edgeEndX = edgeEndX;
-		this.edgeEndY = edgeEndY;
-	}
+
 
 
 	public void addAll(List<Box> children) {
@@ -220,18 +215,7 @@ public class Box {
 	public void setEdgeStartY(int edgeStartY) {
 		this.edgeStartY = edgeStartY;
 	}
-	public int getEdgeEndX() {
-		return edgeEndX;
-	}
-	public void setEdgeEndX(int edgeEndX) {
-		this.edgeEndX = edgeEndX;
-	}
-	public int getEdgeEndY() {
-		return edgeEndY;
-	}
-	public void setEdgeEndY(int edgeEndY) {
-		this.edgeEndY = edgeEndY;
-	}
+
 	public int getPosX() {
 		return posX;
 	}
