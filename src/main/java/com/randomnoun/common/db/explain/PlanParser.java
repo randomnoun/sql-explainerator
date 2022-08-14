@@ -111,14 +111,14 @@ public class PlanParser {
 	
 	private UnionResultNode parseUnionResult(JSONObject obj) {
 		UnionResultNode n = new UnionResultNode();
-		n.tableName = (String) obj.get("table_name");
+		n.setTableName((String) obj.get("table_name"));
 		
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
 		n.getAttributes().put("tableName", obj.get("table_name"));
 		n.getAttributes().put("accessType", obj.get("access_type"));
 		if (obj.containsKey("query_specifications")) {
 			List<QuerySpecificationNode> qsnList = parseQuerySpecifications((JSONArray) obj.get("query_specifications"));
-			n.querySpecifications = qsnList;
+			n.setQuerySpecifications(qsnList);
 			n.addChild(new ListNode("query_specifications", qsnList));
 		} else {
 			// other nodes
@@ -143,7 +143,7 @@ public class PlanParser {
 		n.getAttributes().put("cacheable", obj.get("cacheable"));
 		if (obj.containsKey("query_block")) {
 			QueryBlockNode cn = parseQueryBlock((JSONObject) obj.get("query_block"));
-			n.queryBlock = cn;
+			n.setQueryBlock(cn);
 			n.addChild(cn);
 		} else {
 			throw new IllegalArgumentException("expected query_block in query_specification: " + obj.toString());
@@ -153,16 +153,16 @@ public class PlanParser {
 	
 	private MaterialisedFromSubqueryNode parseMaterialisedFromSubquery(JSONObject obj) {
 		MaterialisedFromSubqueryNode n = new MaterialisedFromSubqueryNode();
-		n.dependent = (Boolean) obj.get("dependent");
-		n.cacheable = (Boolean) obj.get("cacheable");
-		n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table");
+		n.setDependent((Boolean) obj.get("dependent"));
+		n.setCacheable((Boolean) obj.get("cacheable"));
+		n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
 		
 		n.getAttributes().put("dependent", obj.get("dependent"));
 		n.getAttributes().put("cacheable", obj.get("cacheable"));
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table")); // boolean
 		if (obj.containsKey("query_block")) {
 			QueryBlockNode cn = parseQueryBlock((JSONObject) obj.get("query_block"));
-			n.queryBlock = cn;
+			n.setQueryBlock(cn);
 			n.addChild(cn);
 		} else {
 			throw new IllegalArgumentException("expected query_block in query_specification: " + obj.toString());
@@ -175,7 +175,7 @@ public class PlanParser {
 	
 	private DuplicatesRemovalNode parseDuplicatesRemoval(JSONObject obj) {
 		DuplicatesRemovalNode n = new DuplicatesRemovalNode();
-		n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table");
+		n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
 				
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
@@ -184,7 +184,7 @@ public class PlanParser {
 		
 		if (obj.containsKey("nested_loop")) {
 			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.nestedLoop = nln;
+			n.setNestedLoop(nln);
 			n.addChild(nln);
 		} else {
 			throw new IllegalArgumentException("expected nested_loop");
@@ -211,8 +211,8 @@ public class PlanParser {
 	
 	private OrderingOperationNode parseOrderingOperation(JSONObject obj) {
 		OrderingOperationNode n = new OrderingOperationNode();
-		if (obj.containsKey("using_temporary_table")) { n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table"); }
-		n.usingFilesort = (Boolean) obj.get("using_filesort");
+		if (obj.containsKey("using_temporary_table")) { n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table")); }
+		n.setUsingFilesort((Boolean) obj.get("using_filesort"));
 				
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
@@ -232,7 +232,7 @@ public class PlanParser {
 		// n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table");
 		// n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table"));
 		
-		if (obj.containsKey("using_filesort")) { n.usingFilesort = (Boolean) obj.get("using_filesort"); }
+		if (obj.containsKey("using_filesort")) { n.setUsingFilesort((Boolean) obj.get("using_filesort")); }
 		
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
 		// n.attributes.put("selectId", obj.get("select_id"));
@@ -240,7 +240,7 @@ public class PlanParser {
 		
 		if (obj.containsKey("nested_loop")) {
 			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.nestedLoop = nln;
+			n.setNestedLoop(nln);
 			n.addChild(nln);
 		}
 		return n;
@@ -261,30 +261,30 @@ public class PlanParser {
 		TableNode n = new TableNode();
 		
 		// either a table table, or a materialized_from_subquery table (tableName is the alias I guess)
-		n.tableName = (String) obj.get("table_name");
+		n.setTableName((String) obj.get("table_name"));
 		n.getAttributes().put("tableName", obj.get("table_name"));
 		
 		
 		n.getAttributes().put("distinct", obj.get("distinct")); // boolean
 		n.getAttributes().put("usingIndex", obj.get("using_index")); // boolean
 		
-		n.accessType = AccessTypeEnum.fromJsonValue((String) obj.get("access_type"));
+		n.setAccessType(AccessTypeEnum.fromJsonValue((String) obj.get("access_type")));
 		n.getAttributes().put("accessType", obj.get("access_type")); // "ALL", "ref", "eq_ref"
 		n.getAttributes().put("possibleKeys", parseNameList((JSONArray) obj.get("possible_keys"))); // List<String>
-		if (obj.containsKey("key")) { n.key = (String) obj.get("key"); n.getAttributes().put("key",  obj.get("key")); } // "PRIMARY"
+		if (obj.containsKey("key")) { n.setKey((String) obj.get("key")); n.getAttributes().put("key",  obj.get("key")); } // "PRIMARY"
 		n.getAttributes().put("usedKeyParts", parseNameList((JSONArray) obj.get("used_key_parts"))); // List<String>, subset of above ?
 		n.getAttributes().put("usedColumns", parseNameList((JSONArray) obj.get("used_columns"))); // List<String>
 		if (obj.containsKey("key_length")) { n.getAttributes().put("keyLength", Long.parseLong((String) obj.get("key_length"))); }
 		if (obj.containsKey("ref")) { n.getAttributes().put("ref", parseNameList((JSONArray) obj.get("ref"))); } // List<String>
 		
-		if (obj.containsKey("rows_examined_per_scan")) { n.rowsExaminedPerScan = ((Number) obj.get("rows_examined_per_scan")).longValue(); n.getAttributes().put("rows_examined_per_scan", n.rowsExaminedPerScan); }
-		if (obj.containsKey("rows_produced_per_join")) { n.rowsProducedPerJoin = ((Number) obj.get("rows_produced_per_join")).longValue(); n.getAttributes().put("rows_produced_per_join", n.rowsProducedPerJoin); }
+		if (obj.containsKey("rows_examined_per_scan")) { n.setRowsExaminedPerScan(((Number) obj.get("rows_examined_per_scan")).longValue()); n.getAttributes().put("rows_examined_per_scan", n.getRowsExaminedPerScan()); }
+		if (obj.containsKey("rows_produced_per_join")) { n.setRowsProducedPerJoin(((Number) obj.get("rows_produced_per_join")).longValue()); n.getAttributes().put("rows_produced_per_join", n.getRowsProducedPerJoin()); }
 		if (obj.containsKey("filtered")) { n.getAttributes().put("filtered", Double.parseDouble((String) obj.get("filtered"))); }
 		n.getAttributes().put("index_condition", obj.get("index_condition"));
 		
 		if (obj.containsKey("cost_info")) { 
-			n.costInfo = parseCostInfo((JSONObject) obj.get("cost_info")); 
-			n.getAttributes().put("costInfo", n.costInfo); 
+			n.setCostInfo(parseCostInfo((JSONObject) obj.get("cost_info"))); 
+			n.getAttributes().put("costInfo", n.getCostInfo()); 
 		}
 
 		// @TODO object form ?
@@ -292,13 +292,13 @@ public class PlanParser {
 		
 		if (obj.containsKey("attached_subqueries")) {
 			AttachedSubqueriesNode sn = new AttachedSubqueriesNode();
-			n.attachedSubqueries = sn;
+			n.setAttachedSubqueries(sn);
 			n.addChild(sn);
 			JSONArray qs = (JSONArray) obj.get("attached_subqueries");
 			for (Object o : qs) {
 				JSONObject cobj = (JSONObject) o;
 				QuerySpecificationNode qsn = parseQuerySpecification((JSONObject) cobj);
-				sn.querySpecification = qsn;
+				sn.setQuerySpecification(qsn);
 				sn.addChild(qsn);
 			}
 		}
@@ -307,7 +307,7 @@ public class PlanParser {
 		
 		if (obj.containsKey("materialized_from_subquery")) {
 			MaterialisedFromSubqueryNode sn = parseMaterialisedFromSubquery((JSONObject) obj.get("materialized_from_subquery"));
-			n.materialisedFromSubquery = sn;
+			n.setMaterialisedFromSubquery(sn);
 			n.addChild(sn);
 		}
 		

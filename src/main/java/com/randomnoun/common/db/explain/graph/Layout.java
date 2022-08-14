@@ -120,7 +120,7 @@ public class Layout {
 	}
 	
 	public Box layout(UnionResultNode n) {
-		List<QuerySpecificationNode> qsnList = n.querySpecifications;
+		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
 		
 		Box ob = new CBox(); // outer box
 		Box cb = new CBox(); // connector box
@@ -159,7 +159,7 @@ public class Layout {
 	
 	public Box layout(AttachedSubqueriesNode n) {
 		// @TODO multiple qsns
-		List<QuerySpecificationNode> qsnList = Collections.singletonList(n.querySpecification);
+		List<QuerySpecificationNode> qsnList = Collections.singletonList(n.getQuerySpecification());
 		
 		Box ob = new CBox(); // outer box
 		Box cb = new CBox(); // connector box
@@ -199,7 +199,7 @@ public class Layout {
 	
 	
 	public Box layout(DuplicatesRemovalNode n) {
-		NestedLoopNode nln = n.nestedLoop; // 1 child only
+		NestedLoopNode nln = n.getNestedLoop(); // 1 child only
 		Box qb = layout(nln);
 		
 		int w = qb.getWidth();
@@ -211,7 +211,7 @@ public class Layout {
 
 		Box cb = new CBox(); // container box
 		cb.setParentAndPosition(ob,  qb.getEdgeStartX() - 40, 0);
-		cb.setSize(80, n.usingTemporaryTable ? 55 : 40);
+		cb.setSize(80, n.getUsingTemporaryTable() ? 55 : 40);
 		
 		Box lb = new Box(); // label box
 		lb.setParentAndPosition(ob, qb.getEdgeStartX() - 40, 0);
@@ -219,7 +219,7 @@ public class Layout {
 		lb.setLabel("DISTINCT"); 
 		lb.setSize(80, 40);
 		
-		if (n.usingTemporaryTable) {
+		if (n.getUsingTemporaryTable()) {
 			Box ttBox = new CBox(); 
 			ttBox.setLabel("tmp table");
 			ttBox.setSize(80, 10);
@@ -269,13 +269,13 @@ public class Layout {
 			b.setSize(60, 60); // diamond
 			b.setParentAndPosition(ob, tb.getPosX() + tb.getEdgeStartX() - 30, 50); // centered above table beneath it
 			b.setTooltip("nested_loop\n\n" +
-			   "Prefix Cost: " + qsn.costInfo.getPrefixCost());
+			   "Prefix Cost: " + qsn.getCostInfo().getPrefixCost());
 			nestedLoopBoxes.add(b);
 			
 			Box lb = new CBox(); // label box
 			lb.setCssClass("queryCost");
 			lb.setParentAndPosition(b, -10, -15);
-			lb.setLabel(String.valueOf(qsn.costInfo.getPrefixCost())); 
+			lb.setLabel(String.valueOf(qsn.getCostInfo().getPrefixCost())); 
 			lb.setTextAnchor("start");
 			lb.setSize(40, 10);
 
@@ -283,16 +283,16 @@ public class Layout {
 				lb = new CBox(); // label box
 				lb.setCssClass("queryCost");
 				lb.setParentAndPosition(b, 40, -10);
-				lb.setLabel(String.valueOf(qsn.rowsProducedPerJoin) +
-					(qsn.rowsProducedPerJoin == 1 ? " row" : " rows")); 
+				lb.setLabel(String.valueOf(qsn.getRowsProducedPerJoin()) +
+					(qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows")); 
 				lb.setTextAnchor("start");
 				lb.setSize(25, 10);
 			} else {
 				lb = new CBox(); // label box
 				lb.setCssClass("queryCost");
 				lb.setParentAndPosition(b, 65, 15);
-				lb.setLabel(String.valueOf(qsn.rowsProducedPerJoin) +
-					(qsn.rowsProducedPerJoin == 1 ? " row" : " rows")); 
+				lb.setLabel(String.valueOf(qsn.getRowsProducedPerJoin()) +
+					(qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows")); 
 				lb.setTextAnchor("start");
 				lb.setSize(25, 10);
 			}
@@ -301,15 +301,15 @@ public class Layout {
 			if (i == 1) {
 				Box firstTableBox = tableBoxes.get(0);
 				firstTableBox.connectTo(b, "w"); // "upRight", 0, 15
-				firstTableBox.setConnectedWeight((double) qsnList.get(0).rowsExaminedPerScan);
+				firstTableBox.setConnectedWeight((double) qsnList.get(0).getRowsExaminedPerScan());
 			} else {
 				prevNestedLoopBox.connectTo(b, "w"); // "right", 0, 15
-				prevNestedLoopBox.setConnectedWeight((double) qsnList.get(i - 1).rowsExaminedPerScan); // @TODO not sure about this either
+				prevNestedLoopBox.setConnectedWeight((double) qsnList.get(i - 1).getRowsExaminedPerScan()); // @TODO not sure about this either
 				prevNestedLoopBox.setEdgeStartPosition(60, 30);
 			}
 			
 			Box tableBox = tableBoxes.get(i);
-			tableBox.setConnectedWeight((double) qsnList.get(i).rowsExaminedPerScan);
+			tableBox.setConnectedWeight((double) qsnList.get(i).getRowsExaminedPerScan());
 			tableBox.connectTo(b, "s"); // "up", 15, 30
 			
 			prevNestedLoopBox = b;
@@ -321,30 +321,30 @@ public class Layout {
 			
 	public Box layout(TableNode n) {
 		
-		int w = (n.accessType==AccessTypeEnum.FULL_TABLE_SCAN ? 100 :
-			(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
-			(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? 150 :
-			(n.accessType==AccessTypeEnum.UNIQUE_KEY ? 125 : 100)))); 
+		int w = (n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? 100 :
+			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
+			(n.getAccessType()==AccessTypeEnum.NON_UNIQUE_KEY ? 150 :
+			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? 125 : 100)))); 
 		int h = 60;
 		Box ob = new CBox(); // outer box
 		
-		if (n.materialisedFromSubquery == null) {
-			if (n.tableName != null) {
+		if (n.getMaterialisedFromSubquery() == null) {
+			if (n.getTableName() != null) {
 				Box lb = new CBox(); // label box
 				lb.setCssClass("tableName");
 				lb.setParentAndPosition(ob, 0, 32);
-				lb.setLabel(n.tableName); 
+				lb.setLabel(n.getTableName()); 
 				lb.setSize(w, 14);
 			}
-			if (n.key != null) {
+			if (n.getKey() != null) {
 				Box lb = new CBox(); // label box
 				lb.setCssClass("tableKey"); 
 				lb.setParentAndPosition(ob, 0, 46);
-				lb.setLabel(n.key); 
+				lb.setLabel(n.getKey()); 
 				lb.setSize(w, 14);
 			}
 		} else {
-			QueryBlockNode queryBlock = n.materialisedFromSubquery.queryBlock;
+			QueryBlockNode queryBlock = n.getMaterialisedFromSubquery().getQueryBlock();
 			Box qb;
 			qb = layout(queryBlock, null); // query_blocks in materialised queries aren't drawn for some reason
 			// reset to 0,0
@@ -368,19 +368,19 @@ public class Layout {
 			// qb after lb in the diagram so that tooltips work
 			qb.setParentAndPosition(ob, 10 - rv.getMinX(), 85);
 
-			if (n.tableName != null) {
+			if (n.getTableName() != null) {
 				lb = new CBox(); // label box
 				lb.setCssClass("materialisedTableName");
 				lb.setFill(new Color(232, 232, 232));
 				lb.setParentAndPosition(ob, 0, 32);
-				lb.setLabel(n.tableName + " (materialised)"); 
+				lb.setLabel(n.getTableName() + " (materialised)"); 
 				lb.setSize(w, 20);
 			}
-			if (n.key != null) {
+			if (n.getKey() != null) {
 				lb = new CBox(); // label box
 				lb.setCssClass("tableKey"); 
 				lb.setParentAndPosition(ob, 0, 52);
-				lb.setLabel(n.key); 
+				lb.setLabel(n.getKey()); 
 				lb.setSize(w, 14);
 			}
 
@@ -392,16 +392,16 @@ public class Layout {
 		b.setParentAndPosition(ob, 0, 0);
 		b.setSize(w, 30);
 		// b.setTextColor(Color.WHITE);
-		b.setCssClass("table" + (n.accessType==AccessTypeEnum.FULL_TABLE_SCAN ? " fullTableScan" :
-			(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? " fullIndexScan" :
-			(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? " nonUniqueKey" :
-			(n.accessType==AccessTypeEnum.UNIQUE_KEY ? " uniqueKey" : "")))));
-		b.setLabel((n.accessType==AccessTypeEnum.FULL_TABLE_SCAN ? "Full Table Scan" :
-			(n.accessType==AccessTypeEnum.FULL_INDEX_SCAN ? "Full Index Scan" :
-			(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? " Non-Unique Key Lookup" :
-			(n.accessType==AccessTypeEnum.UNIQUE_KEY ? "Unique Key Lookup" : "")))));
+		b.setCssClass("table" + (n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? " fullTableScan" :
+			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? " fullIndexScan" :
+			(n.getAccessType()==AccessTypeEnum.NON_UNIQUE_KEY ? " nonUniqueKey" :
+			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? " uniqueKey" : "")))));
+		b.setLabel((n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? "Full Table Scan" :
+			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? "Full Index Scan" :
+			(n.getAccessType()==AccessTypeEnum.NON_UNIQUE_KEY ? " Non-Unique Key Lookup" :
+			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? "Unique Key Lookup" : "")))));
 		
-		CostInfoNode costInfo = n.costInfo;
+		CostInfoNode costInfo = n.getCostInfo();
 		if (costInfo != null) {
 			double cost= (costInfo.getEvalCost() == null ? (double) 0 : costInfo.getEvalCost()) +
 				(costInfo.getReadCost() == null ? (double) 0 : costInfo.getReadCost());
@@ -411,17 +411,17 @@ public class Layout {
 			lb.setLabel(String.valueOf(cost)); 
 			lb.setSize(w/2, 10);
 		}
-		if (n.rowsExaminedPerScan != null) {
+		if (n.getRowsExaminedPerScan() != null) {
 			Box lb = new CBox(); // label box
 			lb.setCssClass("rhsQueryCost");  lb.setTextAnchor("end");
 			lb.setParentAndPosition(ob, w/2, -15);
-			lb.setLabel(String.valueOf(n.rowsExaminedPerScan) + 
-				(n.rowsExaminedPerScan == 1 ? " row" : " rows")); 
+			lb.setLabel(String.valueOf(n.getRowsExaminedPerScan()) + 
+				(n.getRowsExaminedPerScan() == 1 ? " row" : " rows")); 
 			lb.setSize(w/2, 10);
 		}
 		
-		if (n.attachedSubqueries != null) {
-			Box qb = layout(n.attachedSubqueries);
+		if (n.getAttachedSubqueries() != null) {
+			Box qb = layout(n.getAttachedSubqueries());
 			qb.setParentAndPosition(ob, w + 50, 0);
 			qb.connectTo(b, "e");
 			w = w + 50 + qb.getWidth();
@@ -445,7 +445,7 @@ public class Layout {
 		ob.setSize(w, h + 40);
 		ob.setEdgeStartPosition(cb.getEdgeStartX(),  0);
 		
-		if (n.usingTemporaryTable) { 
+		if (n.isUsingTemporaryTable()) { 
 			Box tb = new CBox(); // label box
 			tb.setParentAndPosition(ob, cb.getEdgeStartX() - 40, 45); 
 			tb.setSize(w, 10);
@@ -459,7 +459,7 @@ public class Layout {
 		lb.setLabel("ORDER"); 
 		lb.setSize(80, 40);
 		lb.setTooltip("Ordering operation\n\n" +
-			"Using Filesort: " + n.usingFilesort);
+			"Using Filesort: " + n.isUsingFilesort());
 
 		cb.connectTo(lb, "s"); // "up", 50, 30
 		cb.setParentAndPosition(ob, 0, 40);
@@ -470,7 +470,7 @@ public class Layout {
 	}
 	public Box layout(GroupingOperationNode n) {
 		
-		NestedLoopNode nln = n.nestedLoop; // 1 child only
+		NestedLoopNode nln = n.getNestedLoop(); // 1 child only
 		Box cb = layout(nln);
 		
 		int w = cb.getWidth();
@@ -496,7 +496,7 @@ public class Layout {
 	
 	public Box layout(QuerySpecificationNode n, String queryBlockLabel) {
 
-		QueryBlockNode qb = n.queryBlock;
+		QueryBlockNode qb = n.getQueryBlock();
 		
 		Box cb = layout(qb, queryBlockLabel);
 		

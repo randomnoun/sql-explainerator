@@ -1,10 +1,18 @@
 package com.randomnoun.common.db.explain.json;
 
 public class AttachedSubqueriesNode extends Node {
-	public QuerySpecificationNode querySpecification;
+	private QuerySpecificationNode querySpecification;
 
 	public AttachedSubqueriesNode() {
 		super("attached_subqueries", true);
+	}
+
+	public QuerySpecificationNode getQuerySpecification() {
+		return querySpecification;
+	}
+
+	public void setQuerySpecification(QuerySpecificationNode querySpecification) {
+		this.querySpecification = querySpecification;
 	}
 	
 
