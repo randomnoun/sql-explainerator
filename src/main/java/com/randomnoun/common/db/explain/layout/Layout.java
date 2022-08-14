@@ -25,7 +25,7 @@ import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
-import com.randomnoun.common.db.explain.visitor.RangeVisitor;
+import com.randomnoun.common.db.explain.visitor.RangeBoxVisitor;
 
 /** Converts a hierarchy of Nodes into a hierarchy of Boxes */
 
@@ -350,7 +350,7 @@ public class Layout {
 			qb = layout(queryBlock, null); // query_blocks in materialised queries aren't drawn for some reason
 			// reset to 0,0
 
-			RangeVisitor rv = new RangeVisitor();
+			RangeBoxVisitor rv = new RangeBoxVisitor();
 			qb.traverse(rv);
 			logger.info("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 			// qb.posX -= rv.getMinX();

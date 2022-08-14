@@ -16,7 +16,7 @@ import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.db.explain.graph.Box;
 import com.randomnoun.common.db.explain.layout.Layout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
-import com.randomnoun.common.db.explain.visitor.RangeVisitor;
+import com.randomnoun.common.db.explain.visitor.RangeBoxVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightVisitor;
 import com.randomnoun.common.db.explain.visitor.SvgBoxVisitor;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
@@ -91,7 +91,7 @@ public class SqlExplainToImageTest extends TestCase {
 		
 		
 		// @TODO translate diagram so that top-left is 0, 0
-		RangeVisitor rv = new RangeVisitor();
+		RangeBoxVisitor rv = new RangeBoxVisitor();
 		b.traverse(rv);
 		// logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 		b.setPosX(b.getPosX() - rv.getMinX());

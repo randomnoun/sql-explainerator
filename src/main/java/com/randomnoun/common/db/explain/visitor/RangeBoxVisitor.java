@@ -2,7 +2,7 @@ package com.randomnoun.common.db.explain.visitor;
 
 import com.randomnoun.common.db.explain.graph.Box;
 
-public class RangeVisitor extends BoxVisitor {
+public class RangeBoxVisitor extends BoxVisitor {
 	
 	int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
 	int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
@@ -10,7 +10,7 @@ public class RangeVisitor extends BoxVisitor {
 	double minWeight = Double.MAX_VALUE;
 	double maxWeight = Double.MIN_VALUE;
 	
-	public RangeVisitor() {
+	public RangeBoxVisitor() {
 	}
 	public void visit(Box b) {
 		int x = b.getAbsoluteX();

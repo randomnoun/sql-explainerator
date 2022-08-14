@@ -27,7 +27,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 		String s = "";
 		if (indent==0) {
 			// get range
-			RangeVisitor rv = new RangeVisitor();
+			RangeBoxVisitor rv = new RangeBoxVisitor();
 			b.traverse(rv);
 			logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 
