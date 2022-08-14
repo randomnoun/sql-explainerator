@@ -11,7 +11,9 @@ import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.graph.Box;
 
-/** Converts a box layout into an SVG diagram 
+/** Converts a box layout into an SVG diagram.
+ * 
+ * (Well, a HTML diagram containing a SVG diagram, including any styles required)
  * 
  * @author knoxg
  */
