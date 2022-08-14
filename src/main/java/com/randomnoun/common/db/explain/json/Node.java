@@ -65,7 +65,7 @@ public abstract class Node implements Struct.ToJson {
 					((v instanceof Boolean) ? ((Boolean) v).toString() :
 					((v instanceof String) ? "\"" + Text.escapeJavascript((String) v) + "\"" :
 					((v instanceof Node) ? ((Node) v).toJson() : // all of these implement Struct.ToJson, but going to list them here anyway 
-					((v instanceof CostInfo) ? ((CostInfo) v).toJson() :
+					((v instanceof CostInfoNode) ? ((CostInfoNode) v).toJson() :
 					((v instanceof NameList) ? ((NameList) v).toJson() :
 						
 					" HUH " + v.getClass().getName() )))))));

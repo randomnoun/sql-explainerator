@@ -3,7 +3,7 @@ package com.randomnoun.common.db.explain.json;
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
 
 public class TableNode extends Node {
-	public CostInfo costInfo;
+	public CostInfoNode costInfo;
 	public AccessTypeEnum accessType;
 	public String tableName;
 	public String key;

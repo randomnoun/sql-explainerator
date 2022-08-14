@@ -11,7 +11,7 @@ import org.json.simple.parser.ParseException;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
 import com.randomnoun.common.db.explain.json.AttachedSubqueriesNode;
-import com.randomnoun.common.db.explain.json.CostInfo;
+import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
 import com.randomnoun.common.db.explain.json.GroupingOperationNode;
 import com.randomnoun.common.db.explain.json.ListNode;
@@ -98,8 +98,8 @@ public class PlanParser {
 		return object == null ? null : ((Number) object).longValue();
 	}
 
-	private CostInfo parseCostInfo(JSONObject obj) {
-		CostInfo ci = new CostInfo();
+	private CostInfoNode parseCostInfo(JSONObject obj) {
+		CostInfoNode ci = new CostInfoNode();
 		if (obj.containsKey("query_cost")) { ci.setQueryCost(Double.parseDouble((String) obj.get("query_cost"))); }
 		if (obj.containsKey("read_cost")) { ci.setReadCost(Double.parseDouble((String) obj.get("read_cost"))); }
 		if (obj.containsKey("eval_cost")) { ci.setEvalCost(Double.parseDouble((String) obj.get("eval_cost"))); }

@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
 import com.randomnoun.common.db.explain.json.AttachedSubqueriesNode;
-import com.randomnoun.common.db.explain.json.CostInfo;
+import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
 import com.randomnoun.common.db.explain.json.GroupingOperationNode;
 import com.randomnoun.common.db.explain.json.NestedLoopNode;
@@ -401,7 +401,7 @@ public class Layout {
 			(n.accessType==AccessTypeEnum.NON_UNIQUE_KEY ? " Non-Unique Key Lookup" :
 			(n.accessType==AccessTypeEnum.UNIQUE_KEY ? "Unique Key Lookup" : "")))));
 		
-		CostInfo costInfo = n.costInfo;
+		CostInfoNode costInfo = n.costInfo;
 		if (costInfo != null) {
 			double cost= (costInfo.getEvalCost() == null ? (double) 0 : costInfo.getEvalCost()) +
 				(costInfo.getReadCost() == null ? (double) 0 : costInfo.getReadCost());

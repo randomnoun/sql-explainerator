@@ -4,7 +4,7 @@ public class QueryBlockNode extends Node {
 	
 	private Long selectId;
 	private Object message;
-	private CostInfo costInfo;
+	private CostInfoNode costInfo;
 	private Node queryNode;
 	
 	public QueryBlockNode() {
@@ -27,11 +27,11 @@ public class QueryBlockNode extends Node {
 		this.message = message;
 	}
 
-	public CostInfo getCostInfo() {
+	public CostInfoNode getCostInfo() {
 		return costInfo;
 	}
 
-	public void setCostInfo(CostInfo costInfo) {
+	public void setCostInfo(CostInfoNode costInfo) {
 		this.costInfo = costInfo;
 	}
 

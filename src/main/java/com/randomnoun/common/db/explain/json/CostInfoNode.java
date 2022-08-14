@@ -2,7 +2,7 @@ package com.randomnoun.common.db.explain.json;
 
 import com.randomnoun.common.Struct;
 
-public class CostInfo implements Struct.ToJson {
+public class CostInfoNode implements Struct.ToJson {
 
 	private Double queryCost;
 	private Double readCost;
