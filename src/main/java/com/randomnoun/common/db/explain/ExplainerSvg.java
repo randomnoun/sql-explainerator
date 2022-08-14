@@ -194,45 +194,11 @@ public class ExplainerSvg {
 				}
 				if (remaining.size() > 0) {
 					throw new IllegalStateException("didn't expect remaining children here");
-					/*
-					s += (f == true ? "": ", ") + "\"children\": [";
-					for (int i = 0; i < remaining.size(); i++) {
-						s += (i==0 ? "" : ", ") + children.get(i).toJson();
-					}
-					s += "]";
-					*/
 				}
 				s += "}";
 			}
 			return s;
 		}
-		
-		/*
-		public long getHtmlBlockWidth() {
-			// assume each child is side-by-side, override when it isn't
-			long childBlockWidth = children.stream()
-				.reduce((long) 0, (w, c) -> { return w + c.getHtmlBlockWidth(); }, Long::sum);
-			return Math.max(1, childBlockWidth);
-		}
-		
-		public long getPixelWidth() {
-			// assume each child is side-by-side, override when it isn't
-			long childPixelWidth = children.stream()
-				.reduce((long) 0, (w, c) -> { return w + c.getPixelWidth(); }, Long::sum);
-			return Math.max(180, childPixelWidth);
-		}
-		
-		public long getLeftPaddingPixelWidth() {
-			// left padding on the first TD in the html for this node
-			// think this is probably over-engineering to the particular query I'm looking at right now
-			// override for nodes that don't have entry branches from the middle of the TD
-			long leftPaddingPixelWidth = children.stream()
-					.reduce((long) 0, (w, c) -> { return w + c.getPixelWidth(); }, Long::sum);
-			return Math.max(0, leftPaddingPixelWidth);
-		}
-		
-		protected abstract void writeHtml(PrintWriter pw);
-		*/
 		
 		protected Stream<Node> reverseStream(List<Node> children) {
 			// why the hell isn't this on https://stackoverflow.com/questions/24010109/java-8-stream-reverse-order 
@@ -254,43 +220,7 @@ public class ExplainerSvg {
 			super("query_block", false);
 		}
 
-		/*
-		@Override
-		public long getLeftPaddingPixelWidth() {
-			return 0;
-		}
-		
-		@Override
-		protected void writeHtml(PrintWriter pw) {
-			pw.println("<table display=\"display: inline-table;\">"); // of course it is
-			CostInfo ci = (CostInfo) this.attributes.get("costInfo");
-			if (ci != null) {
-				pw.println("<tr><td><div class=\"queryCost\">Query cost: " + ci.getQueryCost() + "</div></td></tr>"); 
-			}
-			String label = "query_block" + (selectId == null ? "" : " #" + selectId);
-			String clazz = (selectId == null ? " topNode" : "");
-			long lp = super.getLeftPaddingPixelWidth();
-			String leftPad = lp == 0 ? "" : " style=\"padding-left: " + lp + ";\"";
-			
-			pw.println("<tr><td" + leftPad + "><div class=\"queryBlock " + clazz + "\">" + label + "</div></td></tr>"); // tooltip = select ID & query cost
-			if (message != null) {
-				pw.println("<tr><td" + leftPad + ">" + message + "</td></tr>");
-			}
-			// the thing inside the query block
-			if (this.children.size() > 0) {
-				pw.println("<tr><td" + leftPad + "><div class=\"upArrow\"></div></td></tr>");
-				pw.println("<tr>");
-				reverseStream(children).forEach( c -> {
-					pw.println("<td>");
-					c.writeHtml(pw);
-					pw.println("</td>");
-				});
-				pw.println("</tr>");
-			}
-			pw.println("</td></tr>");
-			pw.println("</table>");
-		}
-		*/
+
 	}
 	
 	public static class UnionResultNode extends Node {
@@ -300,30 +230,7 @@ public class ExplainerSvg {
 			super("union_result", false); // TODO subtypes
 		}
 		
-		/*
-		protected void writeHtml(PrintWriter pw) {
-			QuerySpecificationsNode qsn = (QuerySpecificationsNode) this.children.get(0);
-			
-			pw.println("<table display=\"display: inline-table;\">"); // of course it is
-			String colspan = " colspan=\"" + Math.max(1, qsn.children.size()) + "\"";
-			pw.println("<tr><td " + colspan + "><div class=\"union\">UNION</div></td></tr>"); // tooltip: tableName, usingTemporaryTable: true
-			pw.println("<tr><td " + colspan + "><div class=\"tableName\">" + Text.escapeHtml(tableName) + "</div></td></tr>");
-			if (qsn.children.size() > 0) {
-				pw.println("<tr>");
-				// for (Node c : qsn.children) {
-				reverseStream(qsn.children).forEach( c -> {
-					pw.println("<td>");
-					pw.println("<div class=\"upArrow\"></div>");
-					c.writeHtml(pw);
-					pw.println("</td>");
-				});
-				pw.println("</tr>");
-			}
-			// pw.println("</td></tr>");
-			pw.println("</table>");
-			
-		}
-		*/
+
 	}
 	
 	public static class ListNode extends Node {
@@ -349,30 +256,7 @@ public class ExplainerSvg {
 		public DuplicatesRemovalNode() {
 			super("duplicates_removal", false); 
 		}
-		/*
-		protected void writeHtml(PrintWriter pw) {
-			pw.println("<table display=\"display: inline-table;\">"); // of course it is
-			pw.println("<tr><td><div class=\"duplicatesRemoval\">DISTINCT</div></td></tr>"); // tooltip: tableName, usingTemporaryTable: true
-			if (usingTemporaryTable) {
-				pw.println("<tr><td><div class=\"tempTableName\">tmp table</div></td></tr>"); // tooltip: tableName, usingTemporaryTable: true
-			}
-			
-			// pw.println("<tr><td>tmp table</td></tr>");
-			if (this.children.size() > 0) {
-				// just has a single NestedLoop child
-				pw.println("<tr>");
-				for (Node c : this.children) {
-					pw.println("<td>");
-					pw.println("<div class=\"upArrow\"></div>");
-					c.writeHtml(pw);
-					pw.println("</td>");
-				}
-				pw.println("</tr>");
-			}
-			pw.println("</td></tr>");
-			pw.println("</table>");
-		}
-		*/
+		
 	}
 	
 	public static class OrderingOperationNode extends Node {
@@ -469,6 +353,7 @@ public class ExplainerSvg {
 
 		Box connectedTo;   // draw a line to this box
 		Box layoutParent;  // X and Y co-ordinates are relative to this box ( layoutParent can be null, or parent, or parent.parent ... )
+		Double connectedWeight; // is converted to line width once we know the min/max
 		
 		int posX = 0, posY = 0; // relative to parent
 		int width, height;
@@ -618,6 +503,12 @@ public class ExplainerSvg {
 		public void setTooltip(String tooltip) {
 			this.tooltip = tooltip;
 		}
+		public Double getConnectedWeight() {
+			return connectedWeight;
+		}
+		public void setConnectedWeight(Double connectedWeight) {
+			this.connectedWeight = connectedWeight;
+		}
 		
 	}
 	
@@ -628,28 +519,6 @@ public class ExplainerSvg {
 		}
 	}
 
-	/*
-	public static class ContainerBox extends Box {
-		int edgeStartX;
-		int edgeStartY;
-		public ContainerBox(int width, int height) {
-			this.width = width;
-			this.height = height;
-		}
-		public void addAll(List<Box> children) {
-			this.children.addAll(children);
-		}
-	}
-	
-	public static class LabelBox extends Box {
-		public LabelBox(String label, int width, int height) {
-			this.label = label;
-			this.width = width;
-			this.height = height;
-		}
-	}
-	*/
-	
 	
 	public static class Layout {
 		private QueryBlockNode topNode;
@@ -822,18 +691,6 @@ public class ExplainerSvg {
 		
 		
 		public Box layout(DuplicatesRemovalNode n) {
-			// return null;
-			/*
-			Box b = new Box(); b.setLabel("DISTINCT");
-			b.setSize(80, 50);
-			
-			
-			NestedLoopNode nln = n.nestedLoop; // 1 child only
-			Box cb = layout(nln);
-			cb.connectTo(b, "s"); // , 40, 50
-			return b;
-			*/
-			
 			NestedLoopNode nln = n.nestedLoop; // 1 child only
 			Box cb = layout(nln);
 			
@@ -918,27 +775,34 @@ public class ExplainerSvg {
 						(qsn.rowsProducedPerJoin == 1 ? " row" : " rows")); 
 					lb.setTextAnchor("start");
 					lb.setSize(25, 10);
+				} else {
+					lb = new CBox(); // label box
+					lb.setCssClass("queryCost");
+					lb.setParentAndPosition(b, 65, 15);
+					lb.setLabel(String.valueOf(qsn.rowsProducedPerJoin) +
+						(qsn.rowsProducedPerJoin == 1 ? " row" : " rows")); 
+					lb.setTextAnchor("start");
+					lb.setSize(25, 10);
 				}
 
 				
 				if (i == 1) {
 					Box firstTableBox = tableBoxes.get(0);
 					firstTableBox.connectTo(b, "w"); // "upRight", 0, 15
+					firstTableBox.setConnectedWeight((double) qsnList.get(0).rowsExaminedPerScan);
 				} else {
 					prevNestedLoopBox.connectTo(b, "w"); // "right", 0, 15
+					prevNestedLoopBox.setConnectedWeight((double) qsnList.get(i - 1).rowsExaminedPerScan); // @TODO not sure about this either
 					prevNestedLoopBox.setEdgeStartPosition(60, 30);
 				}
 				
 				Box tableBox = tableBoxes.get(i);
+				tableBox.setConnectedWeight((double) qsnList.get(i).rowsExaminedPerScan);
 				tableBox.connectTo(b, "s"); // "up", 15, 30
 				
 				prevNestedLoopBox = b;
-				// @TODO add costInfo labels onto those edges
 			}
 
-			// @TODO set offsets for all of those
-			// ob.addAll(nestedLoopBoxes);
-			// ob.addAll(tableBoxes);
 			ob.setEdgeStartPosition(prevNestedLoopBox.posX + 30, 50); // although the edge has already been drawn, so this is the edge end position really. maybe not. 
 			return ob;
 		}
@@ -1045,9 +909,6 @@ public class ExplainerSvg {
 			}
 			
 			if (n.attachedSubqueries != null) {
-				// @TODO may be more than one attached subquery
-				// QueryBlockNode queryBlock = n.attachedSubqueries.querySpecification.queryBlock;
-				
 				Box qb = layout(n.attachedSubqueries);
 				qb.setParentAndPosition(ob, w + 50, 0);
 				qb.connectTo(b, "e");
@@ -1058,73 +919,6 @@ public class ExplainerSvg {
 			
 			ob.setSize(w, h);
 			return ob;
-			
-			
-
-			// materialised view here
-			//NestedLoopNode nln = n.nestedLoop; // 1 child only
-			// Box cb = layout(nln);
-			// 
-			// int w = cb.getWidth();
-			// int h = cb.getHeight();
-			
-			/*
-			Box ob = new Box(); // outer box 
-			ob.setStroke(new Color(0, 0, 0, 0));
-			ob.setSize(100, 30);
-			
-			
-			Box lb = new Box(); // label box
-			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
-			lb.setLabel("ORDER"); lb.setSize(80, 50);
-			ob.setEdgeStartPosition(cb.edgeStartX,  0);
-			// lb.setFill(Color.LIGHT_GRAY);
-			
-			cb.connectTo(lb, "s"); // "up", 50, 30
-			cb.setParentAndPosition(ob, 0, 70);
-			return ob;
-			*/
-			
-			
-			// TODO attached subqueries ( linked off rhs )
-			// TODO materialisedFromSubquery ( nested within table box )
-			
-			// Node c = n.queryNode; // 1 child only
-			// Box cb = layout(c);
-			// cb.setParent(b, "up", 50, 30);
-			
-			/*
-			 * /*
-		protected void writeHtml(PrintWriter pw) {
-			pw.println("<table display=\"display: inline-table;\">"); // of course it is
-			pw.println("<tr><td><div class=\"lhsQueryCost\">");
-			pw.println(costInfo==null ? "" : (costInfo.evalCost == null ? (double) 0 : costInfo.evalCost) +
-					(costInfo.readCost == null ? (double) 0 : costInfo.readCost));
-			pw.println("</div><div class=\"rhsQueryCost\">");
-			pw.println(rowsExaminedPerScan == null ? "" : String.valueOf(rowsExaminedPerScan) + 
-					(rowsExaminedPerScan == 1 ? " row" : "rows")); 
-			pw.println("</div>");
-			
-			pw.println("</td></tr>");
-			
-			
-			pw.println("</div></td></tr>");
-			
-			pw.println("<tr><td><div class=\"tableName\">");
-			pw.println(tableName);
-			pw.println("</td></tr>");
-
-			pw.println("<tr><td><div class=\"tableKey\">");
-			pw.println(key == null ? "" : key);
-			pw.println("</td></tr>");
-
-			pw.println("</table>");
-			// @TODO attached subqueries
-		}
-		*/
-			 
-			
-			
 			
 		}
 		public Box layout(OrderingOperationNode n) {
@@ -1201,17 +995,6 @@ public class ExplainerSvg {
 			ob.setSize(w, h + 40);
 			ob.setEdgeStartPosition(cb.edgeStartX,  40);
 
-			/*
-			Box lb = new Box(); // label box
-			lb.setParentAndPosition(ob, cb.edgeStartX - 40, 0);
-			lb.setCssClass("orderingOperation");
-			lb.setLabel(""); 
-			lb.setSize(80, 40);
-			lb.setTooltip("Ordering operation\n\n" +
-				"Using Filesort: " + n.usingFilesort);
-			cb.connectTo(lb, "s"); // "up", 50, 30
-				*/
-			
 			cb.setParentAndPosition(ob, 0, 40);
 			return ob;
 		}
@@ -1525,34 +1308,6 @@ public class ExplainerSvg {
 			return "{ \"" + Text.escapeJavascript(topNode.getJsonType()) + "\": " + topNode.toJson() + "}";
 		}
 
-		/*
-		public void writeHtml(PrintWriter pw) {
-			pw.println("<html>");
-			pw.println("<head><title>Here we go</title>");
-			pw.println("<style>");
-			
-			InputStream is = ExplainerSvg.class.getResourceAsStream("/css.css");
-			String s;
-			try {
-				s = new String(StreamUtil.getByteArray(is));
-			} catch (IOException e) {
-				throw new IllegalStateException("IOException", e);
-			}
-			pw.println(s);
-			
-			// pw.println("TD { vertical-align: top; }");
-			pw.println("</style>");
-			pw.println("</head>");
-			
-			pw.println("<body>");
-			topNode.writeHtml(pw);
-			
-			pw.println("</body></html>");
-			
-			
-		}
-		*/
-		
 	}
 	
 	
@@ -1560,14 +1315,13 @@ public class ExplainerSvg {
 		
 	}
 	
-	public void explain() {
-		
-	}
-	
 	public static class RangeVisitor extends BoxVisitor {
 		
 		int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
 		int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+		
+		double minWeight = Double.MAX_VALUE;
+		double maxWeight = Double.MIN_VALUE;
 		
 		public RangeVisitor() {
 		}
@@ -1581,6 +1335,12 @@ public class ExplainerSvg {
 			minY = Math.min(minY, y);
 			maxX = Math.max(maxX, x + w);
 			maxY = Math.max(maxY, y + h);
+			
+			Double cw = b.getConnectedWeight();
+			if (cw != null) {
+				minWeight = Math.min(minWeight, cw);
+				maxWeight = Math.max(maxWeight, cw);
+			}
 		}
 		
 		public int getMinX() {
@@ -1595,7 +1355,33 @@ public class ExplainerSvg {
 		public int getMaxY() {
 			return maxY;
 		}
+		public double getMinWeight() {
+			return minWeight;
+		}
+		public double getMaxWeight() {
+			return maxWeight;
+		}
+	}
+	
+	public static class ReweightVisitor extends BoxVisitor {
+		double minWeight = Double.MAX_VALUE;
+		double maxWeight = Double.MIN_VALUE;
 		
+		public ReweightVisitor(double minWeight, double maxWeight) {
+			this.minWeight = minWeight;
+			this.maxWeight = maxWeight;
+		}
+		
+		public void visit(Box b) {
+			Double cw = b.getConnectedWeight();
+			Double maxWidth = 3d; // maybe change this depending on the magnitude of maxWeight;
+			
+			if (cw != null) {
+				// turn into a line thickness.
+				Double newWeight = 1 + ((cw - minWeight) / (maxWeight-minWeight)) * maxWidth;
+				b.setConnectedWeight(newWeight);
+			}
+		}
 	}
 	
 	public static class SvgBoxVisitor extends BoxVisitor {
@@ -1623,9 +1409,7 @@ public class ExplainerSvg {
 					throw new IllegalStateException("IOException", e);
 				}
 				
-				// pw.println("TD { vertical-align: top; }");
 				// add 1 to max as 1px lines on the border have 0.5px of that line outside the max co-ordinates
-				
 				s = "<!DOCTYPE html>\n" +
 				  "<html>\n" +
 				  "<head>\n" +
@@ -1636,18 +1420,16 @@ public class ExplainerSvg {
 				  "<body>\n" +
 				  "<svg width=\"" + (rv.getMaxX()+1) + "\" height=\"" + (rv.getMaxY()+1) + "\">\n" +
 				  // svg arrowhead modified from http://thenewcode.com/1068/Making-Arrows-in-SVG
+				  // and https://stackoverflow.com/questions/13626748/how-to-prevent-a-svg-marker-arrow-head-to-inherit-paths-stroke-width
 				  "<defs>\n" +
-				  "    <marker id=\"arrowhead\" markerWidth=\"10\" markerHeight=\"7\" refX=\"10\" refY=\"3.5\" orient=\"auto\">\n" +
-				  "      <polygon points=\"0 0, 10 3.5, 0 7\" />\n" +
+				  "    <marker id=\"arrowhead\" markerWidth=\"12\" markerHeight=\"7\" refX=\"0\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\">\n" +
+				  "      <polygon points=\"0 0, 12 3.5, 0 7\" />\n" +
 				  "    </marker>\n" +
 				  "  </defs>";
 				indent += 4;
 			}
 			for (int i=0; i<indent; i++) { s += " "; }
 			
-			// thinking of using relative positioning here 
-			//   s += "<g transform==\"translate(" + b.posX + ", " + b.posY+")\">\n"; // SVG group
-			// but that's going to make it more difficult to connect edges outside the transform
 			s += "<g" + ( b.cssClass == null ? "" : " class=\"" + b.cssClass + "\"") + ">\n"; // SVG group
 			pw.print(s);
 		}
@@ -1709,6 +1491,7 @@ public class ExplainerSvg {
 			if (b.connectedTo != null) {
 				Box ctb = b.connectedTo;
 				int[] lineTo;
+				double strokeWeight = b.connectedWeight == null ? 1 : b.connectedWeight; 
 				if (b.targetPort.equals("sv")) {
 					lineTo = ctb.getAbsolutePortPosition("s");
 					lineTo[0] = x + b.edgeStartX;
@@ -1716,22 +1499,34 @@ public class ExplainerSvg {
 					lineTo = ctb.getAbsolutePortPosition(b.targetPort);
 				}
 				
-				if ((x + b.edgeStartX) == lineTo[0] || (y + b.edgeStartY == lineTo[1])) {
-					// marker-end="url(#arrowhead)"
-					
+				// still looks a bit weird, maybe something like
+				//   https://stackoverflow.com/questions/27254640/svg-marker-scale-only-one-dimension-with-stroke-width
+				// to scale the arrow cap
+				
+				if ((x + b.edgeStartX) == lineTo[0]) {
+					// adjust end of line to leave room for arrowhead
+					// (arrow is outside the polyline otherwise we don't get a sharp point)
+					int a = (y + b.edgeStartY < lineTo[1]) ? -12 : 12; 
 					s += is + "    <polyline points=\"" + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
-				      (lineTo[0]) + "," + (lineTo[1]) + "\"" +
-					  " style=\"stroke:#000000;\" marker-end=\"url(#arrowhead)\"/>\n";
+				      (lineTo[0]) + "," + (lineTo[1] + a) + "\"" +
+					  " style=\"stroke:#000000; stroke-width:" + strokeWeight + ";\" marker-end=\"url(#arrowhead)\"/>\n";
+				} else if ((y + b.edgeStartY == lineTo[1])) {
+					int a = (x + b.edgeStartX < lineTo[0]) ? -12 : 12;
+					s += is + "    <polyline points=\"" + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
+				      (lineTo[0] + a) + "," + (lineTo[1]) + "\"" +
+					  " style=\"stroke:#000000; stroke-width:" + strokeWeight + ";\" marker-end=\"url(#arrowhead)\"/>\n";
 				} else if (y + b.edgeStartY > lineTo[1]) { // up and horizontal
+					int a = (x + b.edgeStartX < lineTo[0]) ? -12 : 12; 
 					s += is + "    <polyline points=\"" + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
 				      (x + b.edgeStartX) + "," + (lineTo[1]) + " " + 
-					  (lineTo[0]) + "," + (lineTo[1]) + "\"" +
-					  " style=\"stroke:#000000; fill:none;\" marker-end=\"url(#arrowhead)\"/>\n";
-				} else {  // horizontal and down 
+					  (lineTo[0] + a) + "," + (lineTo[1]) + "\"" +
+					  " style=\"stroke:#000000; stroke-width:" + strokeWeight + "; fill: none;\" marker-end=\"url(#arrowhead)\"/>\n";
+				} else {  // horizontal and down
+					int a = (y + b.edgeStartY < lineTo[1]) ? -12 : 12;
 					s += is + "    <polyline points=\"" + (x + b.edgeStartX) + "," + (y + b.edgeStartY) + " " +
 				      (lineTo[0]) + "," + (y + b.edgeStartY) + " " + 
-					  (lineTo[0]) + "," + (lineTo[1]) + "\"" +
-					  " style=\"stroke:#000000; fill:none;\" marker-end=\"url(#arrowhead)\"/>\n";
+					  (lineTo[0]) + "," + (lineTo[1] + a) + "\"" +
+					  " style=\"stroke:#000000; stroke-width:" + strokeWeight + "; fill: none;\" marker-end=\"url(#arrowhead)\"/>\n";
 				}
 			}
 			
@@ -1802,6 +1597,9 @@ public class ExplainerSvg {
 		b.posX -= rv.getMinX();
 		b.posY -= rv.getMinY();
 		
+		ReweightVisitor rwv = new ReweightVisitor(rv.minWeight, rv.maxWeight);
+		b.traverse(rwv);
+
 		
 		FileOutputStream out3 = new FileOutputStream("c:\\temp\\out2.html");
 		pw = new PrintWriter(out3);
@@ -1815,27 +1613,7 @@ public class ExplainerSvg {
 		sbv = new SvgBoxVisitor(sysPw);
 		b.traverse(sbv);
 		sysPw.flush();
-		
-		
-		
-		// String svg = d.toSvg();
-		
-
-		/*
-		FileOutputStream outHtml = new FileOutputStream("c:\\temp\\out2.html");
-		pw = new PrintWriter(outHtml);
-		ec.writeHtml(pw);
-		pw.flush();
-		// System.out.println(out1.toString());
-		out2.close();
-		*/
-
-		
-		
-		// @TODO roundtrip it and see what broke
-		
-		
-		
+	
 		
 	}
 	
