@@ -31,16 +31,17 @@ public class SqlExplainToImageTest extends TestCase {
 		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
 		lcc.init("[explain-to-image]", null);
 
-		File f = new File("target/test");
-		logger.info(f.getCanonicalPath());
+		File f = new File("target/test/sakila");
+		// logger.info(f.getCanonicalPath());
 		f.mkdirs();
+		
 
 	}
 	
 	public void testSomeThings() throws IOException, ParseException {
 		
-		testParser("somequery.json");
-		testSvg("somequery.json");
+		testParser("sakila/sakila-7g.json");
+		testSvg("sakila/sakila-7g.json");
 	}
 	
 	public void testParser(String resourceName) throws IOException, ParseException {
@@ -53,7 +54,7 @@ public class SqlExplainToImageTest extends TestCase {
 		JSONParser jp = new JSONParser();
 		JSONObject obj = (JSONObject) jp.parse(json);
 		// ByteArrayOutputStream out1 = new ByteArrayOutputStream();
-		FileOutputStream out1 = new FileOutputStream("target/test/out1.json");
+		FileOutputStream out1 = new FileOutputStream("target/test/" + resourceName + "-compact.json");
 		PrintWriter pw = new PrintWriter(out1);
 		w.writeJSONValue(obj, pw);
 		pw.flush();
@@ -66,7 +67,7 @@ public class SqlExplainToImageTest extends TestCase {
 		json = pp.toJson();
 		// System.out.println(json);
 		obj = (JSONObject) jp.parse(json);
-		FileOutputStream out2 = new FileOutputStream("target/test/out2.json");
+		FileOutputStream out2 = new FileOutputStream("target/test/" + resourceName + "-roundtrip.json");
 		pw = new PrintWriter(out2);
 		w.writeJSONValue(obj, pw);
 		pw.flush();
@@ -100,7 +101,7 @@ public class SqlExplainToImageTest extends TestCase {
 		ReweightBoxVisitor rwv = new ReweightBoxVisitor(rv.getMinWeight(), rv.getMaxWeight());
 		b.traverse(rwv);
 		
-		FileOutputStream out3 = new FileOutputStream("target/test/out2.html");
+		FileOutputStream out3 = new FileOutputStream("target/test/" + resourceName + ".html");
 		PrintWriter pw = new PrintWriter(out3);
 		SvgBoxVisitor sbv = new SvgBoxVisitor(pw);
 		b.traverse(sbv);
