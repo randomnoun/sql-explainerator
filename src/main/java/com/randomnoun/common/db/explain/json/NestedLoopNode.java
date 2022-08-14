@@ -5,10 +5,18 @@ import java.util.List;
 
 public class NestedLoopNode extends Node {
 	
-	public List<TableNode> tables = new ArrayList<>();
+	private List<TableNode> tables = new ArrayList<>();
 	
 	public NestedLoopNode() {
 		super("nestedLoop", true);
+	}
+
+	public List<TableNode> getTables() {
+		return tables;
+	}
+
+	public void setTables(List<TableNode> tables) {
+		this.tables = tables;
 	}
 	
 }

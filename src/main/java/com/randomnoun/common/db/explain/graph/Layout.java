@@ -237,7 +237,7 @@ public class Layout {
 	
 	public Box layout(NestedLoopNode n) {
 		List<Box> nestedLoopBoxes = new ArrayList<Box>();
-		List<TableNode> qsnList = n.tables;
+		List<TableNode> qsnList = n.getTables();
 		
 		List<Box> tableBoxes = qsnList.stream() // reverseStream(qsnList)
 			.map(c -> layout(c))
@@ -264,7 +264,7 @@ public class Layout {
 		for (int i = 1 ; i < tableBoxes.size(); i++) {
 			Box tb = tableBoxes.get(i);
 			Box b = new Box(); 
-			TableNode qsn = n.tables.get(i);
+			TableNode qsn = n.getTables().get(i);
 			b.setShape("nestedLoop");
 			b.setSize(60, 60); // diamond
 			b.setParentAndPosition(ob, tb.getPosX() + tb.getEdgeStartX() - 30, 50); // centered above table beneath it

@@ -200,7 +200,7 @@ public class PlanParser {
 			JSONObject cobj = (JSONObject) o;
 			if (cobj.containsKey("table")) {
 				TableNode cn = parseTable((JSONObject) cobj.get("table"));
-				n.tables.add(cn);
+				n.getTables().add(cn);
 				n.addChild(cn);
 			} else {
 				throw new IllegalArgumentException("expected table in nested_loop child");
