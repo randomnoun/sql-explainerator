@@ -34,15 +34,10 @@ public class SqlExplainToImageTest extends TestCase {
 	public void setUp() throws IOException {
 		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
 		lcc.init("[explain-to-image]", null);
-
-		// File f = new File("target/test/sakila");
-		// logger.info(f.getCanonicalPath());
-		// f.mkdirs();
 	}
 	
 	public void testSomeThings() throws IOException, ParseException {
-		
-		testParser("sakila/sakila-7g"); // .json
+		testParser("sakila/sakila-7g");
 		testSvg("sakila/sakila-7g");
 	}
 	
@@ -55,16 +50,8 @@ public class SqlExplainToImageTest extends TestCase {
 		JSONParser jp = new JSONParser();
 		JSONObject obj = (JSONObject) jp.parse(json);
 		
-		/*
-		// ByteArrayOutputStream out1 = new ByteArrayOutputStream();
-		FileOutputStream out1 = new FileOutputStream("target/test/" + resourceName + "-compact.json");
-		PrintWriter pw = new PrintWriter(out1);
-		w.writeJSONValue(obj, pw);
-		pw.flush();
-		out1.close();
-		*/
-		
-		PlanParser pp = new PlanParser(json, "1.2.3");
+		PlanParser pp = new PlanParser();
+		pp.parse(json, "1.2.3");
 		json = pp.toJson();
 		obj = (JSONObject) jp.parse(json);
         StringWriter sw = new StringWriter();
@@ -91,17 +78,17 @@ public class SqlExplainToImageTest extends TestCase {
 		StreamUtil.copyStream(is, baos);
 		String json = baos.toString();
 		
-		PlanParser pp = new PlanParser(json, "1.2.3");
+		PlanParser pp = new PlanParser();
+		pp.parse(json, "1.2.3");
 		
 		// diagram attempts
 		Layout layout = new Layout(pp.getTopNode());
 		Box b = layout.getLayoutBox();
 		
 		
-		// @TODO translate diagram so that top-left is 0, 0
+		// translate diagram so that top-left is 0, 0
 		RangeBoxVisitor rv = new RangeBoxVisitor();
 		b.traverse(rv);
-		// logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 		b.setPosX(b.getPosX() - rv.getMinX());
 		b.setPosY(b.getPosY() - rv.getMinY());
 		
@@ -126,7 +113,6 @@ public class SqlExplainToImageTest extends TestCase {
             assertEquals("difference in " + resourceName + ".html", expected.trim(), sw.toString().trim());
         }
 
-        
 		sw = new StringWriter();
         pw = new PrintWriter(sw);
         sbv = new SvgBoxVisitor(pw, false);

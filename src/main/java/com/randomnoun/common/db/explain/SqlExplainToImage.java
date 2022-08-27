@@ -1,108 +1,99 @@
 package com.randomnoun.common.db.explain;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.db.explain.graph.Box;
+import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.layout.Layout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.visitor.RangeBoxVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightBoxVisitor;
 import com.randomnoun.common.db.explain.visitor.SvgBoxVisitor;
-import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
-/* Based on the explain renderer in MySQL Workbench, although it turns out that that code is GPLed
- * so I'll have to clean-room this instead.
+/** Class used to convert sql execution plans ( from 'EXPLAIN' statements ) into diagrams.
  * 
- * TODO: run a bunch of query plans and see what kinds of images it produces.
- * 
- * ok so I think I'm going to have to use SVG at some stage so let's do that
- * also, roundtrip all the examples at https://github.com/joelsotelods/sakila-db-queries
- * since I should be able to bundle all those into a unit test without tripping over any licensing issues 
- * 
+ * <p>The diagrams are based on the output of MySQL Workbench, but the algorithm has been clean-roomed 
+ * so that I don't have to GPL this code.
+ *
+ * <p>Unit tests are based on the sakila database, which is BSD licensed.
  */
-
 public class SqlExplainToImage {
 
 	static Logger logger = Logger.getLogger(SqlExplainToImage.class);
 	
+	// The box class is how we're describing the resulting diagram. It contains boxes, which represent shapes or other containers
+	Box b;
+	
 	public SqlExplainToImage() {
-		
 	}
 	
-	public static void main(String args[]) throws IOException, ParseException {
-		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
-		lcc.init("[explain-to-image]", null);
-		
-		// InputStream is = ExplainerSvg.class.getResourceAsStream("/sakila-7g.json");
-		InputStream is = SqlExplainToImage.class.getResourceAsStream("/somequery.json");
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
-		StreamUtil.copyStream(is, baos);
-		String json = baos.toString();
-		
-		CompactJsonWriter w = new CompactJsonWriter();
-		JSONParser jp = new JSONParser();
-		JSONObject obj = (JSONObject) jp.parse(json);
-		// ByteArrayOutputStream out1 = new ByteArrayOutputStream();
-		FileOutputStream out1 = new FileOutputStream("c:\\temp\\out1.json");
-		PrintWriter pw = new PrintWriter(out1);
-		w.writeJSONValue(obj, pw);
-		pw.flush();
-		out1.close();
-		
-		
-		PlanParser pp = new PlanParser(json, "1.2.3");
-		
-		// roundtrip attempt
-		json = pp.toJson();
-		System.out.println(json);
-		obj = (JSONObject) jp.parse(json);
-		FileOutputStream out2 = new FileOutputStream("c:\\temp\\out2.json");
-		pw = new PrintWriter(out2);
-		w.writeJSONValue(obj, pw);
-		pw.flush();
-		// System.out.println(out1.toString());
-		out2.close();
-		
-		// diagram attempts
-		Layout layout = new Layout(pp.getTopNode());
+	// @TODO set options ( alternate css resources )
+
+	public void parseJson(String json, String server_version) throws ParseException {
+		// parse the json and create the diagram
+		PlanParser pp = new PlanParser();
+		pp.parse(json, server_version);
+		QueryBlockNode qbn = pp.getTopNode();
+		createDiagram(qbn);
+	}
+
+	public void parseJson(Reader r, String server_version) throws ParseException, IOException {
+		// parse the json and create the diagram
+		PlanParser pp = new PlanParser();
+		pp.parse(r, server_version);
+		QueryBlockNode qbn = pp.getTopNode();
+		createDiagram(qbn);
+	}
+
+	private void createDiagram(QueryBlockNode qbn) {
+		// create the layout
+		Layout layout = new Layout(qbn);
 		Box b = layout.getLayoutBox();
 		
-		
-		// @TODO translate diagram so that top-left is 0, 0
+		// translate diagram so that top-left is 0, 0
 		RangeBoxVisitor rv = new RangeBoxVisitor();
 		b.traverse(rv);
-		// logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 		b.setPosX(b.getPosX() - rv.getMinX());
 		b.setPosY(b.getPosY() - rv.getMinY());
 		
 		ReweightBoxVisitor rwv = new ReweightBoxVisitor(rv.getMinWeight(), rv.getMaxWeight());
 		b.traverse(rwv);
+	}
 
-		
-		FileOutputStream out3 = new FileOutputStream("c:\\temp\\out2.html");
-		pw = new PrintWriter(out3);
-		SvgBoxVisitor sbv = new SvgBoxVisitor(pw);
-		b.traverse(sbv);
-		pw.flush();
-		out3.close();
-		
-		
-		PrintWriter sysPw = new PrintWriter(System.out);
-		sbv = new SvgBoxVisitor(sysPw);
-		b.traverse(sbv);
-		sysPw.flush();
-	
-		
+	/** Return the diagram as SVG */
+	public String getSvg() {
+		StringWriter sw = new StringWriter();
+		writeSvg(sw);
+		return sw.toString();
 	}
 	
+	public void writeSvg(Writer w) {
+	    PrintWriter pw = new PrintWriter(w);
+	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, false);
+		b.traverse(sbv);
+		pw.flush();
+	}
+	
+	/** Return the diagram as HTML */
+	public String getHtml() {
+		StringWriter sw = new StringWriter();
+		writeSvg(sw);
+		return sw.toString();
+	}
+	
+	public void writeHtml(Writer w) {
+	    PrintWriter pw = new PrintWriter(w);
+	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true);
+		b.traverse(sbv);
+		pw.flush();
+	}
+	
+
 }

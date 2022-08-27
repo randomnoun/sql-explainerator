@@ -1,5 +1,7 @@
 package com.randomnoun.common.db.explain.parser;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,25 +31,34 @@ import com.randomnoun.common.db.explain.json.UnionResultNode;
 public class PlanParser {
 
 	private QueryBlockNode topNode;
-	String json;
 	
-	public PlanParser(String json, String server_version) throws ParseException {
-		this.json = json;
-		this.topNode = getNode(json);
+	public PlanParser() {
 	}
 	
-	public QueryBlockNode getNode(String json) throws ParseException {
+	public void parse(String json, String serverVersion) throws ParseException {
 		JSONParser jp = new JSONParser();
 		JSONObject obj = (JSONObject) jp.parse(json);
 		
-		// ok then
 		QueryBlockNode n;
 		if (obj.containsKey("query_block")) {
 			n = parseQueryBlock((JSONObject) obj.get("query_block"));
 		} else {
 			throw new IllegalArgumentException("expected query_block");
 		}
-		return n;
+		this.topNode = n;
+	}
+
+	public void parse(Reader r, String serverVersion) throws ParseException, IOException {
+		JSONParser jp = new JSONParser();
+		JSONObject obj = (JSONObject) jp.parse(r);
+		
+		QueryBlockNode n;
+		if (obj.containsKey("query_block")) {
+			n = parseQueryBlock((JSONObject) obj.get("query_block"));
+		} else {
+			throw new IllegalArgumentException("expected query_block");
+		}
+		this.topNode = n;
 	}
 
 	// query_block
