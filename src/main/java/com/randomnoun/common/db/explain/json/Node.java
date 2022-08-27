@@ -68,14 +68,14 @@ public abstract class Node implements Struct.ToJson {
 					((v instanceof CostInfoNode) ? ((CostInfoNode) v).toJson() :
 					((v instanceof NameList) ? ((NameList) v).toJson() :
 						
-					" HUH " + v.getClass().getName() )))))));
+					" UNEXPECTED CLASS " + v.getClass().getName() ))))))); // this is intentionally invalid JSON
 				f = false;
 			}
 			List<Object> remaining = new ArrayList<>();
 			for (Object v : children) {
 				if (v instanceof Node) {
 					Node n = (Node) v;
-					s += (f == true ? "": ", ") + "\"" + Text.escapeJavascript(n.jsonType) + "\": " + n.toJson(); // -CHILD 
+					s += (f == true ? "": ", ") + "\"" + Text.escapeJavascript(n.jsonType) + "\": " + n.toJson(); 
 				} else {
 					remaining.add(v);
 				}
@@ -89,8 +89,8 @@ public abstract class Node implements Struct.ToJson {
 	}
 	
 	protected Stream<Node> reverseStream(List<Node> children) {
-		// why the hell isn't this on https://stackoverflow.com/questions/24010109/java-8-stream-reverse-order 
-		// ?
+		// this is the sort of thing you expect to find at https://stackoverflow.com/questions/24010109/java-8-stream-reverse-order
+		// but isn't there
 		return IntStream.range(0, children.size())
 			.mapToObj(i -> children.get(children.size() - i - 1)); 
 	}

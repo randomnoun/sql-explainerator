@@ -8,11 +8,10 @@ public class CostInfoNode implements Struct.ToJson {
 	private Double readCost;
 	private Double evalCost;
 	private Double prefixCost;
-	private String dataReadPerJoin; // "96K"
+	private String dataReadPerJoin; 
 	
 	
 	public String toJson() {
-		// return "{ \"let's pretend\": \"this is the costInfo\" }";
 		String s = "{";
 		boolean f = true;
 		if (dataReadPerJoin!=null) { s += (f ? "" : ", ") + "\"dataReadPerJoin\":\"" + dataReadPerJoin + "\""; f = false; }
