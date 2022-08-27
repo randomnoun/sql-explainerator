@@ -55,7 +55,7 @@ public class SqlExplainToImage {
 	private void createDiagram(QueryBlockNode qbn) {
 		// create the layout
 		Layout layout = new Layout(qbn);
-		Box b = layout.getLayoutBox();
+		b = layout.getLayoutBox();
 		
 		// translate diagram so that top-left is 0, 0
 		RangeBoxVisitor rv = new RangeBoxVisitor();
@@ -69,13 +69,15 @@ public class SqlExplainToImage {
 
 	/** Return the diagram as SVG */
 	public String getSvg() {
+		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 		StringWriter sw = new StringWriter();
 		writeSvg(sw);
 		return sw.toString();
 	}
 	
 	public void writeSvg(Writer w) {
-	    PrintWriter pw = new PrintWriter(w);
+		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
+		PrintWriter pw = new PrintWriter(w);
 	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, false);
 		b.traverse(sbv);
 		pw.flush();
@@ -83,12 +85,14 @@ public class SqlExplainToImage {
 	
 	/** Return the diagram as HTML */
 	public String getHtml() {
+		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 		StringWriter sw = new StringWriter();
 		writeSvg(sw);
 		return sw.toString();
 	}
 	
 	public void writeHtml(Writer w) {
+		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 	    PrintWriter pw = new PrintWriter(w);
 	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true);
 		b.traverse(sbv);
