@@ -2,9 +2,11 @@
 
 **sql-explain-to-image**  converts query execution plans ( the output from an 'EXPLAIN' statement ) into pretty diagrams
 
-It's based on the 'visual explain' pane in [MySQL Workbench](https://www.mysql.com/products/workbench/), and looks like this:
+It attempts to recreate the type of diagrams you get from the 'visual explain' pane in [MySQL Workbench](https://www.mysql.com/products/workbench/), and looks like this:
 
 ![](https://raw.githubusercontent.com/randomnoun/sql-explain-to-image/master/src/site/readme/sakila-7g.png)
+
+The images are in SVG form, although you can also generate HTML output which wraps the SVG.
 
 ## Why would anyone want to do that  ?
 
