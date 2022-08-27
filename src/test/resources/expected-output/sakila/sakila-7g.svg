@@ -143,7 +143,7 @@ svg.sql g.tempTableName > text {
                     </g>
                     <g class="lhsQueryCost">
                         <rect x="150" y="245" width="62" height="10" style="stroke:transparent; "/>
-                        <text x="150" y="250" style="text-anchor:start;">1.5999999999999999</text>
+                        <text x="150" y="250" style="text-anchor:start;">1.6</text>
                     </g>
                     <g class="rhsQueryCost">
                         <rect x="212" y="245" width="62" height="10" style="stroke:transparent; "/>
