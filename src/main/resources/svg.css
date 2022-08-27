@@ -2,7 +2,6 @@ svg.sql {
     font-family: Arial;
     font-size: 14px;
 }
-/* svg */
 svg.sql rect {
     stroke: black;
     fill: transparent;
@@ -12,14 +11,21 @@ svg.sql text {
     dominant-baseline: middle;
     fill: black;
 }
+svg.sql g.queryBlock.topNode > rect { 
+	fill: #cccccc; 
+}
+svg.sql g.union > rect { 
+	fill: #b3b3b3; 
+}
 
-svg.sql g.queryBlock.topNode > rect { fill: #cccccc; }
-
-svg.sql g.union > rect { fill: #b3b3b3; }
-
-svg.sql g.duplicatesRemoval > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
-svg.sql g.orderingOperation > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
-svg.sql g.groupingOperation > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
+svg.sql g.duplicatesRemoval > rect,
+svg.sql g.orderingOperation > rect,
+svg.sql g.groupingOperation > rect { 
+	stroke: #cfcf40; 
+	stroke-width: 2; 
+	rx: 9; 
+	ry: 9; 
+}
 
 svg.sql g.table.nonUniqueKey > text,
 svg.sql g.table.uniqueKey > text,
@@ -29,18 +35,40 @@ svg.sql g.table.fullIndexScan > text {
     font-size: 11px; 
 }
 
-svg.sql g.table.nonUniqueKey > rect { fill: #339933; }
-svg.sql g.table.uniqueKey > rect { fill: #008000; }
-svg.sql g.table.fullTableScan > rect { fill: #bf4040; }
-svg.sql g.table.fullIndexScan > rect { fill: #bf4040; }
+svg.sql g.table.nonUniqueKey > rect { 
+	fill: #339933; 
+}
+svg.sql g.table.uniqueKey > rect { 
+	fill: #008000; 
+}
+svg.sql g.table.fullTableScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.fullIndexScan > rect { 
+	fill: #bf4040; 
+}
 
 
-svg.sql g.queryCost > text { font-size: 11px; } 
-svg.sql g.lhsQueryCost > text { font-size: 11px; text-anchor: start; }
-svg.sql g.rhsQueryCost > text { font-size: 11px; text-anchor: end; }
+svg.sql g.queryCost > text { 
+	font-size: 11px; 
+} 
+svg.sql g.lhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: start; 
+}
+svg.sql g.rhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: end; 
+}
+svg.sql g.tableName > text { 
+	font-size: 11px; 
+} 
+svg.sql g.tableKey > text { 
+	font-size: 11px; 
+	font-weight: bold; 
+} 
 
-svg.sql g.tableName > text { font-size: 11px; } 
-svg.sql g.tableKey > text { font-size: 11px; font-weight: bold; } 
-
-
-svg.sql g.tempTableName > text { font-size: 10px; font-weight: bold; }
+svg.sql g.tempTableName > text { 
+	font-size: 10px; 
+	font-weight: bold; 
+}

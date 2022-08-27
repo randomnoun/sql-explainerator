@@ -7,7 +7,6 @@
     font-family: Arial;
     font-size: 14px;
 }
-/* svg */
 svg.sql rect {
     stroke: black;
     fill: transparent;
@@ -17,14 +16,21 @@ svg.sql text {
     dominant-baseline: middle;
     fill: black;
 }
+svg.sql g.queryBlock.topNode > rect { 
+	fill: #cccccc; 
+}
+svg.sql g.union > rect { 
+	fill: #b3b3b3; 
+}
 
-svg.sql g.queryBlock.topNode > rect { fill: #cccccc; }
-
-svg.sql g.union > rect { fill: #b3b3b3; }
-
-svg.sql g.duplicatesRemoval > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
-svg.sql g.orderingOperation > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
-svg.sql g.groupingOperation > rect { stroke: #cfcf40; stroke-width: 2; rx: 9; ry: 9; }
+svg.sql g.duplicatesRemoval > rect,
+svg.sql g.orderingOperation > rect,
+svg.sql g.groupingOperation > rect { 
+	stroke: #cfcf40; 
+	stroke-width: 2; 
+	rx: 9; 
+	ry: 9; 
+}
 
 svg.sql g.table.nonUniqueKey > text,
 svg.sql g.table.uniqueKey > text,
@@ -34,21 +40,43 @@ svg.sql g.table.fullIndexScan > text {
     font-size: 11px; 
 }
 
-svg.sql g.table.nonUniqueKey > rect { fill: #339933; }
-svg.sql g.table.uniqueKey > rect { fill: #008000; }
-svg.sql g.table.fullTableScan > rect { fill: #bf4040; }
-svg.sql g.table.fullIndexScan > rect { fill: #bf4040; }
+svg.sql g.table.nonUniqueKey > rect { 
+	fill: #339933; 
+}
+svg.sql g.table.uniqueKey > rect { 
+	fill: #008000; 
+}
+svg.sql g.table.fullTableScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.fullIndexScan > rect { 
+	fill: #bf4040; 
+}
 
 
-svg.sql g.queryCost > text { font-size: 11px; } 
-svg.sql g.lhsQueryCost > text { font-size: 11px; text-anchor: start; }
-svg.sql g.rhsQueryCost > text { font-size: 11px; text-anchor: end; }
+svg.sql g.queryCost > text { 
+	font-size: 11px; 
+} 
+svg.sql g.lhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: start; 
+}
+svg.sql g.rhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: end; 
+}
+svg.sql g.tableName > text { 
+	font-size: 11px; 
+} 
+svg.sql g.tableKey > text { 
+	font-size: 11px; 
+	font-weight: bold; 
+} 
 
-svg.sql g.tableName > text { font-size: 11px; } 
-svg.sql g.tableKey > text { font-size: 11px; font-weight: bold; } 
-
-
-svg.sql g.tempTableName > text { font-size: 10px; font-weight: bold; }
+svg.sql g.tempTableName > text { 
+	font-size: 10px; 
+	font-weight: bold; 
+}
     ]]></style>
     <marker id="arrowhead" markerWidth="12" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 12 3.5, 0 7" />
@@ -247,7 +275,7 @@ svg.sql g.tempTableName > text { font-size: 10px; font-weight: bold; }
                                     </g>
                                     <g class="queryCost">
                                         <rect x="920" y="425" width="25" height="10" style="stroke:transparent; "/>
-                                        <text x="920" y="430" style="text-anchor:start;">16085 rows</text>
+                                        <text x="920" y="430" style="text-anchor:start;">16.09K rows</text>
                                     </g>
                                 </g>
                             </g>

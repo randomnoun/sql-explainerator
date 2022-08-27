@@ -9,7 +9,7 @@
 	<parent>
 		<artifactId>parent-pom</artifactId>
 		<groupId>com.randomnoun.build</groupId>
-		<version>1.20</version>
+		<version>1.26</version>
 	</parent>
 
 	<packaging>jar</packaging>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.randomnoun.common</groupId>
             <artifactId>log4j-one</artifactId>
-            <version>0.0.4</version>
+            <version>1.0.0</version>
         </dependency>
 
 		<dependency>
@@ -42,7 +42,7 @@
 		<dependency>
 			<groupId>com.randomnoun.common</groupId>
 			<artifactId>common-public</artifactId>
-			<version>1.0.8</version>
+			<version>1.0.10</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -112,6 +112,10 @@
 					<groupId>org.ccil.cowan.tagsoup</groupId>
 					<artifactId>tagsoup</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.randomnoun.common</groupId>
+					<artifactId>jessop</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		
@@ -120,7 +124,6 @@
           <artifactId>json-simple</artifactId>
           <version>1.1.1</version>
         </dependency>
-
 
 	</dependencies>
 
@@ -157,7 +160,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.randomnoun.common.db.explain.ExplainerCli</mainClass>
+									<mainClass>com.randomnoun.common.db.explain.SqlExplainToImageCli</mainClass>
 								</transformer>
 							</transformers>
 							<shadedArtifactAttached>true</shadedArtifactAttached>
