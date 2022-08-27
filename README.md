@@ -1,6 +1,6 @@
 # sql-explain-to-image
 
-**sql-explain-to-image**  converts query optimisation plans ( the output from an 'EXPLAIN' statement ) into pretty diagrams
+**sql-explain-to-image**  converts query execution plans ( the output from an 'EXPLAIN' statement ) into pretty diagrams
 
 It's based on the 'visual explain' pane in [MySQL Workbench](https://www.mysql.com/products/workbench/), and looks like this:
 
