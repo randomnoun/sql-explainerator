@@ -1,6 +1,7 @@
 package com.randomnoun.common.db.explain.layout;
 
 import java.awt.Color;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +54,17 @@ public class Layout {
 			.mapToObj(i -> children.get(children.size() - i - 1)); 
 	}
 
+	private String siUnits(long v) {
+		DecimalFormat df =  new DecimalFormat("0.##");
+		if (v < 1_000) { return String.valueOf(v); }
+		else if (v < 1_000_000)                  { return df.format((double) v/1_000) + "K"; }
+		else if (v < 1_000_000_000)              { return df.format((double) v/1_000_000) + "M"; }
+		else if (v < 1_000_000_000_000L)         { return df.format((double) v/1_000_000_000) + "G"; }
+		else if (v < 1_000_000_000_000_000L)     { return df.format((double) v/1_000_000_000_000L) + "T"; }
+		else if (v < 1_000_000_000_000_000_000L) { return df.format((double) v/1_000_000_000_000_000L) + "P"; }
+		else { return String.valueOf(v); }
+	}
+		
 
 	private Box layout(QueryBlockNode n, String queryBlockLabel) {
 		return layout(n, queryBlockLabel, false);
@@ -284,7 +296,7 @@ public class Layout {
 				lb = new CBox(); // label box
 				lb.setCssClass("queryCost");
 				lb.setParentAndPosition(b, 40, -10);
-				lb.setLabel(String.valueOf(qsn.getRowsProducedPerJoin()) +
+				lb.setLabel(siUnits(qsn.getRowsProducedPerJoin()) +
 					(qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows")); 
 				lb.setTextAnchor("start");
 				lb.setSize(25, 10);
@@ -292,7 +304,7 @@ public class Layout {
 				lb = new CBox(); // label box
 				lb.setCssClass("queryCost");
 				lb.setParentAndPosition(b, 65, 15);
-				lb.setLabel(String.valueOf(qsn.getRowsProducedPerJoin()) +
+				lb.setLabel(siUnits(qsn.getRowsProducedPerJoin()) +
 					(qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows")); 
 				lb.setTextAnchor("start");
 				lb.setSize(25, 10);
@@ -416,7 +428,7 @@ public class Layout {
 			Box lb = new CBox(); // label box
 			lb.setCssClass("rhsQueryCost");  lb.setTextAnchor("end");
 			lb.setParentAndPosition(ob, w/2, -15);
-			lb.setLabel(String.valueOf(n.getRowsExaminedPerScan()) + 
+			lb.setLabel(siUnits(n.getRowsExaminedPerScan()) + 
 				(n.getRowsExaminedPerScan() == 1 ? " row" : " rows")); 
 			lb.setSize(w/2, 10);
 		}
