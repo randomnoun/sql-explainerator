@@ -416,12 +416,13 @@ public class Layout {
 		
 		CostInfoNode costInfo = n.getCostInfo();
 		if (costInfo != null) {
-			double cost= (costInfo.getEvalCost() == null ? (double) 0 : costInfo.getEvalCost()) +
+			double cost = (costInfo.getEvalCost() == null ? (double) 0 : costInfo.getEvalCost()) +
 				(costInfo.getReadCost() == null ? (double) 0 : costInfo.getReadCost());
 			Box lb = new CBox(); // label box
 			lb.setCssClass("lhsQueryCost"); lb.setTextAnchor("start");
 			lb.setParentAndPosition(ob, 0, -15);
-			lb.setLabel(String.valueOf(cost)); 
+			DecimalFormat df = new DecimalFormat("0.##");
+			lb.setLabel(df.format(cost)); 
 			lb.setSize(w/2, 10);
 		}
 		if (n.getRowsExaminedPerScan() != null) {
