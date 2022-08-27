@@ -37,9 +37,9 @@ public class SqlExplainToImageCli {
 		// create the Options
 		Options options = new Options();
 		options.addOption( Option.builder("h").longOpt( "help" ).desc( "This usage text" ).build() );
-		options.addOption( Option.builder("i").longOpt( "infile" ).desc( "input file, or '-' for stdin" ).hasArg().argName("infile").build() );
-		options.addOption( Option.builder("o").longOpt( "outfile" ).desc( "output file, or '-' for stdout" ).hasArg().argName("outfile").build() );
-		options.addOption( Option.builder("f").longOpt( "format" ).desc( "output format" ).hasArg().argName("format").build() );
+		options.addOption( Option.builder("i").longOpt( "infile" ).desc( "input file, or '-' for stdin; default = stdin" ).hasArg().argName("infile").build() );
+		options.addOption( Option.builder("o").longOpt( "outfile" ).desc( "output file, or '-' for stdout; default = stdout" ).hasArg().argName("outfile").build() );
+		options.addOption( Option.builder("f").longOpt( "format" ).desc( "output format (svg or html); default = svg" ).hasArg().argName("format").build() );
 		options.addOption( Option.builder("j").longOpt( "jdbc" ).desc( "JDBC connection string" ).hasArg().argName("jdbc").build() );
 		options.addOption( Option.builder("u").longOpt( "username" ).desc( "JDBC username" ).hasArg().argName("username").build() );
 		options.addOption( Option.builder("p").longOpt( "password" ).desc( "JDBC password" ).hasArg().argName("password").build() );
