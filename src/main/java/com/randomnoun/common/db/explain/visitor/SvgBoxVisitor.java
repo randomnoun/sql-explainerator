@@ -11,9 +11,7 @@ import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.graph.Box;
 
-/** Converts a box layout into an SVG diagram.
- * 
- * (Well, a HTML document containing a SVG diagram, including any styles required)
+/** Converts a box layout into an SVG diagram, or an HTML document containing an SVG diagram.
  * 
  * @author knoxg
  */
@@ -21,11 +19,13 @@ public class SvgBoxVisitor extends BoxVisitor {
 	
 	Logger logger = Logger.getLogger(SvgBoxVisitor.class);
 	
+	boolean asHtml = false;
 	int indent = 0;
 	PrintWriter pw;
 	
-	public SvgBoxVisitor(PrintWriter pw) {
+	public SvgBoxVisitor(PrintWriter pw, boolean asHtml) {
 		this.pw = pw;
+		this.asHtml = asHtml;
 	}
 	
 	@Override
@@ -46,7 +46,13 @@ public class SvgBoxVisitor extends BoxVisitor {
 			}
 			
 			// add 1 to max as 1px lines on the border have 0.5px of that line outside the max co-ordinates
-			s = "<!DOCTYPE html>\n" +
+			int w = rv.getMaxX() + 1;
+			int h = rv.getMaxY() + 1;
+
+			// svg arrowhead modified from http://thenewcode.com/1068/Making-Arrows-in-SVG
+			// and https://stackoverflow.com/questions/13626748/how-to-prevent-a-svg-marker-arrow-head-to-inherit-paths-stroke-width
+			
+			s = (asHtml ? "<!DOCTYPE html>\n" +
 			  "<html>\n" +
 			  "<head>\n" +
 			  "<style>\n" + 
@@ -54,14 +60,28 @@ public class SvgBoxVisitor extends BoxVisitor {
 			  "</style>\n" +
 			  "</head>\n" +
 			  "<body>\n" +
-			  "<svg width=\"" + (rv.getMaxX()+1) + "\" height=\"" + (rv.getMaxY()+1) + "\">\n" +
-			  // svg arrowhead modified from http://thenewcode.com/1068/Making-Arrows-in-SVG
-			  // and https://stackoverflow.com/questions/13626748/how-to-prevent-a-svg-marker-arrow-head-to-inherit-paths-stroke-width
-			  "<defs>\n" +
+			  "<svg width=\"" + w + "\" height=\"" + h + "\" class=\"sql\">\n" +
+			  "  <defs>\n" + 
 			  "    <marker id=\"arrowhead\" markerWidth=\"12\" markerHeight=\"7\" refX=\"0\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\">\n" +
 			  "      <polygon points=\"0 0, 12 3.5, 0 7\" />\n" +
 			  "    </marker>\n" +
-			  "  </defs>";
+			  "  </defs>\n"
+			  :
+			  
+			  "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
+			  "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n" +
+			  "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\"\n" +
+			  "  width=\"" + w + "\" height=\"" + h + "\" viewBox=\"0 0 " + w + " " + h + "\" class=\"sql\">\n" +
+			  "  <defs>\n" +
+			  "    <style type=\"text/css\"><![CDATA[" +
+			  css +
+			  "    ]]></style>\n" +
+			  "    <marker id=\"arrowhead\" markerWidth=\"12\" markerHeight=\"7\" refX=\"0\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\">\n" +
+			  "      <polygon points=\"0 0, 12 3.5, 0 7\" />\n" +
+			  "    </marker>\n" +
+			  "  </defs>\n"
+			);
+			
 			indent += 4;
 		}
 		for (int i=0; i<indent; i++) { s += " "; }
@@ -178,9 +198,11 @@ public class SvgBoxVisitor extends BoxVisitor {
 		s += "</g>\n"; // end SVG group
 		if (indent==4) {
 			indent -= 4;
-			s += "</svg>\n" +
-			"</body>\n" +
-			"</html>\n";
+			s += "</svg>\n";
+			if (asHtml) {
+				s += "</body>\n" +
+					"</html>\n";
+			}
 		}
 		pw.print(s);
 	}

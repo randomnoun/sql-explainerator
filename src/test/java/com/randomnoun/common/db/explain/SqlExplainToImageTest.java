@@ -29,17 +29,15 @@ public class SqlExplainToImageTest extends TestCase {
 
 	Logger logger = Logger.getLogger(SqlExplainToImageTest.class);
 	
-    private static boolean WRITE_EXPECTED_OUTPUT = false;	
+    private static boolean WRITE_EXPECTED_OUTPUT = true;	
 	
 	public void setUp() throws IOException {
 		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
 		lcc.init("[explain-to-image]", null);
 
-		File f = new File("target/test/sakila");
+		// File f = new File("target/test/sakila");
 		// logger.info(f.getCanonicalPath());
-		f.mkdirs();
-		
-
+		// f.mkdirs();
 	}
 	
 	public void testSomeThings() throws IOException, ParseException {
@@ -112,7 +110,7 @@ public class SqlExplainToImageTest extends TestCase {
 		
 		StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        SvgBoxVisitor sbv = new SvgBoxVisitor(pw);
+        SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true);
 		b.traverse(sbv);
 		pw.flush();
 		
@@ -127,7 +125,26 @@ public class SqlExplainToImageTest extends TestCase {
             fis.close();
             assertEquals("difference in " + resourceName + ".html", expected.trim(), sw.toString().trim());
         }
+
         
+		sw = new StringWriter();
+        pw = new PrintWriter(sw);
+        sbv = new SvgBoxVisitor(pw, false);
+		b.traverse(sbv);
+		pw.flush();
+		
+		tf = new File("src/test/resources/expected-output/" + resourceName + ".svg");
+        if (WRITE_EXPECTED_OUTPUT) {
+            FileOutputStream fos = new FileOutputStream(tf);
+            fos.write(sw.toString().getBytes());
+    		fos.close();
+        } else {
+            FileInputStream fis = new FileInputStream(tf);
+            String expected = new String(StreamUtil.getByteArray(fis));
+            fis.close();
+            assertEquals("difference in " + resourceName + ".svg", expected.trim(), sw.toString().trim());
+        }
+
 	}
 	
 }

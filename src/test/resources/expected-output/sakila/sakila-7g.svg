@@ -1,8 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-svg.sql { 
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+  width="996" height="621" viewBox="0 0 996 621" class="sql">
+  <defs>
+    <style type="text/css"><![CDATA[svg.sql { 
     font-family: Arial;
     font-size: 14px;
 }
@@ -48,11 +49,7 @@ svg.sql g.tableKey > text { font-size: 11px; font-weight: bold; }
 
 
 svg.sql g.tempTableName > text { font-size: 10px; font-weight: bold; }
-</style>
-</head>
-<body>
-<svg width="996" height="621" class="sql">
-  <defs>
+    ]]></style>
     <marker id="arrowhead" markerWidth="12" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 12 3.5, 0 7" />
     </marker>
@@ -344,5 +341,3 @@ svg.sql g.tempTableName > text { font-size: 10px; font-weight: bold; }
         </g>
     </g>
 </svg>
-</body>
-</html>
