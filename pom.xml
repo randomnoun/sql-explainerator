@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.randomnoun.db</groupId>
 	<artifactId>explain-to-image</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 
 	<parent>
 		<artifactId>parent-pom</artifactId>
