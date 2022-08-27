@@ -19,9 +19,9 @@ Usage text:
 C:\util\java> java -jar explain-to-image-0.0.1-with-dependencies.jar --help
 usage: SqlExplainToImageCli [options]
  -h,--help                  This usage text
- -i,--infile <infile>       input file, or '-' for stdin
- -o,--outfile <outfile>     output file, or '-' for stdout
- -f,--format <format>       output format
+ -i,--infile <infile>       input file, or '-' for stdin; default = stdin
+ -o,--outfile <outfile>     output file, or '-' for stdout; default = stdout
+ -f,--format <format>       output format (svg or html); default = svg
  -j,--jdbc <jdbc>           JDBC connection string
  -u,--username <username>   JDBC username
  -p,--password <password>   JDBC password
@@ -51,14 +51,18 @@ username, password and sql, e.g.:
 
   SqlExplainToImageCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \
     --sql "SELECT 1 fROM DUAL" --outfile plan.svg
-
-
 ```
 
 And some example command-lines:
 
 ```
 C:\util\java> java -jar explain-to-image-0.0.1-SNAPSHOT-with-dependencies.jar --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 --sql "SELECT 1 fROM DUAL" --outfile plan.svg
+```
+
+```
+C:\util\java>"c:\Program Files\MySQL\MySQL Server 8.0\bin\mysql" --user=root --password=abc123 --silent --raw --skip-column-names --execute "EXPLAIN FORMAT=JSON SELECT 1 FROM DUAL" sakila > plan.json
+
+C:\util\java>java -jar explain-to-image-0.0.1-SNAPSHOT-with-dependencies.jar --infile plan.json --outfile plan.svg
 ```
 
 ## Where can I get it ? 
