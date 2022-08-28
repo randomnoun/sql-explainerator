@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
+import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.graph.Box;
 
 /** Converts a box layout into an SVG diagram, or an HTML document containing an SVG diagram.
@@ -20,12 +21,19 @@ public class SvgBoxVisitor extends BoxVisitor {
 	Logger logger = Logger.getLogger(SvgBoxVisitor.class);
 	
 	boolean asHtml = false;
+	TooltipTypeEnum tooltipType = TooltipTypeEnum.SVG_TITLE;
+	String css;
+	String script;
+	
 	int indent = 0;
 	PrintWriter pw;
 	
-	public SvgBoxVisitor(PrintWriter pw, boolean asHtml) {
+	public SvgBoxVisitor(PrintWriter pw, boolean asHtml, TooltipTypeEnum tooltipType, String css, String script) {
 		this.pw = pw;
 		this.asHtml = asHtml;
+		this.tooltipType = tooltipType;
+		this.css = css;
+		this.script = script;
 	}
 	
 	@Override
@@ -37,13 +45,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 			b.traverse(rv);
 			logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 
-			InputStream is = SvgBoxVisitor.class.getResourceAsStream("/svg.css");
-			String css;
-			try {
-				css = new String(StreamUtil.getByteArray(is));
-			} catch (IOException e) {
-				throw new IllegalStateException("IOException", e);
-			}
+			if (css==null) { css = getResource("/svg.css"); }
 			
 			// add 1 to max as 1px lines on the border have 0.5px of that line outside the max co-ordinates
 			int w = rv.getMaxX() + 1;
@@ -60,7 +62,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 			  "</style>\n" +
 			  "</head>\n" +
 			  "<body>\n" +
-			  "<svg width=\"" + w + "\" height=\"" + h + "\" class=\"sql\">\n" +
+			  "<svg width=\"" + w + "\" height=\"" + h + "\" class=\"sql\"" + (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? " onload=\"initSqlExplain(evt)\"" : "") +">\n" +
 			  "  <defs>\n" + 
 			  "    <marker id=\"arrowhead\" markerWidth=\"12\" markerHeight=\"7\" refX=\"0\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\">\n" +
 			  "      <polygon points=\"0 0, 12 3.5, 0 7\" />\n" +
@@ -71,7 +73,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 			  "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
 			  "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n" +
 			  "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\"\n" +
-			  "  width=\"" + w + "\" height=\"" + h + "\" viewBox=\"0 0 " + w + " " + h + "\" class=\"sql\">\n" +
+			  "  width=\"" + w + "\" height=\"" + h + "\" viewBox=\"0 0 " + w + " " + h + "\" class=\"sql\"" + (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? " onload=\"initSqlExplain(evt)\"" : "") + ">\n" +
 			  "  <defs>\n" +
 			  "    <style type=\"text/css\"><![CDATA[" +
 			  css +
@@ -88,6 +90,15 @@ public class SvgBoxVisitor extends BoxVisitor {
 		
 		s += "<g" + ( b.getCssClass() == null ? "" : " class=\"" + b.getCssClass() + "\"") + ">\n"; // SVG group
 		pw.print(s);
+	}
+
+	private String getResource(String resourceName) {
+		InputStream is = SvgBoxVisitor.class.getResourceAsStream(resourceName);
+		try {
+			return new String(StreamUtil.getByteArray(is));
+		} catch (IOException e) {
+			throw new IllegalStateException("IOException", e);
+		}
 	}
 
 	String toHex(Color c) {
@@ -119,9 +130,20 @@ public class SvgBoxVisitor extends BoxVisitor {
 				  (b.getFill() == null ? "" : "fill:" + toHex(b.getFill())+ "; ") +
 				  (b.getStrokeDashArray() == null ? "" : "stroke-dasharray:" + Text.escapeHtml(Text.join(b.getStrokeDashArray(), " ")) + "; ") +
 				"\"";
-			s += (b.getTooltip() == null ? "/>\n" : ">\n" +
-				is + "        <title>" + Text.escapeHtml(b.getTooltip()) + "</title>\n" +
-				is + "    </rect>\n");
+			
+			if (b.getTooltip() == null || tooltipType == TooltipTypeEnum.NONE) {
+				s += "/>\n";
+			} else {
+				if (tooltipType == TooltipTypeEnum.ATTRIBUTE || tooltipType == TooltipTypeEnum.ATTRIBUTE_JS) {
+					// replace newlines with &#10; ?
+					s += " data-tooltip-html=\"" + Text.escapeHtml(b.getTooltip()) + "\" />\n";
+					
+				} else if (tooltipType == TooltipTypeEnum.SVG_TITLE) {
+					s += ">\n" +
+						is + "        <title>" + Text.escapeHtml(b.getTooltip()) + "</title>\n" +
+						is + "    </rect>\n";
+				}
+			}
 		} else if (b.getShape().equals("nestedLoop")) {
 			// s += is + "<path fill=\"none\" stroke=\"black\" d=\"M 30,0 L 60 30 L 30 60 L 0 30 L 30 0\"></path>\n";
 			s += is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\">\n";
@@ -196,13 +218,30 @@ public class SvgBoxVisitor extends BoxVisitor {
 		indent -= 4;
 		for (int i=0; i<indent; i++) { s += " "; }
 		s += "</g>\n"; // end SVG group
+		 
 		if (indent==4) {
-			indent -= 4;
+			// close off SVG and HTML elements
+			if (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS) {
+				if (script == null) { css = getResource("/svg.js"); }
+			} else {
+				script = null;
+			}
+			if (script != null && !asHtml) {
+				s += "    <script type=\"text/ecmascript\"><![CDATA[\n" +
+						script + "\n" +
+					"    ]]></script>\n";
+			}
 			s += "</svg>\n";
 			if (asHtml) {
+				if (script != null) {
+					s += "<script type=\"text/ecmascript\">\n" +
+							script + "\n" +
+						"</script>\n";
+				}
 				s += "</body>\n" +
 					"</html>\n";
 			}
+			indent -= 4;
 		}
 		pw.print(s);
 	}

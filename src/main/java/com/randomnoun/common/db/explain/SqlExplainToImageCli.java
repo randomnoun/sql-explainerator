@@ -1,5 +1,6 @@
 package com.randomnoun.common.db.explain;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,7 +25,9 @@ import org.json.simple.parser.ParseException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
+import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
+import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 /** All the CLI options */
@@ -40,11 +43,15 @@ public class SqlExplainToImageCli {
 		options.addOption( Option.builder("i").longOpt( "infile" ).desc( "input file, or '-' for stdin; default = stdin" ).hasArg().argName("infile").build() );
 		options.addOption( Option.builder("o").longOpt( "outfile" ).desc( "output file, or '-' for stdout; default = stdout" ).hasArg().argName("outfile").build() );
 		options.addOption( Option.builder("f").longOpt( "format" ).desc( "output format (svg or html); default = svg" ).hasArg().argName("format").build() );
+		options.addOption( Option.builder("t").longOpt( "tooltip" ).desc( "tooltip type (none, title, attribute, javascript); default = title" ).hasArg().argName("tooltip").build() );
 		options.addOption( Option.builder("j").longOpt( "jdbc" ).desc( "JDBC connection string" ).hasArg().argName("jdbc").build() );
 		options.addOption( Option.builder("u").longOpt( "username" ).desc( "JDBC username" ).hasArg().argName("username").build() );
 		options.addOption( Option.builder("p").longOpt( "password" ).desc( "JDBC password" ).hasArg().argName("password").build() );
 		options.addOption( Option.builder("d").longOpt( "driver" ).desc( "JDBC driver class name; default = org.mariadb.jdbc.Driver" ).hasArg().argName("driver").build() );
 		options.addOption( Option.builder("q").longOpt( "sql" ).desc( "SQL to explain" ).hasArg().argName("sql").build() );
+		
+		options.addOption( Option.builder("c").longOpt( "css" ).desc( "alternate css file" ).hasArg().argName("css").build() );
+		options.addOption( Option.builder("s").longOpt( "script" ).desc( "alternate javascript file" ).hasArg().argName("script").build() );
 
 		/*
 		options.addOption( Option.builder("O").longOpt( "option" ).desc( "use value for script option" )
@@ -78,6 +85,9 @@ public class SqlExplainToImageCli {
 	
 		CommandLine line = null;
 		boolean usage = false;
+		TooltipTypeEnum tooltipType = TooltipTypeEnum.SVG_TITLE;
+		String css = null;
+		String script = null;
 		try {
 		    line = parser.parse( options, args );
 		} catch (org.apache.commons.cli.ParseException exp) {
@@ -87,10 +97,14 @@ public class SqlExplainToImageCli {
 		String driverName = line.getOptionValue("driverName", "org.mariadb.jdbc.Driver");
 		boolean help = line.hasOption("help");
 		String infile = line.getOptionValue("infile");
+		String tooltipString = line.getOptionValue("tooltip");
 		String jdbc = line.getOptionValue("jdbc");
 		String username = line.getOptionValue("username");
 		String password = line.getOptionValue("password");
 		String sql = line.getOptionValue("sql");
+		
+		String cssfile = line.getOptionValue("css");
+		String scriptfile = line.getOptionValue("script");
 		
 		String outfile = line.getOptionValue("outfile");
 		
@@ -103,9 +117,28 @@ public class SqlExplainToImageCli {
 		    formatter.printHelp( "SqlExplainToImageCli [options]", null, options, footer );
 		    System.exit(1);
 		}
+		if (!Text.isBlank(tooltipString)) {
+			try {
+				tooltipType = TooltipTypeEnum.fromValue(tooltipString);
+			} catch (IllegalArgumentException iae) {
+				System.err.println("Invalid --tooltip; expected 'none', 'title', 'javascript' or 'attribute'");
+			}
+		}
+		if (!Text.isBlank(cssfile)) {
+			FileInputStream fis = new FileInputStream(cssfile);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			StreamUtil.copyStream(fis, baos);
+			css = new String(cssfile);
+		}
+		if (!Text.isBlank(scriptfile)) {
+			FileInputStream fis = new FileInputStream(cssfile);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			StreamUtil.copyStream(fis, baos);
+			script = new String(cssfile);
+		}
 		
 		if (!(format.equals("svg") || format.equals("html"))) {
-			System.err.println("Invalid --format; expected svg or html");
+			System.err.println("Invalid --format; expected 'svg' or 'html'");
 			System.exit(1);
 		}
 			
@@ -145,6 +178,9 @@ public class SqlExplainToImageCli {
 		
 		SqlExplainToImage seti = new SqlExplainToImage();
 		seti.parseJson(r, "1.2.3");
+		seti.setTooltipType(tooltipType);
+		seti.setCss(css);
+		seti.setScript(script);
 		if (format.equals("svg")) {
 			seti.writeSvg(pw);
 		} else {

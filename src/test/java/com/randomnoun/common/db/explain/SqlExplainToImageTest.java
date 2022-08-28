@@ -15,6 +15,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import com.randomnoun.common.StreamUtil;
+import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.graph.Box;
 import com.randomnoun.common.db.explain.layout.Layout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
@@ -97,7 +98,7 @@ public class SqlExplainToImageTest extends TestCase {
 		
 		StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true);
+        SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true, TooltipTypeEnum.SVG_TITLE, null, null);
 		b.traverse(sbv);
 		pw.flush();
 		
@@ -115,7 +116,7 @@ public class SqlExplainToImageTest extends TestCase {
 
 		sw = new StringWriter();
         pw = new PrintWriter(sw);
-        sbv = new SvgBoxVisitor(pw, false);
+        sbv = new SvgBoxVisitor(pw, false, TooltipTypeEnum.SVG_TITLE, null, null);
 		b.traverse(sbv);
 		pw.flush();
 		

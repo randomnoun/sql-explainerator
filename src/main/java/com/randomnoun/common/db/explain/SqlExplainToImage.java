@@ -9,6 +9,7 @@ import java.io.Writer;
 import org.apache.log4j.Logger;
 import org.json.simple.parser.ParseException;
 
+import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.graph.Box;
 import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.layout.Layout;
@@ -30,6 +31,9 @@ public class SqlExplainToImage {
 	
 	// The box class is how we're describing the resulting diagram. It contains boxes, which represent shapes or other containers
 	Box b;
+	TooltipTypeEnum tooltipType = TooltipTypeEnum.SVG_TITLE;
+	String css;
+	String script;
 	
 	public SqlExplainToImage() {
 	}
@@ -78,7 +82,7 @@ public class SqlExplainToImage {
 	public void writeSvg(Writer w) {
 		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 		PrintWriter pw = new PrintWriter(w);
-	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, false);
+	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, false, tooltipType, css, script);
 		b.traverse(sbv);
 		pw.flush();
 	}
@@ -94,10 +98,35 @@ public class SqlExplainToImage {
 	public void writeHtml(Writer w) {
 		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 	    PrintWriter pw = new PrintWriter(w);
-	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true);
+	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true, tooltipType, css, script);
 		b.traverse(sbv);
 		pw.flush();
 	}
-	
+
+	public TooltipTypeEnum getTooltipType() {
+		return tooltipType;
+	}
+
+	public void setTooltipType(TooltipTypeEnum tooltipType) {
+		this.tooltipType = tooltipType;
+	}
+
+	public String getCss() {
+		return css;
+	}
+
+	public void setCss(String css) {
+		this.css = css;
+	}
+
+	public String getScript() {
+		return script;
+	}
+
+	public void setScript(String script) {
+		this.script = script;
+	}
+
+
 
 }
