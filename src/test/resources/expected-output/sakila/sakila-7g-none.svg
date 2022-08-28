@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1"
-  width="996" height="621" viewBox="0 0 996 621" class="sql">
+  width="996" height="621" class="sql">
   <defs>
     <style type="text/css"><![CDATA[svg text {
 	pointer-events: none;
@@ -255,7 +255,7 @@ svg.sql g.tempTableName > text {
                                     </g>
                                     <g class="table nonUniqueKey">
                                         <rect x="835" y="545" width="150" height="30" style=""/>
-                                        <text x="910" y="560" style=""> Non-Unique Key Lookup</text>
+                                        <text x="910" y="560" style="">Non-Unique Key Lookup</text>
                                     </g>
                                     <g class="lhsQueryCost">
                                         <rect x="835" y="530" width="75" height="10" style="stroke:transparent; "/>
@@ -294,7 +294,7 @@ svg.sql g.tempTableName > text {
                     </g>
                     <g class="table nonUniqueKey">
                         <rect x="675" y="260" width="320" height="30" style=""/>
-                        <text x="835" y="275" style=""> Non-Unique Key Lookup</text>
+                        <text x="835" y="275" style="">Non-Unique Key Lookup</text>
                     </g>
                     <g class="lhsQueryCost">
                         <rect x="675" y="245" width="160" height="10" style="stroke:transparent; "/>

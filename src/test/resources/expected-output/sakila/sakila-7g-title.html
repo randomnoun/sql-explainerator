@@ -124,7 +124,9 @@ svg.sql g.tempTableName > text {
                         <text x="50" y="313" style="">PRIMARY</text>
                     </g>
                     <g class="table fullIndexScan">
-                        <rect x="0" y="260" width="100" height="30" style=""/>
+                        <rect x="0" y="260" width="100" height="30" style="">
+                            <title>sto&#xa;  Access Type: index&#xa;    Full Index Scan&#xa;    Cost Hint: High - especially for large indexes&#xa;  Used Columns: store_id,&#xa;    address_id&#xa;&#xa;Key/Index: PRIMARY&#xa;  Used Key Parts: store_id&#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_address_id&#xa;&#xa;Rows Examined per Scan: 2&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;Cost Info&#xa;  Read: 0.25&#xa;  Eval: 0.2&#xa;  Prefix: 0.45&#xa;  Data Read: 32</title>
+                        </rect>
                         <text x="50" y="275" style="">Full Index Scan</text>
                     </g>
                     <g class="lhsQueryCost">
@@ -148,7 +150,9 @@ svg.sql g.tempTableName > text {
                         <text x="212" y="313" style="">PRIMARY</text>
                     </g>
                     <g class="table uniqueKey">
-                        <rect x="150" y="260" width="125" height="30" style=""/>
+                        <rect x="150" y="260" width="125" height="30" style="">
+                            <title>adr&#xa;  Access Type: eq_ref&#xa;    Unique Key Lookup&#xa;    Cost Hint: Low - The optimizer is able to find an index that it can use to retrieve required records.&#xa;Fast because the index search leads directly to the page with all the row data&#xa;  Used Columns: address_id,&#xa;    city_id&#xa;&#xa;Key/Index: PRIMARY&#xa;  Used Key Parts: address_id&#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_city_id&#xa;&#xa;Rows Examined per Scan: 1&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;Cost Info&#xa;  Read: 1.4&#xa;  Eval: 0.2&#xa;  Prefix: 2.05&#xa;  Data Read: 1K</title>
+                        </rect>
                         <text x="212" y="275" style="">Unique Key Lookup</text>
                     </g>
                     <g class="lhsQueryCost">
@@ -172,7 +176,9 @@ svg.sql g.tempTableName > text {
                         <text x="387" y="313" style="">PRIMARY</text>
                     </g>
                     <g class="table uniqueKey">
-                        <rect x="325" y="260" width="125" height="30" style=""/>
+                        <rect x="325" y="260" width="125" height="30" style="">
+                            <title>cit&#xa;  Access Type: eq_ref&#xa;    Unique Key Lookup&#xa;    Cost Hint: Low - The optimizer is able to find an index that it can use to retrieve required records.&#xa;Fast because the index search leads directly to the page with all the row data&#xa;  Used Columns: city_id,&#xa;    city,&#xa;    country_id&#xa;&#xa;Key/Index: PRIMARY&#xa;  Used Key Parts: city_id&#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_country_id&#xa;&#xa;Rows Examined per Scan: 1&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;Cost Info&#xa;  Read: 0.5&#xa;  Eval: 0.2&#xa;  Prefix: 2.75&#xa;  Data Read: 432</title>
+                        </rect>
                         <text x="387" y="275" style="">Unique Key Lookup</text>
                     </g>
                     <g class="lhsQueryCost">
@@ -196,7 +202,9 @@ svg.sql g.tempTableName > text {
                         <text x="562" y="313" style="">PRIMARY</text>
                     </g>
                     <g class="table uniqueKey">
-                        <rect x="500" y="260" width="125" height="30" style=""/>
+                        <rect x="500" y="260" width="125" height="30" style="">
+                            <title>cou&#xa;  Access Type: eq_ref&#xa;    Unique Key Lookup&#xa;    Cost Hint: Low - The optimizer is able to find an index that it can use to retrieve required records.&#xa;Fast because the index search leads directly to the page with all the row data&#xa;  Used Columns: country_id,&#xa;    country&#xa;&#xa;Key/Index: PRIMARY&#xa;  Used Key Parts: country_id&#xa;  Possible Keys: PRIMARY&#xa;&#xa;Rows Examined per Scan: 1&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;Cost Info&#xa;  Read: 0.5&#xa;  Eval: 0.2&#xa;  Prefix: 3.45&#xa;  Data Read: 416</title>
+                        </rect>
                         <text x="562" y="275" style="">Unique Key Lookup</text>
                     </g>
                     <g class="lhsQueryCost">
@@ -237,7 +245,9 @@ svg.sql g.tempTableName > text {
                                         <text x="735" y="598" style="">idx_fk_store_id</text>
                                     </g>
                                     <g class="table fullIndexScan">
-                                        <rect x="685" y="545" width="100" height="30" style=""/>
+                                        <rect x="685" y="545" width="100" height="30" style="">
+                                            <title>cus&#xa;  Access Type: index&#xa;    Full Index Scan&#xa;    Cost Hint: High - especially for large indexes&#xa;  Used Columns: customer_id,&#xa;    store_id&#xa;&#xa;Key/Index: idx_fk_store_id&#xa;  Used Key Parts: store_id&#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_store_id&#xa;&#xa;Rows Examined per Scan: 599&#xa;Rows Produced per Join: 599&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;Cost Info&#xa;  Read: 1.25&#xa;  Eval: 59.9&#xa;  Prefix: 61.15&#xa;  Data Read: 341K</title>
+                                        </rect>
                                         <text x="735" y="560" style="">Full Index Scan</text>
                                     </g>
                                     <g class="lhsQueryCost">
@@ -261,8 +271,10 @@ svg.sql g.tempTableName > text {
                                         <text x="910" y="598" style="">idx_fk_customer_id</text>
                                     </g>
                                     <g class="table nonUniqueKey">
-                                        <rect x="835" y="545" width="150" height="30" style=""/>
-                                        <text x="910" y="560" style=""> Non-Unique Key Lookup</text>
+                                        <rect x="835" y="545" width="150" height="30" style="">
+                                            <title>pay&#xa;  Access Type: ref&#xa;    Non-Unique Key Lookup&#xa;    Cost Hint: Low-medium - Low if number of matching rows is small, higher as the number of rows increases&#xa;  Used Columns: payment_id,&#xa;    customer_id,&#xa;    amount&#xa;&#xa;Key/Index: idx_fk_customer_id&#xa;  Used Key Parts: customer_id&#xa;  Possible Keys: idx_fk_customer_id&#xa;&#xa;Rows Examined per Scan: 26&#xa;Rows Produced per Join: 16085&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;Cost Info&#xa;  Read: 4021.5&#xa;  Eval: 1608.6&#xa;  Prefix: 5691.25&#xa;  Data Read: 377K</title>
+                                        </rect>
+                                        <text x="910" y="560" style="">Non-Unique Key Lookup</text>
                                     </g>
                                     <g class="lhsQueryCost">
                                         <rect x="835" y="530" width="75" height="10" style="stroke:transparent; "/>
@@ -300,8 +312,10 @@ svg.sql g.tempTableName > text {
                         <text x="835" y="319" style="">&lt;auto_key0&gt;</text>
                     </g>
                     <g class="table nonUniqueKey">
-                        <rect x="675" y="260" width="320" height="30" style=""/>
-                        <text x="835" y="275" style=""> Non-Unique Key Lookup</text>
+                        <rect x="675" y="260" width="320" height="30" style="">
+                            <title>B&#xa;  Access Type: ref&#xa;    Non-Unique Key Lookup&#xa;    Cost Hint: Low-medium - Low if number of matching rows is small, higher as the number of rows increases&#xa;  Used Columns: store_id,&#xa;    sales&#xa;&#xa;Key/Index: &amp;lt;auto_key0&amp;gt;&#xa;  Used Key Parts: store_id&#xa;  Possible Keys: &amp;lt;auto_key0&amp;gt;&#xa;&#xa;Rows Examined per Scan: 160&#xa;Rows Produced per Join: 321&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;Cost Info&#xa;  Read: 80.42&#xa;  Eval: 32.17&#xa;  Prefix: 116.05&#xa;  Data Read: 7K</title>
+                        </rect>
+                        <text x="835" y="275" style="">Non-Unique Key Lookup</text>
                     </g>
                     <g class="lhsQueryCost">
                         <rect x="675" y="245" width="160" height="10" style="stroke:transparent; "/>
