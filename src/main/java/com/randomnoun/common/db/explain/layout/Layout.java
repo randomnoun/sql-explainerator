@@ -55,7 +55,7 @@ public class Layout {
 			.mapToObj(i -> children.get(children.size() - i - 1)); 
 	}
 
-	private String siUnits(long v) {
+	private String toSiUnits(long v) {
 		DecimalFormat df =  new DecimalFormat("0.##");
 		if (v < 1_000) { return String.valueOf(v); }
 		else if (v < 1_000_000)                  { return df.format((double) v/1_000) + "K"; }
@@ -297,7 +297,7 @@ public class Layout {
 				costShape = new CShape(); // label shape
 				costShape.setCssClass("queryCost");
 				costShape.setParentAndPosition(diamond, 40, -10);
-				costShape.setLabel(siUnits(qsn.getRowsProducedPerJoin()) +
+				costShape.setLabel(toSiUnits(qsn.getRowsProducedPerJoin()) +
 					(qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows")); 
 				costShape.setTextAnchor("start");
 				costShape.setSize(25, 10);
@@ -305,7 +305,7 @@ public class Layout {
 				costShape = new CShape(); // label shape
 				costShape.setCssClass("queryCost");
 				costShape.setParentAndPosition(diamond, 65, 15);
-				costShape.setLabel(siUnits(qsn.getRowsProducedPerJoin()) +
+				costShape.setLabel(toSiUnits(qsn.getRowsProducedPerJoin()) +
 					(qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows")); 
 				costShape.setTextAnchor("start");
 				costShape.setSize(25, 10);
@@ -450,7 +450,7 @@ public class Layout {
 			Shape costLabel = new CShape(); // label shape
 			costLabel.setCssClass("rhsQueryCost");  costLabel.setTextAnchor("end");
 			costLabel.setParentAndPosition(outer, w/2, -15);
-			costLabel.setLabel(siUnits(n.getRowsExaminedPerScan()) + 
+			costLabel.setLabel(toSiUnits(n.getRowsExaminedPerScan()) + 
 				(n.getRowsExaminedPerScan() == 1 ? " row" : " rows")); 
 			costLabel.setSize(w/2, 10);
 		}
