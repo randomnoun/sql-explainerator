@@ -16,12 +16,12 @@ import org.json.simple.parser.ParseException;
 
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
-import com.randomnoun.common.db.explain.graph.Box;
+import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.layout.Layout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
-import com.randomnoun.common.db.explain.visitor.RangeBoxVisitor;
-import com.randomnoun.common.db.explain.visitor.ReweightBoxVisitor;
-import com.randomnoun.common.db.explain.visitor.SvgBoxVisitor;
+import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
+import com.randomnoun.common.db.explain.visitor.ReweightShapeVisitor;
+import com.randomnoun.common.db.explain.visitor.SvgShapeVisitor;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 import junit.framework.TestCase;
@@ -84,21 +84,21 @@ public class SqlExplainToImageTest extends TestCase {
 		
 		// diagram attempts
 		Layout layout = new Layout(pp.getTopNode());
-		Box b = layout.getLayoutBox();
+		Shape b = layout.getLayoutShape();
 		
 		
 		// translate diagram so that top-left is 0, 0
-		RangeBoxVisitor rv = new RangeBoxVisitor();
+		RangeShapeVisitor rv = new RangeShapeVisitor();
 		b.traverse(rv);
 		b.setPosX(b.getPosX() - rv.getMinX());
 		b.setPosY(b.getPosY() - rv.getMinY());
 		
-		ReweightBoxVisitor rwv = new ReweightBoxVisitor(rv.getMinWeight(), rv.getMaxWeight());
+		ReweightShapeVisitor rwv = new ReweightShapeVisitor(rv.getMinWeight(), rv.getMaxWeight());
 		b.traverse(rwv);
 		
 		StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true, TooltipTypeEnum.SVG_TITLE, null, null);
+        SvgShapeVisitor sbv = new SvgShapeVisitor(pw, true, TooltipTypeEnum.SVG_TITLE, null, null);
 		b.traverse(sbv);
 		pw.flush();
 		
@@ -116,7 +116,7 @@ public class SqlExplainToImageTest extends TestCase {
 
 		sw = new StringWriter();
         pw = new PrintWriter(sw);
-        sbv = new SvgBoxVisitor(pw, false, TooltipTypeEnum.SVG_TITLE, null, null);
+        sbv = new SvgShapeVisitor(pw, false, TooltipTypeEnum.SVG_TITLE, null, null);
 		b.traverse(sbv);
 		pw.flush();
 		

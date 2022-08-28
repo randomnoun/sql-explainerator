@@ -10,15 +10,15 @@ import org.apache.log4j.Logger;
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
-import com.randomnoun.common.db.explain.graph.Box;
+import com.randomnoun.common.db.explain.graph.Shape;
 
-/** Converts a box layout into an SVG diagram, or an HTML document containing an SVG diagram.
+/** Converts a shape layout into an SVG diagram, or an HTML document containing an SVG diagram.
  * 
  * @author knoxg
  */
-public class SvgBoxVisitor extends BoxVisitor {
+public class SvgShapeVisitor extends ShapeVisitor {
 	
-	Logger logger = Logger.getLogger(SvgBoxVisitor.class);
+	Logger logger = Logger.getLogger(SvgShapeVisitor.class);
 	
 	boolean asHtml = false;
 	TooltipTypeEnum tooltipType = TooltipTypeEnum.SVG_TITLE;
@@ -28,7 +28,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 	int indent = 0;
 	PrintWriter pw;
 	
-	public SvgBoxVisitor(PrintWriter pw, boolean asHtml, TooltipTypeEnum tooltipType, String css, String script) {
+	public SvgShapeVisitor(PrintWriter pw, boolean asHtml, TooltipTypeEnum tooltipType, String css, String script) {
 		this.pw = pw;
 		this.asHtml = asHtml;
 		this.tooltipType = tooltipType;
@@ -37,11 +37,11 @@ public class SvgBoxVisitor extends BoxVisitor {
 	}
 	
 	@Override
-	public void preVisit(Box b) {
+	public void preVisit(Shape b) {
 		String s = "";
 		if (indent==0) {
 			// get range
-			RangeBoxVisitor rv = new RangeBoxVisitor();
+			RangeShapeVisitor rv = new RangeShapeVisitor();
 			b.traverse(rv);
 			logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 
@@ -93,7 +93,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 	}
 
 	private String getResource(String resourceName) {
-		InputStream is = SvgBoxVisitor.class.getResourceAsStream(resourceName);
+		InputStream is = SvgShapeVisitor.class.getResourceAsStream(resourceName);
 		try {
 			return new String(StreamUtil.getByteArray(is));
 		} catch (IOException e) {
@@ -111,7 +111,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 	}
 	
 	@Override
-	public void visit(Box b) {
+	public void visit(Shape b) {
 		// TODO Auto-generated method stub
 		String is = "";
 		for (int i=0; i<indent; i++) { is += " "; }
@@ -167,7 +167,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 			  Text.escapeHtml(b.getLabel()) + "</text>\n";
 		}
 		if (b.getConnectedTo() != null) {
-			Box ctb = b.getConnectedTo();
+			Shape ctb = b.getConnectedTo();
 			int[] lineTo;
 			double strokeWeight = b.getConnectedWeight() == null ? 1 : b.getConnectedWeight(); 
 			if (b.getTargetPort().equals("sv")) {
@@ -213,7 +213,7 @@ public class SvgBoxVisitor extends BoxVisitor {
 	}
 
 	@Override
-	public void postVisit(Box b) {
+	public void postVisit(Shape b) {
 		String s = "";
 		indent -= 4;
 		for (int i=0; i<indent; i++) { s += " "; }

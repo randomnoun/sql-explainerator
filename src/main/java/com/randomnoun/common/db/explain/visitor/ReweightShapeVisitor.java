@@ -1,21 +1,21 @@
 package com.randomnoun.common.db.explain.visitor;
 
-import com.randomnoun.common.db.explain.graph.Box;
+import com.randomnoun.common.db.explain.graph.Shape;
 
-/** A BoxVisitor that will rescale connection weights from 'number of rows' values to pixel values
+/** A ShapeVisitor that will rescale connection weights from 'number of rows' values to pixel values
  * 
  * @author knoxg
  */
-public class ReweightBoxVisitor extends BoxVisitor {
+public class ReweightShapeVisitor extends ShapeVisitor {
 	private double minWeight = Double.MAX_VALUE;
 	private double maxWeight = Double.MIN_VALUE;
 	
-	public ReweightBoxVisitor(double minWeight, double maxWeight) {
+	public ReweightShapeVisitor(double minWeight, double maxWeight) {
 		this.minWeight = minWeight;
 		this.maxWeight = maxWeight;
 	}
 	
-	public void visit(Box b) {
+	public void visit(Shape b) {
 		Double cw = b.getConnectedWeight();
 		Double maxWidth = 3d; // maybe change this depending on the magnitude of maxWeight;
 		

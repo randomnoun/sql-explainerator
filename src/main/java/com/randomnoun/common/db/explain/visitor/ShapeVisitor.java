@@ -1,21 +1,21 @@
 package com.randomnoun.common.db.explain.visitor;
 
-import com.randomnoun.common.db.explain.graph.Box;
+import com.randomnoun.common.db.explain.graph.Shape;
 
-/** A BoxVisitor will visit all boxes in a hierarchy.
+/** A ShapeVisitor will visit all shapes in a hierarchy.
  * 
  * Subclass this class to perform specific tasks in the visitor
  * 
  */
-public class BoxVisitor {
+public class ShapeVisitor {
 	
 	// before node or children have been traversed
-	public void preVisit(Box b) { }
+	public void preVisit(Shape b) { }
 		
 	// traverse a node
-	public void visit(Box b) { }
+	public void visit(Shape b) { }
 
 	// after children have been traversed
-	public void postVisit(Box b) { }
+	public void postVisit(Shape b) { }
 
 }

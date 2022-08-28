@@ -1,14 +1,14 @@
 package com.randomnoun.common.db.explain.visitor;
 
-import com.randomnoun.common.db.explain.graph.Box;
+import com.randomnoun.common.db.explain.graph.Shape;
 
-/** A BoxVisitor that captures the minimum and maximum X and Y co-ordinates of the boxes in this layout.
+/** A ShapeVisitor that captures the minimum and maximum X and Y co-ordinates of the shapes in this layout.
  * 
- * It also captures the minimum and maximum weight of connection lines, which are rescaled in ReweightBoxVisitor
+ * It also captures the minimum and maximum weight of connection lines, which are rescaled in ReweightShapeVisitor
  * 
  * @author knoxg
  */
-public class RangeBoxVisitor extends BoxVisitor {
+public class RangeShapeVisitor extends ShapeVisitor {
 	
 	int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
 	int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
@@ -16,9 +16,9 @@ public class RangeBoxVisitor extends BoxVisitor {
 	double minWeight = Double.MAX_VALUE;
 	double maxWeight = Double.MIN_VALUE;
 	
-	public RangeBoxVisitor() {
+	public RangeShapeVisitor() {
 	}
-	public void visit(Box b) {
+	public void visit(Shape b) {
 		int x = b.getAbsoluteX();
 		int y = b.getAbsoluteY();
 		int w = b.getWidth();

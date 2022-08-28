@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 import org.apache.log4j.Logger;
 
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
-import com.randomnoun.common.db.explain.graph.Box;
-import com.randomnoun.common.db.explain.graph.CBox;
+import com.randomnoun.common.db.explain.graph.Shape;
+import com.randomnoun.common.db.explain.graph.CShape;
 import com.randomnoun.common.db.explain.json.AttachedSubqueriesNode;
 import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
@@ -26,9 +26,9 @@ import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
-import com.randomnoun.common.db.explain.visitor.RangeBoxVisitor;
+import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 
-/** Converts a hierarchy of Nodes into a hierarchy of Boxes */
+/** Converts a hierarchy of Nodes into a hierarchy of Shapes */
 
 public class Layout {
 
@@ -40,8 +40,8 @@ public class Layout {
 		this.topNode = topNode;
 	}
 
-	public Box getLayoutBox() {
-		Box b = layout(topNode, "query_block", true);
+	public Shape getLayoutShape() {
+		Shape b = layout(topNode, "query_block", true);
 		// probably need to reposition everything so that it starts at 0,0
 		return b;
 	}
@@ -66,15 +66,15 @@ public class Layout {
 	}
 		
 
-	private Box layout(QueryBlockNode n, String queryBlockLabel) {
+	private Shape layout(QueryBlockNode n, String queryBlockLabel) {
 		return layout(n, queryBlockLabel, false);
 	}
 	
-	private Box layout(QueryBlockNode n, String queryBlockLabel, boolean topNode) {
+	private Shape layout(QueryBlockNode n, String queryBlockLabel, boolean topNode) {
 		Node c = n.getQueryNode(); // 1 child only
 		
-		Box ob = new CBox(); // outer box
-		Box cb = null; // child box
+		Shape ob = new CShape(); // outer shape
+		Shape cb = null; // child shape
 		int w = 100, h = 0;
 		if (c != null) {
 			if (c instanceof UnionResultNode) { cb = layout((UnionResultNode) c); }
@@ -98,7 +98,7 @@ public class Layout {
 			  (n.getCostInfo() == null ? "" :"Query cost: " + n.getCostInfo().getQueryCost() + "\n");
 			
 			
-			Box lb = new Box(); // label box
+			Shape lb = new Shape(); // label shape
 			lb.setCssClass("queryBlock" + clazz);
 			if (cb == null) {
 				lb.setParentAndPosition(ob, 0, 0);
@@ -113,7 +113,7 @@ public class Layout {
 			// lb.setFill(Color.LIGHT_GRAY);
 			
 			if (cb == null) {
-				Box ntb = new CBox(); // label box
+				Shape ntb = new CShape(); // label shape
 				ntb.setCssClass("tableName" + clazz);
 				ntb.setParentAndPosition(ob, 0, 35);
 				ntb.setSize(100, 10);
@@ -132,20 +132,20 @@ public class Layout {
 		return ob;
 	}
 	
-	private Box layout(UnionResultNode n) {
+	private Shape layout(UnionResultNode n) {
 		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
 		
-		Box ob = new CBox(); // outer box
-		Box cb = new CBox(); // connector box
+		Shape ob = new CShape(); // outer shape
+		Shape cb = new CShape(); // connector shape
 		
-		List<Box> qsBoxes = reverseStream(qsnList)
+		List<Shape> qsShapes = reverseStream(qsnList)
 			.map(c -> layout(c, "query_block"))
 			.collect(Collectors.toList());
 		
-		List<Integer> tableWidths = qsBoxes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
-		List<Integer> tableHeights = qsBoxes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+		List<Integer> tableWidths = qsShapes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
+		List<Integer> tableHeights = qsShapes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
 		int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
-			+ (qsBoxes.size() - 1) * 50; // 50px padding
+			+ (qsShapes.size() - 1) * 50; // 50px padding
 		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
 
 		ob.setSize(totalWidth,  50 + maxHeight);
@@ -153,13 +153,13 @@ public class Layout {
 		cb.setParentAndPosition(ob, 0, 0);
 		cb.setSize(totalWidth,  60); 
 		
-		Box b = new Box();
+		Shape b = new Shape();
 		b.setParentAndPosition(cb,  0,  0);
 		b.setLabel("UNION");
 		b.setFill(new Color(179, 179, 179)); // #b3b3b3
 		b.setSize(totalWidth, 30);
 		int offset = 0;
-		for (Box qsb : qsBoxes) {
+		for (Shape qsb : qsShapes) {
 			qsb.setParentAndPosition(ob, offset, 50);
 			int w = qsb.getWidth();
 			qsb.connectTo(cb, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
@@ -170,21 +170,21 @@ public class Layout {
 		return ob;
 	}
 	
-	private Box layout(AttachedSubqueriesNode n) {
+	private Shape layout(AttachedSubqueriesNode n) {
 		// @TODO multiple qsns
 		List<QuerySpecificationNode> qsnList = Collections.singletonList(n.getQuerySpecification());
 		
-		Box ob = new CBox(); // outer box
-		Box cb = new CBox(); // connector box
+		Shape ob = new CShape(); // outer shape
+		Shape cb = new CShape(); // connector shape
 		
-		List<Box> qsBoxes = reverseStream(qsnList)
+		List<Shape> qsShapes = reverseStream(qsnList)
 			.map(c -> layout(c, "subquery"))
 			.collect(Collectors.toList());
 		
-		List<Integer> tableWidths = qsBoxes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
-		List<Integer> tableHeights = qsBoxes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+		List<Integer> tableWidths = qsShapes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
+		List<Integer> tableHeights = qsShapes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
 		int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
-			+ (qsBoxes.size() - 1) * 50; // 50px padding
+			+ (qsShapes.size() - 1) * 50; // 50px padding
 		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
 
 		ob.setSize(totalWidth,  30 + maxHeight);
@@ -192,14 +192,14 @@ public class Layout {
 		cb.setParentAndPosition(ob, 0, 0);
 		cb.setSize(totalWidth,  30); 
 		
-		Box b = new Box();
+		Shape b = new Shape();
 		b.setParentAndPosition(cb,  0,  0);
 		b.setLabel("attached_subqueries");
 		// b.setFill(new Color(0, 0, 0)); // #b3b3b3
 		b.setSize(totalWidth, 30);
 		b.setStrokeDashArray(Arrays.asList(new String[] { "2" }));
 		int offset = 0;
-		for (Box qsb : qsBoxes) {
+		for (Shape qsb : qsShapes) {
 			qsb.setParentAndPosition(ob, offset, 30);
 			int w = qsb.getWidth();
 			qsb.connectTo(cb, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
@@ -211,34 +211,34 @@ public class Layout {
 	}
 	
 	
-	private Box layout(DuplicatesRemovalNode n) {
+	private Shape layout(DuplicatesRemovalNode n) {
 		NestedLoopNode nln = n.getNestedLoop(); // 1 child only
-		Box qb = layout(nln);
+		Shape qb = layout(nln);
 		
 		int w = qb.getWidth();
 		int h = qb.getHeight();
 		
-		Box ob = new CBox(); // outer box
+		Shape ob = new CShape(); // outer shape
 		ob.setSize(w, h + 10 + 45);
 		ob.setEdgeStartPosition(qb.getEdgeStartX(),  0);
 
-		Box cb = new CBox(); // container box
+		Shape cb = new CShape(); // container Shape
 		cb.setParentAndPosition(ob,  qb.getEdgeStartX() - 40, 0);
 		cb.setSize(80, n.getUsingTemporaryTable() ? 55 : 40);
 		
-		Box lb = new Box(); // label box
+		Shape lb = new Shape(); // label shape
 		lb.setParentAndPosition(ob, qb.getEdgeStartX() - 40, 0);
 		lb.setCssClass("duplicatesRemoval");
 		lb.setLabel("DISTINCT"); 
 		lb.setSize(80, 40);
 		
 		if (n.getUsingTemporaryTable()) {
-			Box ttBox = new CBox(); 
-			ttBox.setLabel("tmp table");
-			ttBox.setSize(80, 10);
-			ttBox.setCssClass("tempTableName");
-			ttBox.setTextAnchor("start");
-			ttBox.setParentAndPosition(ob, qb.getEdgeStartX() - 40, 45);
+			Shape ttShape = new CShape(); 
+			ttShape.setLabel("tmp table");
+			ttShape.setSize(80, 10);
+			ttShape.setCssClass("tempTableName");
+			ttShape.setTextAnchor("start");
+			ttShape.setParentAndPosition(ob, qb.getEdgeStartX() - 40, 45);
 		}
 
 		qb.connectTo(cb, "s"); // "up", 50, 30
@@ -248,52 +248,52 @@ public class Layout {
 
 	}
 	
-	private Box layout(NestedLoopNode n) {
-		List<Box> nestedLoopBoxes = new ArrayList<Box>();
+	private Shape layout(NestedLoopNode n) {
+		List<Shape> nestedLoopShapes = new ArrayList<Shape>();
 		List<TableNode> qsnList = n.getTables();
 		
-		List<Box> tableBoxes = qsnList.stream() // reverseStream(qsnList)
+		List<Shape> tableShapes = qsnList.stream() // reverseStream(qsnList)
 			.map(c -> layout(c))
 			.collect(Collectors.toList());
-		List<Integer> tableWidths = tableBoxes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
-		List<Integer> tableHeights = tableBoxes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+		List<Integer> tableWidths = tableShapes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
+		List<Integer> tableHeights = tableShapes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
 		
 		int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
-			+ (tableBoxes.size() - 1) * 50; // 50px padding
+			+ (tableShapes.size() - 1) * 50; // 50px padding
 		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
 
-		Box ob = new CBox(); // outer box
+		Shape ob = new CShape(); // outer shape
 		ob.setSize(totalWidth, 50 + 60 + 50 + maxHeight); // arrow + diamond + arrow + tables
 		
 		int offset = 0;
-		for (int i = 0; i < tableBoxes.size(); i++) {
-			Box tb = tableBoxes.get(i);
+		for (int i = 0; i < tableShapes.size(); i++) {
+			Shape tb = tableShapes.get(i);
 			tb.setParentAndPosition(ob, offset, 50 + 60 + 50);
 			offset += tableWidths.get(i) + 50;
 		}
 		 
 				
-		Box prevNestedLoopBox = null;
-		for (int i = 1 ; i < tableBoxes.size(); i++) {
-			Box tb = tableBoxes.get(i);
-			Box b = new Box(); 
+		Shape prevNestedLoopShape = null;
+		for (int i = 1 ; i < tableShapes.size(); i++) {
+			Shape tb = tableShapes.get(i);
+			Shape b = new Shape(); 
 			TableNode qsn = n.getTables().get(i);
 			b.setShape("nestedLoop");
 			b.setSize(60, 60); // diamond
 			b.setParentAndPosition(ob, tb.getPosX() + tb.getEdgeStartX() - 30, 50); // centered above table beneath it
 			b.setTooltip("nested_loop\n\n" +
 			   "Prefix Cost: " + qsn.getCostInfo().getPrefixCost());
-			nestedLoopBoxes.add(b);
+			nestedLoopShapes.add(b);
 			
-			Box lb = new CBox(); // label box
+			Shape lb = new CShape(); // label shape
 			lb.setCssClass("queryCost");
 			lb.setParentAndPosition(b, -10, -15);
 			lb.setLabel(String.valueOf(qsn.getCostInfo().getPrefixCost())); 
 			lb.setTextAnchor("start");
 			lb.setSize(40, 10);
 
-			if (i == tableBoxes.size() - 1) {
-				lb = new CBox(); // label box
+			if (i == tableShapes.size() - 1) {
+				lb = new CShape(); // label shape
 				lb.setCssClass("queryCost");
 				lb.setParentAndPosition(b, 40, -10);
 				lb.setLabel(siUnits(qsn.getRowsProducedPerJoin()) +
@@ -301,7 +301,7 @@ public class Layout {
 				lb.setTextAnchor("start");
 				lb.setSize(25, 10);
 			} else {
-				lb = new CBox(); // label box
+				lb = new CShape(); // label shape
 				lb.setCssClass("queryCost");
 				lb.setParentAndPosition(b, 65, 15);
 				lb.setLabel(siUnits(qsn.getRowsProducedPerJoin()) +
@@ -312,45 +312,45 @@ public class Layout {
 
 			
 			if (i == 1) {
-				Box firstTableBox = tableBoxes.get(0);
-				firstTableBox.connectTo(b, "w"); // "upRight", 0, 15
-				firstTableBox.setConnectedWeight((double) qsnList.get(0).getRowsExaminedPerScan());
+				Shape firstTableShape = tableShapes.get(0);
+				firstTableShape.connectTo(b, "w"); // "upRight", 0, 15
+				firstTableShape.setConnectedWeight((double) qsnList.get(0).getRowsExaminedPerScan());
 			} else {
-				prevNestedLoopBox.connectTo(b, "w"); // "right", 0, 15
-				prevNestedLoopBox.setConnectedWeight((double) qsnList.get(i - 1).getRowsExaminedPerScan()); // @TODO not sure about this either
-				prevNestedLoopBox.setEdgeStartPosition(60, 30);
+				prevNestedLoopShape.connectTo(b, "w"); // "right", 0, 15
+				prevNestedLoopShape.setConnectedWeight((double) qsnList.get(i - 1).getRowsExaminedPerScan()); // @TODO not sure about this either
+				prevNestedLoopShape.setEdgeStartPosition(60, 30);
 			}
 			
-			Box tableBox = tableBoxes.get(i);
-			tableBox.setConnectedWeight((double) qsnList.get(i).getRowsExaminedPerScan());
-			tableBox.connectTo(b, "s"); // "up", 15, 30
+			Shape tableShape = tableShapes.get(i);
+			tableShape.setConnectedWeight((double) qsnList.get(i).getRowsExaminedPerScan());
+			tableShape.connectTo(b, "s"); // "up", 15, 30
 			
-			prevNestedLoopBox = b;
+			prevNestedLoopShape = b;
 		}
 
-		ob.setEdgeStartPosition(prevNestedLoopBox.getPosX() + 30, 50); // although the edge has already been drawn, so this is the edge end position really. maybe not. 
+		ob.setEdgeStartPosition(prevNestedLoopShape.getPosX() + 30, 50); // although the edge has already been drawn, so this is the edge end position really. maybe not. 
 		return ob;
 	}
 			
-	private Box layout(TableNode n) {
+	private Shape layout(TableNode n) {
 		
 		int w = (n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? 100 :
 			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
 			(n.getAccessType()==AccessTypeEnum.NON_UNIQUE_KEY ? 150 :
 			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? 125 : 100)))); 
 		int h = 60;
-		Box ob = new CBox(); // outer box
+		Shape ob = new CShape(); // outer shape
 		
 		if (n.getMaterialisedFromSubquery() == null) {
 			if (n.getTableName() != null) {
-				Box lb = new CBox(); // label box
+				Shape lb = new CShape(); // label shape
 				lb.setCssClass("tableName");
 				lb.setParentAndPosition(ob, 0, 32);
 				lb.setLabel(n.getTableName()); 
 				lb.setSize(w, 14);
 			}
 			if (n.getKey() != null) {
-				Box lb = new CBox(); // label box
+				Shape lb = new CShape(); // label shape
 				lb.setCssClass("tableKey"); 
 				lb.setParentAndPosition(ob, 0, 46);
 				lb.setLabel(n.getKey()); 
@@ -358,11 +358,11 @@ public class Layout {
 			}
 		} else {
 			QueryBlockNode queryBlock = n.getMaterialisedFromSubquery().getQueryBlock();
-			Box qb;
+			Shape qb;
 			qb = layout(queryBlock, null); // query_blocks in materialised queries aren't drawn for some reason
 			// reset to 0,0
 
-			RangeBoxVisitor rv = new RangeBoxVisitor();
+			RangeShapeVisitor rv = new RangeShapeVisitor();
 			qb.traverse(rv);
 			logger.info("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 			// qb.posX -= rv.getMinX();
@@ -371,8 +371,8 @@ public class Layout {
 			h = 80 + qb.getHeight() + 20; // 20px padding bottom
 			w = Math.max(w, qb.getWidth() + 20); // 10px padding left and right
 
-			Box lb = new CBox();
-			lb.setCssClass("dotted"); // dotted line box
+			Shape lb = new CShape();
+			lb.setCssClass("dotted"); // dotted line Shape
 			lb.setStroke(new Color(140, 140, 140)); // #8c8c8c
 			lb.setStrokeDashArray(Arrays.asList(new String[] { "4" }));
 			lb.setParentAndPosition(ob, 0, 0);
@@ -382,7 +382,7 @@ public class Layout {
 			qb.setParentAndPosition(ob, 10 - rv.getMinX(), 85);
 
 			if (n.getTableName() != null) {
-				lb = new CBox(); // label box
+				lb = new CShape(); // label shape
 				lb.setCssClass("materialisedTableName");
 				lb.setFill(new Color(232, 232, 232));
 				lb.setParentAndPosition(ob, 0, 32);
@@ -390,7 +390,7 @@ public class Layout {
 				lb.setSize(w, 20);
 			}
 			if (n.getKey() != null) {
-				lb = new CBox(); // label box
+				lb = new CShape(); // label shape
 				lb.setCssClass("tableKey"); 
 				lb.setParentAndPosition(ob, 0, 52);
 				lb.setLabel(n.getKey()); 
@@ -401,7 +401,7 @@ public class Layout {
 
 		ob.setEdgeStartPosition(w / 2, 0);
 		
-		Box b = new Box(); 
+		Shape b = new Shape(); 
 		b.setParentAndPosition(ob, 0, 0);
 		b.setSize(w, 30);
 		// b.setTextColor(Color.WHITE);
@@ -418,7 +418,7 @@ public class Layout {
 		if (costInfo != null) {
 			double cost = (costInfo.getEvalCost() == null ? (double) 0 : costInfo.getEvalCost()) +
 				(costInfo.getReadCost() == null ? (double) 0 : costInfo.getReadCost());
-			Box lb = new CBox(); // label box
+			Shape lb = new CShape(); // label shape
 			lb.setCssClass("lhsQueryCost"); lb.setTextAnchor("start");
 			lb.setParentAndPosition(ob, 0, -15);
 			DecimalFormat df = new DecimalFormat("0.##");
@@ -426,7 +426,7 @@ public class Layout {
 			lb.setSize(w/2, 10);
 		}
 		if (n.getRowsExaminedPerScan() != null) {
-			Box lb = new CBox(); // label box
+			Shape lb = new CShape(); // label shape
 			lb.setCssClass("rhsQueryCost");  lb.setTextAnchor("end");
 			lb.setParentAndPosition(ob, w/2, -15);
 			lb.setLabel(siUnits(n.getRowsExaminedPerScan()) + 
@@ -435,7 +435,7 @@ public class Layout {
 		}
 		
 		if (n.getAttachedSubqueries() != null) {
-			Box qb = layout(n.getAttachedSubqueries());
+			Shape qb = layout(n.getAttachedSubqueries());
 			qb.setParentAndPosition(ob, w + 50, 0);
 			qb.connectTo(b, "e");
 			w = w + 50 + qb.getWidth();
@@ -447,27 +447,27 @@ public class Layout {
 		return ob;
 		
 	}
-	private Box layout(OrderingOperationNode n) {
+	private Shape layout(OrderingOperationNode n) {
 
 		NestedLoopNode nln = n.nestedLoop; // 1 child only
-		Box cb = layout(nln);
+		Shape cb = layout(nln);
 		
 		int w = cb.getWidth();
 		int h = cb.getHeight();
 		
-		Box ob = new CBox(); // outer box, nestedLoop exit edge is drawn inside the nestedLoop box
+		Shape ob = new CShape(); // outer shape, nestedLoop exit edge is drawn inside the nestedLoop Shape
 		ob.setSize(w, h + 40);
 		ob.setEdgeStartPosition(cb.getEdgeStartX(),  0);
 		
 		if (n.isUsingTemporaryTable()) { 
-			Box tb = new CBox(); // label box
+			Shape tb = new CShape(); // label shape
 			tb.setParentAndPosition(ob, cb.getEdgeStartX() - 40, 45); 
 			tb.setSize(w, 10);
 			tb.setCssClass("tempTableName");
 			tb.setLabel("tmp table"); 
 		}
 		
-		Box lb = new Box(); // label box
+		Shape lb = new Shape(); // label shape
 		lb.setParentAndPosition(ob, cb.getEdgeStartX() - 40, 0);
 		lb.setCssClass("orderingOperation");
 		lb.setLabel("ORDER"); 
@@ -482,19 +482,19 @@ public class Layout {
 		return ob;
 		
 	}
-	private Box layout(GroupingOperationNode n) {
+	private Shape layout(GroupingOperationNode n) {
 		
 		NestedLoopNode nln = n.getNestedLoop(); // 1 child only
-		Box cb = layout(nln);
+		Shape cb = layout(nln);
 		
 		int w = cb.getWidth();
 		int h = cb.getHeight();
 		
-		Box ob = new CBox(); // outer box 
+		Shape ob = new CShape(); // outer shape 
 		ob.setSize(w, h + 40);
 		ob.setEdgeStartPosition(cb.getEdgeStartX(),  0);
 		
-		Box lb = new Box(); // label box
+		Shape lb = new Shape(); // label shape
 		lb.setParentAndPosition(ob, cb.getEdgeStartX() - 40, 0);
 		lb.setCssClass("groupingOperation");
 		lb.setLabel("GROUP"); 
@@ -508,16 +508,16 @@ public class Layout {
 		
 	}
 	
-	private Box layout(QuerySpecificationNode n, String queryBlockLabel) {
+	private Shape layout(QuerySpecificationNode n, String queryBlockLabel) {
 
 		QueryBlockNode qb = n.getQueryBlock();
 		
-		Box cb = layout(qb, queryBlockLabel);
+		Shape cb = layout(qb, queryBlockLabel);
 		
 		int w = cb.getWidth();
 		int h = cb.getHeight();
 		
-		Box ob = new CBox(); 
+		Shape ob = new CShape(); 
 		ob.setSize(w, h + 40);
 		ob.setEdgeStartPosition(cb.getEdgeStartX(),  40);
 
@@ -525,7 +525,7 @@ public class Layout {
 		return ob;
 	}
 	
-	private Box layout(Node n) {
+	private Shape layout(Node n) {
 		throw new UnsupportedOperationException("layout for node " + n.getClass().getName() + " not implemented");
 	}
 	

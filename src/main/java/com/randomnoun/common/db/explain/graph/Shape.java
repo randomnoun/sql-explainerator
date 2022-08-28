@@ -4,20 +4,20 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.randomnoun.common.db.explain.visitor.BoxVisitor;
+import com.randomnoun.common.db.explain.visitor.ShapeVisitor;
 
 /**
- * a box holds other boxes, and basically translates to a rectangle in the generated diagram
- * a box may have a parent box which is outside the bounds of the box; 
- * all children of the box should be within the bounds of the box but don't have to be ( e.g. labels outside this box and the connectedTo box )
+ * A Shape holds other shapes, and basically translates to a rectangle in the generated diagram
+ * a shape may have a parent shape which is outside the bounds of the shape; 
+ * all children of the shape should be within the bounds of the shape but don't have to be ( e.g. labels outside this shape and the connectedTo shape )
  *
  * @author knoxg
  */
-public class Box {
+public class Shape {
 
 
-	private Box connectedTo;   // draw a line to this box
-	private Box layoutParent;  // X and Y co-ordinates are relative to this box ( layoutParent can be null, or parent, or parent.parent ... )
+	private Shape connectedTo;   // draw a line to this shape
+	private Shape layoutParent;  // X and Y co-ordinates are relative to this shape ( layoutParent can be null, or parent, or parent.parent ... )
 	private Double connectedWeight; // is converted to line width once we know the min/max
 	
 	private int posX = 0; // relative to parent
@@ -29,7 +29,7 @@ public class Box {
 	private String tooltip;
 	
 	private String targetPort;
-	private int edgeStartX; // draw edges from this box from this point
+	private int edgeStartX; // draw edges from this shape from this point
 	private int edgeStartY;
 	
 	private String cssClass;
@@ -40,7 +40,7 @@ public class Box {
 	private String textAnchor = null;
 	
 	
-	List<Box> children = new ArrayList<Box>();
+	List<Shape> children = new ArrayList<Shape>();
 	
 	public void setLabel(String label) {
 		this.label = label;
@@ -53,14 +53,14 @@ public class Box {
 	public void setFill(Color c) { this.fill = c; }
 	public void setTextColor(Color c) { this.textColor = c; }
 	
-	public void connectTo(Box connectedTo, String targetPort) {
+	public void connectTo(Shape connectedTo, String targetPort) {
 		this.connectedTo = connectedTo;
 		this.targetPort = targetPort;
 	
 		//this.edgeStartX = edgeX;
 		//this.edgeStartY = edgeY;
 	}
-	public void setParentAndPosition(Box parent, int posX, int posY) {
+	public void setParentAndPosition(Shape parent, int posX, int posY) {
 		if (this.layoutParent!=null) {
 			throw new IllegalStateException("twice");
 		}
@@ -81,8 +81,8 @@ public class Box {
 
 
 
-	public void addAll(List<Box> children) {
-		for (Box c : children) {
+	public void addAll(List<Shape> children) {
+		for (Shape c : children) {
 			if (c.layoutParent!=null) {
 				throw new IllegalStateException("twice");
 			}
@@ -110,7 +110,7 @@ public class Box {
 	
 	public int getAbsoluteX() {
 		int x = posX;
-		Box rel = layoutParent;
+		Shape rel = layoutParent;
 		while (rel != null) {
 			x += rel.posX;
 			rel = rel.layoutParent;
@@ -120,7 +120,7 @@ public class Box {
 
 	public int getAbsoluteY() {
 		int y = posY;
-		Box rel = layoutParent;
+		Shape rel = layoutParent;
 		while (rel != null) {
 			y += rel.posY;
 			rel = rel.layoutParent;
@@ -128,10 +128,10 @@ public class Box {
 		return y;
 	}
 
-	public void traverse(BoxVisitor visitor) {
+	public void traverse(ShapeVisitor visitor) {
 		visitor.preVisit(this);
 		visitor.visit(this);
-		for (Box c : children) {
+		for (Shape c : children) {
 			c.traverse(visitor);
 		}
 		visitor.postVisit(this);
@@ -185,16 +185,16 @@ public class Box {
 	public String getLabel() {
 		return label;
 	}
-	public Box getConnectedTo() {
+	public Shape getConnectedTo() {
 		return connectedTo;
 	}
-	public void setConnectedTo(Box connectedTo) {
+	public void setConnectedTo(Shape connectedTo) {
 		this.connectedTo = connectedTo;
 	}
-	public Box getLayoutParent() {
+	public Shape getLayoutParent() {
 		return layoutParent;
 	}
-	public void setLayoutParent(Box layoutParent) {
+	public void setLayoutParent(Shape layoutParent) {
 		this.layoutParent = layoutParent;
 	}
 	public String getTargetPort() {

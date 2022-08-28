@@ -10,13 +10,13 @@ import org.apache.log4j.Logger;
 import org.json.simple.parser.ParseException;
 
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
-import com.randomnoun.common.db.explain.graph.Box;
+import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.layout.Layout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
-import com.randomnoun.common.db.explain.visitor.RangeBoxVisitor;
-import com.randomnoun.common.db.explain.visitor.ReweightBoxVisitor;
-import com.randomnoun.common.db.explain.visitor.SvgBoxVisitor;
+import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
+import com.randomnoun.common.db.explain.visitor.ReweightShapeVisitor;
+import com.randomnoun.common.db.explain.visitor.SvgShapeVisitor;
 
 /** Class used to convert sql execution plans ( from 'EXPLAIN' statements ) into diagrams.
  * 
@@ -29,8 +29,8 @@ public class SqlExplainToImage {
 
 	static Logger logger = Logger.getLogger(SqlExplainToImage.class);
 	
-	// The box class is how we're describing the resulting diagram. It contains boxes, which represent shapes or other containers
-	Box b;
+	// The shape class is how we're describing the resulting diagram. It contains shapes, which represent rectangles or other containers
+	Shape s;
 	TooltipTypeEnum tooltipType = TooltipTypeEnum.SVG_TITLE;
 	String css;
 	String script;
@@ -59,47 +59,47 @@ public class SqlExplainToImage {
 	private void createDiagram(QueryBlockNode qbn) {
 		// create the layout
 		Layout layout = new Layout(qbn);
-		b = layout.getLayoutBox();
+		s = layout.getLayoutShape();
 		
 		// translate diagram so that top-left is 0, 0
-		RangeBoxVisitor rv = new RangeBoxVisitor();
-		b.traverse(rv);
-		b.setPosX(b.getPosX() - rv.getMinX());
-		b.setPosY(b.getPosY() - rv.getMinY());
+		RangeShapeVisitor rv = new RangeShapeVisitor();
+		s.traverse(rv);
+		s.setPosX(s.getPosX() - rv.getMinX());
+		s.setPosY(s.getPosY() - rv.getMinY());
 		
-		ReweightBoxVisitor rwv = new ReweightBoxVisitor(rv.getMinWeight(), rv.getMaxWeight());
-		b.traverse(rwv);
+		ReweightShapeVisitor rwv = new ReweightShapeVisitor(rv.getMinWeight(), rv.getMaxWeight());
+		s.traverse(rwv);
 	}
 
 	/** Return the diagram as SVG */
 	public String getSvg() {
-		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
+		if (s==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 		StringWriter sw = new StringWriter();
 		writeSvg(sw);
 		return sw.toString();
 	}
 	
 	public void writeSvg(Writer w) {
-		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
+		if (s==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 		PrintWriter pw = new PrintWriter(w);
-	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, false, tooltipType, css, script);
-		b.traverse(sbv);
+	    SvgShapeVisitor sbv = new SvgShapeVisitor(pw, false, tooltipType, css, script);
+		s.traverse(sbv);
 		pw.flush();
 	}
 	
 	/** Return the diagram as HTML */
 	public String getHtml() {
-		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
+		if (s==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 		StringWriter sw = new StringWriter();
 		writeSvg(sw);
 		return sw.toString();
 	}
 	
 	public void writeHtml(Writer w) {
-		if (b==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
+		if (s==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 	    PrintWriter pw = new PrintWriter(w);
-	    SvgBoxVisitor sbv = new SvgBoxVisitor(pw, true, tooltipType, css, script);
-		b.traverse(sbv);
+	    SvgShapeVisitor sbv = new SvgShapeVisitor(pw, true, tooltipType, css, script);
+		s.traverse(sbv);
 		pw.flush();
 	}
 
