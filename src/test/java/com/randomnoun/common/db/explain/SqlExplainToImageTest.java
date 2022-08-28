@@ -30,7 +30,7 @@ public class SqlExplainToImageTest extends TestCase {
 
 	Logger logger = Logger.getLogger(SqlExplainToImageTest.class);
 	
-    private static boolean WRITE_EXPECTED_OUTPUT = false;	
+    private static boolean WRITE_EXPECTED_OUTPUT = true;	
 	
 	public void setUp() throws IOException {
 		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
@@ -96,41 +96,45 @@ public class SqlExplainToImageTest extends TestCase {
 		ReweightShapeVisitor rwv = new ReweightShapeVisitor(rv.getMinWeight(), rv.getMaxWeight());
 		b.traverse(rwv);
 		
-		StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        SvgShapeVisitor sbv = new SvgShapeVisitor(pw, true, TooltipTypeEnum.SVG_TITLE, null, null);
-		b.traverse(sbv);
-		pw.flush();
-		
-		File tf = new File("src/test/resources/expected-output/" + resourceName + ".html");
-        if (WRITE_EXPECTED_OUTPUT) {
-            FileOutputStream fos = new FileOutputStream(tf);
-            fos.write(sw.toString().getBytes());
-    		fos.close();
-        } else {
-            FileInputStream fis = new FileInputStream(tf);
-            String expected = new String(StreamUtil.getByteArray(fis));
-            fis.close();
-            assertEquals("difference in " + resourceName + ".html", expected.trim(), sw.toString().trim());
-        }
-
-		sw = new StringWriter();
-        pw = new PrintWriter(sw);
-        sbv = new SvgShapeVisitor(pw, false, TooltipTypeEnum.SVG_TITLE, null, null);
-		b.traverse(sbv);
-		pw.flush();
-		
-		tf = new File("src/test/resources/expected-output/" + resourceName + ".svg");
-        if (WRITE_EXPECTED_OUTPUT) {
-            FileOutputStream fos = new FileOutputStream(tf);
-            fos.write(sw.toString().getBytes());
-    		fos.close();
-        } else {
-            FileInputStream fis = new FileInputStream(tf);
-            String expected = new String(StreamUtil.getByteArray(fis));
-            fis.close();
-            assertEquals("difference in " + resourceName + ".svg", expected.trim(), sw.toString().trim());
-        }
+		for (TooltipTypeEnum tooltipType : TooltipTypeEnum.values()) {
+			String ttName = tooltipType.getValue();
+			
+			StringWriter sw = new StringWriter();
+	        PrintWriter pw = new PrintWriter(sw);
+	        SvgShapeVisitor sbv = new SvgShapeVisitor(pw, true, tooltipType, null, null); // TooltipTypeEnum.SVG_TITLE
+			b.traverse(sbv);
+			pw.flush();
+			
+			File tf = new File("src/test/resources/expected-output/" + resourceName + "-" + ttName + ".html");
+	        if (WRITE_EXPECTED_OUTPUT) {
+	            FileOutputStream fos = new FileOutputStream(tf);
+	            fos.write(sw.toString().getBytes());
+	    		fos.close();
+	        } else {
+	            FileInputStream fis = new FileInputStream(tf);
+	            String expected = new String(StreamUtil.getByteArray(fis));
+	            fis.close();
+	            assertEquals("difference in " + resourceName + ".html", expected.trim(), sw.toString().trim());
+	        }
+	
+			sw = new StringWriter();
+	        pw = new PrintWriter(sw);
+	        sbv = new SvgShapeVisitor(pw, false, tooltipType, null, null);
+			b.traverse(sbv);
+			pw.flush();
+			
+			tf = new File("src/test/resources/expected-output/" + resourceName + "-" + ttName + ".svg");
+	        if (WRITE_EXPECTED_OUTPUT) {
+	            FileOutputStream fos = new FileOutputStream(tf);
+	            fos.write(sw.toString().getBytes());
+	    		fos.close();
+	        } else {
+	            FileInputStream fis = new FileInputStream(tf);
+	            String expected = new String(StreamUtil.getByteArray(fis));
+	            fis.close();
+	            assertEquals("difference in " + resourceName + ".svg", expected.trim(), sw.toString().trim());
+	        }
+		}
 
 	}
 	

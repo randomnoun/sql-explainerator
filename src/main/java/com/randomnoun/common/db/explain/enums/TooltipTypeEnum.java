@@ -18,6 +18,9 @@ public enum TooltipTypeEnum {
 	private TooltipTypeEnum(String value) {
 		this.value = value;
 	}
+	public String getValue() {
+		return value;
+	}
 	public static TooltipTypeEnum fromValue(String value) {
 		for (TooltipTypeEnum e : TooltipTypeEnum.values()) {
 			if (e.value.equals(value)) { return e; }

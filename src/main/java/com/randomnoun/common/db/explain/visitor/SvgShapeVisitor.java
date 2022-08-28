@@ -218,11 +218,20 @@ public class SvgShapeVisitor extends ShapeVisitor {
 		indent -= 4;
 		for (int i=0; i<indent; i++) { s += " "; }
 		s += "</g>\n"; // end SVG group
-		 
+		
 		if (indent==4) {
 			// close off SVG and HTML elements
+			
+			s += "<g id=\"tooltip\" visibility=\"hidden\" >\n" +
+			  "		<foreignObject style=\"overflow: visible;\">\n" +
+			  "		    <body xmlns=\"http://www.w3.org/1999/xhtml\" style=\"margin: 0; padding: 0;\">\n" +
+			  "		      <div style=\"padding: 4px; white-space: pre; display: inline-block; background: white; border: 1px solid black; box-shadow: 2px 2px 2px #333;\">Tooltip</div>\n" +
+			  "		    </body>      \n" +
+			  "		</foreignObject>\n" +
+			  "	</g>\n";
+			
 			if (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS) {
-				if (script == null) { css = getResource("/svg.js"); }
+				if (script == null) { script = getResource("/svg.js"); }
 			} else {
 				script = null;
 			}
