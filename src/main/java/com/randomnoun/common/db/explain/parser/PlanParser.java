@@ -140,7 +140,6 @@ public class PlanParser {
 	
 	private List<QuerySpecificationNode> parseQuerySpecifications(JSONArray qs) {
 		List<QuerySpecificationNode> qsnList = new ArrayList<>();
-		// QuerySpecificationsNode n = new QuerySpecificationsNode();
 		for (Object o : qs) {
 			JSONObject cobj = (JSONObject) o;
 			QuerySpecificationNode cn = parseQuerySpecification((JSONObject) cobj);

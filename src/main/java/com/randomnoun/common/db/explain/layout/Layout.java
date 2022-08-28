@@ -65,6 +65,10 @@ public class Layout {
 		else if (v < 1_000_000_000_000_000_000L) { return df.format((double) v/1_000_000_000_000_000L) + "P"; }
 		else { return String.valueOf(v); }
 	}
+	
+	private List<String> escapeHtml(List<String> list) {
+		return list.stream().map(s -> Text.escapeHtml(s)).collect(Collectors.toList());
+	}
 		
 
 	private Shape layout(QueryBlockNode n, String queryBlockLabel) {
@@ -111,7 +115,6 @@ public class Layout {
 			label.setSize(100, 30);
 			label.setLabel(labelText); 
 			label.setTooltip(tooltip);
-			// lb.setFill(Color.LIGHT_GRAY);
 			
 			if (child == null) {
 				Shape noTableShape = new CShape(); // label shape
@@ -467,9 +470,6 @@ public class Layout {
 		outer.setSize(w, h);
 		return outer;
 		
-	}
-	private List<String> escapeHtml(List<String> list) {
-		return list.stream().map(s -> Text.escapeHtml(s)).collect(Collectors.toList());
 	}
 
 	private Shape layout(OrderingOperationNode n) {
