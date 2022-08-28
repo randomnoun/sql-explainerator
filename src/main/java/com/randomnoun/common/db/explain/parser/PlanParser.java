@@ -282,16 +282,36 @@ public class PlanParser {
 		
 		n.setAccessType(AccessTypeEnum.fromJsonValue((String) obj.get("access_type")));
 		n.getAttributes().put("accessType", obj.get("access_type")); // "ALL", "ref", "eq_ref"
-		n.getAttributes().put("possibleKeys", parseNameList((JSONArray) obj.get("possible_keys"))); // List<String>
+		
+		List<String> possibleKeys = parseNameList((JSONArray) obj.get("possible_keys"));
+		n.setPossibleKeys(possibleKeys);
+		n.getAttributes().put("possibleKeys", possibleKeys); // List<String>
+		
 		if (obj.containsKey("key")) { n.setKey((String) obj.get("key")); n.getAttributes().put("key",  obj.get("key")); } // "PRIMARY"
-		n.getAttributes().put("usedKeyParts", parseNameList((JSONArray) obj.get("used_key_parts"))); // List<String>, subset of above ?
-		n.getAttributes().put("usedColumns", parseNameList((JSONArray) obj.get("used_columns"))); // List<String>
+		
+		List<String> usedKeyParts = parseNameList((JSONArray) obj.get("used_key_parts"));
+		n.setUsedKeyParts(usedKeyParts);
+		n.getAttributes().put("usedKeyParts", usedKeyParts); // List<String>, subset of above ?
+		
+		List<String> usedColumns = parseNameList((JSONArray) obj.get("used_columns"));
+		n.setUsedColumns(usedColumns);
+		n.getAttributes().put("usedColumns", usedColumns); // List<String>
 		if (obj.containsKey("key_length")) { n.getAttributes().put("keyLength", Long.parseLong((String) obj.get("key_length"))); }
 		if (obj.containsKey("ref")) { n.getAttributes().put("ref", parseNameList((JSONArray) obj.get("ref"))); } // List<String>
 		
-		if (obj.containsKey("rows_examined_per_scan")) { n.setRowsExaminedPerScan(((Number) obj.get("rows_examined_per_scan")).longValue()); n.getAttributes().put("rows_examined_per_scan", n.getRowsExaminedPerScan()); }
-		if (obj.containsKey("rows_produced_per_join")) { n.setRowsProducedPerJoin(((Number) obj.get("rows_produced_per_join")).longValue()); n.getAttributes().put("rows_produced_per_join", n.getRowsProducedPerJoin()); }
-		if (obj.containsKey("filtered")) { n.getAttributes().put("filtered", Double.parseDouble((String) obj.get("filtered"))); }
+		if (obj.containsKey("rows_examined_per_scan")) { 
+			n.setRowsExaminedPerScan(((Number) obj.get("rows_examined_per_scan")).longValue());
+			n.getAttributes().put("rows_examined_per_scan", n.getRowsExaminedPerScan()); 
+			}
+		if (obj.containsKey("rows_produced_per_join")) { 
+			n.setRowsProducedPerJoin(((Number) obj.get("rows_produced_per_join")).longValue()); 
+			n.getAttributes().put("rows_produced_per_join", n.getRowsProducedPerJoin()); 
+			}
+		if (obj.containsKey("filtered")) {
+			Double filtered = Double.parseDouble((String) obj.get("filtered"));
+			n.setFiltered(filtered);
+			n.getAttributes().put("filtered", filtered); 
+		}
 		n.getAttributes().put("index_condition", obj.get("index_condition"));
 		
 		if (obj.containsKey("cost_info")) { 

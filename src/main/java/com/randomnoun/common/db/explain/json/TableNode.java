@@ -1,5 +1,7 @@
 package com.randomnoun.common.db.explain.json;
 
+import java.util.List;
+
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
 
 public class TableNode extends Node {
@@ -7,8 +9,12 @@ public class TableNode extends Node {
 	private AccessTypeEnum accessType;
 	private String tableName;
 	private String key;
+	private List<String> possibleKeys;
+	private List<String> usedKeyParts;
+	private List<String> usedColumns;
 	private Long rowsExaminedPerScan;
 	private Long rowsProducedPerJoin;
+	private Double filtered;
 	private AttachedSubqueriesNode attachedSubqueries;
 	private MaterialisedFromSubqueryNode materialisedFromSubquery;
 
@@ -79,5 +85,37 @@ public class TableNode extends Node {
 	public void setMaterialisedFromSubquery(MaterialisedFromSubqueryNode materialisedFromSubquery) {
 		this.materialisedFromSubquery = materialisedFromSubquery;
 	}
-	
+
+	public List<String> getPossibleKeys() {
+		return possibleKeys;
+	}
+
+	public void setPossibleKeys(List<String> possibleKeys) {
+		this.possibleKeys = possibleKeys;
+	}
+
+	public List<String> getUsedKeyParts() {
+		return usedKeyParts;
+	}
+
+	public void setUsedKeyParts(List<String> usedKeyParts) {
+		this.usedKeyParts = usedKeyParts;
+	}
+
+	public List<String> getUsedColumns() {
+		return usedColumns;
+	}
+
+	public void setUsedColumns(List<String> usedColumns) {
+		this.usedColumns = usedColumns;
+	}
+
+	public Double getFiltered() {
+		return filtered;
+	}
+
+	public void setFiltered(Double filtered) {
+		this.filtered = filtered;
+	}
+
 }

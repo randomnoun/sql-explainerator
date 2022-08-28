@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 
+import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
 import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.graph.CShape;
@@ -405,14 +406,36 @@ public class Layout {
 		b.setParentAndPosition(ob, 0, 0);
 		b.setSize(w, 30);
 		// b.setTextColor(Color.WHITE);
-		b.setCssClass("table" + (n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? " fullTableScan" :
-			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? " fullIndexScan" :
-			(n.getAccessType()==AccessTypeEnum.NON_UNIQUE_KEY ? " nonUniqueKey" :
-			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? " uniqueKey" : "")))));
-		b.setLabel((n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? "Full Table Scan" :
-			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? "Full Index Scan" :
-			(n.getAccessType()==AccessTypeEnum.NON_UNIQUE_KEY ? " Non-Unique Key Lookup" :
-			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? "Unique Key Lookup" : "")))));
+		b.setCssClass("table " + n.getAccessType().getCssClass());
+		b.setLabel(n.getAccessType().getLabel());
+
+		DecimalFormat df = new DecimalFormat("0.##");
+		String tooltip = 
+			n.getTableName() + "\n"  +
+		    "  Access Type: " + n.getAccessType().getJsonValue() + "\n" +
+			"    " + b.getLabel() + "\n" +
+		    "    Cost Hint: " + n.getAccessType().getCostHint() + "\n" +
+			"  Used Columns: " + Text.join(escapeHtml(n.getUsedColumns()), ",\n    ") + "\n" +
+		    "\n" +
+			"Key/Index: " + Text.escapeHtml(n.getKey()) + "\n" +
+		    "  Used Key Parts: " + Text.join(escapeHtml(n.getUsedKeyParts()), ",\n    ") + "\n" +
+			"  Possible Keys: " + Text.join(escapeHtml(n.getPossibleKeys()), ",\n    ") + "\n" +
+		    "\n" +
+			"Rows Examined per Scan: " + n.getRowsExaminedPerScan() + "\n" +
+		    "Rows Produced per Join: " + n.getRowsProducedPerJoin() + "\n" +
+			"Filtered (ratio of rows produced per rows examined): " + df.format(n.getFiltered()) + "%\n" +
+		    "  Hint: 100% is best, &lt;= 1% is worst\n" +
+			"  A low value means the query examines a lot of rows that are not returned.\n" +
+		    "Cost Info\n" +
+			"  Read: " + df.format(n.getCostInfo().getReadCost()) + "\n" +
+			"  Eval: " + df.format(n.getCostInfo().getEvalCost()) + "\n" +
+			"  Prefix: " + df.format(n.getCostInfo().getPrefixCost()) + "\n" +
+			"  Data Read: " + n.getCostInfo().getDataReadPerJoin();
+		b.setTooltip(tooltip);
+		
+		// and we probably need a formatted tooltip here as well now. joy.
+		
+		    
 		
 		CostInfoNode costInfo = n.getCostInfo();
 		if (costInfo != null) {
@@ -421,7 +444,6 @@ public class Layout {
 			Shape lb = new CShape(); // label shape
 			lb.setCssClass("lhsQueryCost"); lb.setTextAnchor("start");
 			lb.setParentAndPosition(ob, 0, -15);
-			DecimalFormat df = new DecimalFormat("0.##");
 			lb.setLabel(df.format(cost)); 
 			lb.setSize(w/2, 10);
 		}
@@ -447,6 +469,10 @@ public class Layout {
 		return ob;
 		
 	}
+	private List<String> escapeHtml(List<String> list) {
+		return list.stream().map(s -> Text.escapeHtml(s)).collect(Collectors.toList());
+	}
+
 	private Shape layout(OrderingOperationNode n) {
 
 		NestedLoopNode nln = n.nestedLoop; // 1 child only

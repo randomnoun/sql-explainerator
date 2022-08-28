@@ -48,8 +48,9 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			if (css==null) { css = getResource("/svg.css"); }
 			
 			// add 1 to max as 1px lines on the border have 0.5px of that line outside the max co-ordinates
-			int w = rv.getMaxX() + 1;
-			int h = rv.getMaxY() + 1;
+			// js tooltips take up entire width/height as the tooltips can extend outside the svg
+			String w = tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? "100%" : String.valueOf(rv.getMaxX() + 1);
+			String h = tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? "100%" : String.valueOf(rv.getMaxY() + 1);
 
 			// svg arrowhead modified from http://thenewcode.com/1068/Making-Arrows-in-SVG
 			// and https://stackoverflow.com/questions/13626748/how-to-prevent-a-svg-marker-arrow-head-to-inherit-paths-stroke-width
@@ -73,7 +74,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			  "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
 			  "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n" +
 			  "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\"\n" +
-			  "  width=\"" + w + "\" height=\"" + h + "\" viewBox=\"0 0 " + w + " " + h + "\" class=\"sql\"" + (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? " onload=\"initSqlExplain(evt)\"" : "") + ">\n" +
+			  "  width=\"" + w + "\" height=\"" + h + "\" class=\"sql\"" + (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? " onload=\"initSqlExplain(evt)\"" : "") + ">\n" +
 			  "  <defs>\n" +
 			  "    <style type=\"text/css\"><![CDATA[" +
 			  css +
