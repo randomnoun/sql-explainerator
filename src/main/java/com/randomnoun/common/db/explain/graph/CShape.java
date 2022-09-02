@@ -2,6 +2,10 @@ package com.randomnoun.common.db.explain.graph;
 
 import java.awt.Color;
 
+/** Container shape ( no border )
+ * 
+ * @author knoxg
+ */
 public class CShape extends Shape {
 	public CShape() {
 		super();

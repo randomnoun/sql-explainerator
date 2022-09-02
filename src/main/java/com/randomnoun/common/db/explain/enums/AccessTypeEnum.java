@@ -1,5 +1,12 @@
 package com.randomnoun.common.db.explain.enums;
 
+/** The possible values of the 'access_type' entry in 'table' nodes.
+ * 
+ * We store the JSON value, a nicer value used in the CSS classes, the label text used in the diagram,
+ * and some tooltip text to describe the query cost.  
+ *  
+ * @author knoxg
+ */
 public enum AccessTypeEnum {
 	
 	FULL_TABLE_SCAN("ALL", "fullTableScan", "Full Table Scan",  
