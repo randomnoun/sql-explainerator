@@ -8,6 +8,7 @@ public class CostInfoNode implements Struct.ToJson {
 	private Double readCost;
 	private Double evalCost;
 	private Double prefixCost;
+	private Double sortCost;
 	private String dataReadPerJoin; 
 	
 	
@@ -19,6 +20,7 @@ public class CostInfoNode implements Struct.ToJson {
 		if (readCost!=null) { s += (f ? "" : ", ") + "\"readCost\":" + readCost; f = false; }
 		if (evalCost!=null) { s += (f ? "" : ", ") + "\"evalCost\":" + evalCost; f = false; }
 		if (prefixCost!=null) { s += (f ? "" : ", ") + "\"prefixCost\":" + prefixCost; f = false; }
+		if (sortCost!=null) { s += (f ? "" : ", ") + "\"sortCost\":" + sortCost; f = false; }
 		s += "}";
 		return s;
 	}
@@ -52,6 +54,14 @@ public class CostInfoNode implements Struct.ToJson {
 	}
 	public void setDataReadPerJoin(String dataReadPerJoin) {
 		this.dataReadPerJoin = dataReadPerJoin;
+	}
+
+	public Double getSortCost() {
+		return sortCost;
+	}
+
+	public void setSortCost(Double sortCost) {
+		this.sortCost = sortCost;
 	}
 
 }
