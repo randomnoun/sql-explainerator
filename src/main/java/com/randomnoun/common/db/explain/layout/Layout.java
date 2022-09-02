@@ -82,14 +82,7 @@ public class Layout {
 		Shape child = null; // child shape
 		int w = 100, h = 0;
 		if (c != null) {
-			if (c instanceof UnionResultNode) { child = layout((UnionResultNode) c); }
-			else if (c instanceof DuplicatesRemovalNode) { child = layout((DuplicatesRemovalNode) c); }
-			else if (c instanceof TableNode) { child = layout((TableNode) c); }
-			else if (c instanceof OrderingOperationNode) { child = layout((OrderingOperationNode) c); }
-			else if (c instanceof GroupingOperationNode) { child = layout((GroupingOperationNode) c); }
-			else {
-				throw new IllegalStateException("unexpected class " + c.getClass().getName() + " in QueryBlockNode");
-			}
+			child = layout(c);
 
 			w = child.getWidth();
 			h = child.getHeight();
@@ -474,8 +467,10 @@ public class Layout {
 
 	private Shape layout(OrderingOperationNode n) {
 
-		NestedLoopNode nln = n.nestedLoop; // 1 child only
-		Shape child = layout(nln);
+		// NestedLoopNode nln = n.nestedLoop; // 1 child only
+		Node cn = n.getOrderedNode();
+		
+		Shape child = layout(cn);
 		
 		int w = child.getWidth();
 		int h = child.getHeight();
@@ -549,9 +544,23 @@ public class Layout {
 		child.setParentAndPosition(outer, 0, 40);
 		return outer;
 	}
-	
-	private Shape layout(Node n) {
-		throw new UnsupportedOperationException("layout for node " + n.getClass().getName() + " not implemented");
+
+	// call this if there is a choice of different Node types, which will then call a more strongly typed layout method
+	// vaguely thought Java would do this automatically, but I guess not
+	private Shape layout(Node node) {
+		Shape shape;
+		if (node instanceof UnionResultNode) { shape = layout((UnionResultNode) node); }
+		else if (node instanceof DuplicatesRemovalNode) { shape = layout((DuplicatesRemovalNode) node); }
+		else if (node instanceof TableNode) { shape = layout((TableNode) node); }
+		else if (node instanceof OrderingOperationNode) { shape = layout((OrderingOperationNode) node); }
+		else if (node instanceof GroupingOperationNode) { shape = layout((GroupingOperationNode) node); }
+		else if (node instanceof NestedLoopNode) { shape = layout((NestedLoopNode) node); }
+		else {
+			throw new IllegalStateException("unexpected class " + node.getClass().getName() + " in layout()");
+		}
+		return shape;
+		
+		// throw new UnsupportedOperationException("layout for node " + n.getClass().getName() + " not implemented");
 	}
 	
 	
