@@ -1,0 +1,172 @@
+{
+  "query_block" : {
+    "cost_info" : {
+      "query_cost" : "116.04"
+    } ,
+    "ordering_operation" : {
+      "nested_loop" : [ {
+          "table" : {
+            "access_type" : "index",
+            "cost_info" : {
+              "data_read_per_join" : "32",
+              "eval_cost" : "0.20",
+              "prefix_cost" : "0.45",
+              "read_cost" : "0.25"
+            } ,
+            "filtered" : "100.00",
+            "key" : "PRIMARY",
+            "key_length" : "1",
+            "possible_keys" : [ "PRIMARY", "idx_fk_address_id" ],
+            "rows_examined_per_scan" : 2,
+            "rows_produced_per_join" : 2,
+            "table_name" : "sto",
+            "used_columns" : [ "store_id", "address_id" ],
+            "used_key_parts" : [ "store_id" ]
+          } 
+        } , 
+        {
+          "table" : {
+            "access_type" : "eq_ref",
+            "attached_condition" : "(`sakila`.`adr`.`city_id` is not null)",
+            "cost_info" : {
+              "data_read_per_join" : "1K",
+              "eval_cost" : "0.20",
+              "prefix_cost" : "2.05",
+              "read_cost" : "1.40"
+            } ,
+            "filtered" : "100.00",
+            "key" : "PRIMARY",
+            "key_length" : "2",
+            "possible_keys" : [ "PRIMARY", "idx_fk_city_id" ],
+            "ref" : [ "sakila.sto.address_id" ],
+            "rows_examined_per_scan" : 1,
+            "rows_produced_per_join" : 2,
+            "table_name" : "adr",
+            "used_columns" : [ "address_id", "city_id" ],
+            "used_key_parts" : [ "address_id" ]
+          } 
+        } , 
+        {
+          "table" : {
+            "access_type" : "eq_ref",
+            "cost_info" : {
+              "data_read_per_join" : "432",
+              "eval_cost" : "0.20",
+              "prefix_cost" : "2.75",
+              "read_cost" : "0.50"
+            } ,
+            "filtered" : "100.00",
+            "key" : "PRIMARY",
+            "key_length" : "2",
+            "possible_keys" : [ "PRIMARY", "idx_fk_country_id" ],
+            "ref" : [ "sakila.adr.city_id" ],
+            "rows_examined_per_scan" : 1,
+            "rows_produced_per_join" : 2,
+            "table_name" : "cit",
+            "used_columns" : [ "city_id", "city", "country_id" ],
+            "used_key_parts" : [ "city_id" ]
+          } 
+        } , 
+        {
+          "table" : {
+            "access_type" : "eq_ref",
+            "cost_info" : {
+              "data_read_per_join" : "416",
+              "eval_cost" : "0.20",
+              "prefix_cost" : "3.45",
+              "read_cost" : "0.50"
+            } ,
+            "filtered" : "100.00",
+            "key" : "PRIMARY",
+            "key_length" : "2",
+            "possible_keys" : [ "PRIMARY" ],
+            "ref" : [ "sakila.cit.country_id" ],
+            "rows_examined_per_scan" : 1,
+            "rows_produced_per_join" : 2,
+            "table_name" : "cou",
+            "used_columns" : [ "country_id", "country" ],
+            "used_key_parts" : [ "country_id" ]
+          } 
+        } , 
+        {
+          "table" : {
+            "access_type" : "ref",
+            "cost_info" : {
+              "data_read_per_join" : "7K",
+              "eval_cost" : "32.17",
+              "prefix_cost" : "116.05",
+              "read_cost" : "80.42"
+            } ,
+            "filtered" : "100.00",
+            "key" : "<auto_key0>",
+            "key_length" : "1",
+            "materialized_from_subquery" : {
+              "cacheable" : true,
+              "dependent" : false,
+              "query_block" : {
+                "cost_info" : {
+                  "query_cost" : "5691.25"
+                } ,
+                "grouping_operation" : {
+                  "nested_loop" : [ {
+                      "table" : {
+                        "access_type" : "index",
+                        "cost_info" : {
+                          "data_read_per_join" : "341K",
+                          "eval_cost" : "59.90",
+                          "prefix_cost" : "61.15",
+                          "read_cost" : "1.25"
+                        } ,
+                        "filtered" : "100.00",
+                        "key" : "idx_fk_store_id",
+                        "key_length" : "1",
+                        "possible_keys" : [ "PRIMARY", "idx_fk_store_id" ],
+                        "rows_examined_per_scan" : 599,
+                        "rows_produced_per_join" : 599,
+                        "table_name" : "cus",
+                        "used_columns" : [ "customer_id", "store_id" ],
+                        "used_key_parts" : [ "store_id" ],
+                        "using_index" : true
+                      } 
+                    } , 
+                    {
+                      "table" : {
+                        "access_type" : "ref",
+                        "cost_info" : {
+                          "data_read_per_join" : "377K",
+                          "eval_cost" : "1608.60",
+                          "prefix_cost" : "5691.25",
+                          "read_cost" : "4021.50"
+                        } ,
+                        "filtered" : "100.00",
+                        "key" : "idx_fk_customer_id",
+                        "key_length" : "2",
+                        "possible_keys" : [ "idx_fk_customer_id" ],
+                        "ref" : [ "sakila.cus.customer_id" ],
+                        "rows_examined_per_scan" : 26,
+                        "rows_produced_per_join" : 16085,
+                        "table_name" : "pay",
+                        "used_columns" : [ "payment_id", "customer_id", "amount" ],
+                        "used_key_parts" : [ "customer_id" ]
+                      } 
+                    }  ],
+                  "using_filesort" : false
+                } ,
+                "select_id" : 3
+              } ,
+              "using_temporary_table" : true
+            } ,
+            "possible_keys" : [ "<auto_key0>" ],
+            "ref" : [ "sakila.sto.store_id" ],
+            "rows_examined_per_scan" : 160,
+            "rows_produced_per_join" : 321,
+            "table_name" : "B",
+            "used_columns" : [ "store_id", "sales" ],
+            "used_key_parts" : [ "store_id" ]
+          } 
+        }  ],
+      "using_filesort" : false
+    } ,
+    "select_id" : 1
+  } 
+} 

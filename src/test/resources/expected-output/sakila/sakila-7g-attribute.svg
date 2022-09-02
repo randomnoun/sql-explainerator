@@ -42,7 +42,8 @@ svg.sql g.groupingOperation > rect {
 svg.sql g.table.nonUniqueKey > text,
 svg.sql g.table.uniqueKey > text,
 svg.sql g.table.fullTableScan > text,
-svg.sql g.table.fullIndexScan > text { 
+svg.sql g.table.fullIndexScan > text,
+svg.sql g.table.singleRow > text { 
     fill: white;
     font-size: 11px; 
 }
@@ -58,6 +59,9 @@ svg.sql g.table.fullTableScan > rect {
 }
 svg.sql g.table.fullIndexScan > rect { 
 	fill: #bf4040; 
+}
+svg.sql g.table.singleRow > rect { 
+    fill: #4080bf;
 }
 
 
