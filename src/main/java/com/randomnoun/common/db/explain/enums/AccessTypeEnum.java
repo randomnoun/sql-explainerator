@@ -15,7 +15,12 @@ public enum AccessTypeEnum {
 	
 	UNIQUE_KEY("eq_ref", "uniqueKey", "Unique Key Lookup",  
 	  "Low - The optimizer is able to find an index that it can use to retrieve required records.\n" +
-	  "Fast because the index search leads directly to the page with all the row data"); // green
+	  "Fast because the index search leads directly to the page with all the row data"),
+	
+	CONST("const", "singleRow", "Single Row\n(constant)",  
+	  "Very low cost"); // blue
+
+	; // green
 	
 	
 	private String jsonValue;
