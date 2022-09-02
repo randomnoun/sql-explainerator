@@ -4,7 +4,9 @@ public class OrderingOperationNode extends Node {
 	private boolean usingTemporaryTable = false;
 	private boolean usingFilesort = false;
 
-	public NestedLoopNode nestedLoop;
+	private Node orderedNode; // the thing we're ordering
+	
+	
 	public OrderingOperationNode() {
 		super("ordering_operation", false); 
 	}
@@ -19,5 +21,11 @@ public class OrderingOperationNode extends Node {
 	}
 	public void setUsingFilesort(boolean usingFilesort) {
 		this.usingFilesort = usingFilesort;
+	}
+	public Node getOrderedNode() {
+		return orderedNode;
+	}
+	public void setOrderedNode(Node orderedNode) {
+		this.orderedNode = orderedNode;
 	}
 }
