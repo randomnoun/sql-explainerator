@@ -2,3 +2,6 @@
 /.settings/
 /.classpath
 /.project
+/src/test/java/com/randomnoun/common/db/explain/SqlExplainToImageOtherTest.java
+/src/test/resources/expected-output/other/
+/src/test/resources/other/
