@@ -116,6 +116,7 @@ public class PlanParser {
 		if (obj.containsKey("read_cost")) { ci.setReadCost(Double.parseDouble((String) obj.get("read_cost"))); }
 		if (obj.containsKey("eval_cost")) { ci.setEvalCost(Double.parseDouble((String) obj.get("eval_cost"))); }
 		if (obj.containsKey("prefix_cost")) { ci.setPrefixCost(Double.parseDouble((String) obj.get("prefix_cost"))); }
+		if (obj.containsKey("sort_cost")) { ci.setSortCost(Double.parseDouble((String) obj.get("sort_cost"))); }
 		ci.setDataReadPerJoin((String) obj.get("data_read_per_join"));
 		return ci;
 	}
@@ -191,7 +192,10 @@ public class PlanParser {
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
 		// n.attributes.put("selectId", obj.get("select_id"));
-		// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
+		if (obj.containsKey("cost_info")) {
+			n.setCostInfo(parseCostInfo((JSONObject) obj.get("cost_info")));
+			n.getAttributes().put("costInfo", n.getCostInfo()); 
+		}
 		
 		if (obj.containsKey("nested_loop")) {
 			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
@@ -232,9 +236,16 @@ public class PlanParser {
 		
 		if (obj.containsKey("nested_loop")) {
 			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.nestedLoop = nln;
+			n.setOrderedNode(nln);
 			n.addChild(nln);
+		} else if (obj.containsKey("duplicates_removal")) { // DISTINCT node
+			DuplicatesRemovalNode drn = parseDuplicatesRemoval((JSONObject) obj.get("duplicates_removal"));
+			n.setOrderedNode(drn);
+			n.addChild(drn);
+		} else {
+			throw new IllegalArgumentException("orderingOperation missing child");
 		}
+
 		return n;
 	}
 	
