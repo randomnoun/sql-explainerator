@@ -222,15 +222,18 @@ public class Layout {
 
 		Shape container = new CShape(); // container Shape
 		container.setParentAndPosition(outer,  child.getEdgeStartX() - 40, 0);
-		container.setSize(80, n.getUsingTemporaryTable() ? 55 : 40);
+		container.setSize(80, n.isUsingTemporaryTable() ? 55 : 40);
 		
-		Shape label = new Shape(); // label shape
-		label.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
-		label.setCssClass("duplicatesRemoval");
-		label.setLabel("DISTINCT"); 
-		label.setSize(80, 40);
+		Shape boxShape = new Shape(); // box shape
+		boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
+		boxShape.setCssClass("duplicatesRemoval");
+		boxShape.setLabel("DISTINCT"); 
+		boxShape.setSize(80, 40);
+		boxShape.setTooltip("Duplicates removal\n\n" +
+			"Using Temporary Table: " + n.isUsingTemporaryTable() + "\n" +
+			"Using Filesort: " + n.isUsingFilesort());
 		
-		if (n.getUsingTemporaryTable()) {
+		if (n.isUsingTemporaryTable()) {
 			Shape ttShape = new CShape(); 
 			ttShape.setLabel("tmp table");
 			ttShape.setSize(80, 10);
@@ -472,33 +475,62 @@ public class Layout {
 		// NestedLoopNode nln = n.nestedLoop; // 1 child only
 		Node cn = n.getOrderedNode();
 		
-		Shape child = layout(cn);
+		// for reasons I'm not entirely sure of, if cn is a DuplicatesRemovalNode ('DISTINCT'), 
+		// then it's on the lhs of the ORDER shape, otherwise it's underneath
 		
+		Shape child = layout(cn);
 		int w = child.getWidth();
 		int h = child.getHeight();
 		
-		Shape outer = new CShape(); // outer shape, nestedLoop exit edge is drawn inside the nestedLoop Shape
-		outer.setSize(w, h + 40);
-		outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
+		Shape outer;
+		Shape boxShape;
+
+		// ordering operations that create temp tables are coloured red
+		// but distinct operations that create temp tables aren't. go figure.
 		
-		if (n.isUsingTemporaryTable()) { 
-			Shape tableShape = new CShape(); // label shape
-			tableShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 45); 
-			tableShape.setSize(w, 10);
-			tableShape.setCssClass("tempTableName");
-			tableShape.setLabel("tmp table"); 
-		}
-		
-		Shape label = new Shape(); // label shape
-		label.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
-		label.setCssClass("orderingOperation");
-		label.setLabel("ORDER"); 
-		label.setSize(80, 40);
-		label.setTooltip("Ordering operation\n\n" +
+		boxShape = new Shape(); 
+		boxShape.setCssClass("orderingOperation" + (n.isUsingTemporaryTable() ? " hasTempTable" : ""));
+		boxShape.setLabel("ORDER"); 
+		boxShape.setSize(80, 40);
+		boxShape.setTooltip("Ordering operation\n\n" +
 			"Using Filesort: " + n.isUsingFilesort());
 
-		child.connectTo(label, "s"); // "up", 50, 30
-		child.setParentAndPosition(outer, 0, 40);
+		if (n.isUsingTemporaryTable() || n.isUsingFilesort()) { 
+			Shape labelShape = new CShape(); // label underneath the box
+			String label = n.isUsingTemporaryTable() ? "tmp table" : "";
+			label += n.isUsingFilesort() ? (label.equals("") ? "" : ", ") + "filesort" : "";
+			labelShape.setParentAndPosition(boxShape, 0, 45); 
+			labelShape.setSize(80, 10);
+			labelShape.setCssClass("tempTableName");
+			labelShape.setLabel(label); 
+		}
+		
+		if (cn instanceof DuplicatesRemovalNode) {
+			// child is left of this node
+			int prevEdgeStartX = child.getEdgeStartX(); // edge would have started in middle of the 'DISTINCT' node
+			int newEdgeStartX = prevEdgeStartX + 40;    // now it starts on the right hand side of it
+			outer = new CShape(); // outer shape, nestedLoop exit edge is drawn inside the nestedLoop Shape
+			child.setEdgeStartX(newEdgeStartX);    
+			child.setEdgeStartY(20);
+			outer.setSize(newEdgeStartX + 160, h); // w + 160
+			outer.setEdgeStartPosition(newEdgeStartX + 100, 0);
+
+			boxShape.setParentAndPosition(outer, newEdgeStartX + 60, 0);
+
+			child.connectTo(boxShape, "w");
+			child.setParentAndPosition(outer, 0, 0);
+			
+		} else {
+			outer = new CShape(); // outer shape, nestedLoop exit edge is drawn inside the nestedLoop Shape
+			outer.setSize(w, h + 40);
+			outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
+			
+			boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
+
+			child.connectTo(boxShape, "s"); // "up", 50, 30
+			child.setParentAndPosition(outer, 0, 40);
+		}
+
 		
 		
 		return outer;

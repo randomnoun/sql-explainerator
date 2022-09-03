@@ -188,6 +188,7 @@ public class PlanParser {
 	private DuplicatesRemovalNode parseDuplicatesRemoval(JSONObject obj) {
 		DuplicatesRemovalNode n = new DuplicatesRemovalNode();
 		n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
+		n.setUsingFilesort((Boolean) obj.get("using_filesort"));
 				
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));

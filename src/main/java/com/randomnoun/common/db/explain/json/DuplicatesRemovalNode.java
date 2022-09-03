@@ -1,7 +1,8 @@
 package com.randomnoun.common.db.explain.json;
 
 public class DuplicatesRemovalNode extends Node {
-	private Boolean usingTemporaryTable;
+	private boolean usingFilesort;
+	private boolean usingTemporaryTable;
 	private CostInfoNode costInfo;
 	
 	private NestedLoopNode nestedLoop;
@@ -9,12 +10,7 @@ public class DuplicatesRemovalNode extends Node {
 	public DuplicatesRemovalNode() {
 		super("duplicates_removal", false); 
 	}
-	public Boolean getUsingTemporaryTable() {
-		return usingTemporaryTable;
-	}
-	public void setUsingTemporaryTable(Boolean usingTemporaryTable) {
-		this.usingTemporaryTable = usingTemporaryTable;
-	}
+
 	public NestedLoopNode getNestedLoop() {
 		return nestedLoop;
 	}
@@ -27,5 +23,23 @@ public class DuplicatesRemovalNode extends Node {
 	public void setCostInfo(CostInfoNode costInfo) {
 		this.costInfo = costInfo;
 	}
+
+	public boolean isUsingFilesort() {
+		return usingFilesort;
+	}
+
+	public void setUsingFilesort(boolean usingFilesort) {
+		this.usingFilesort = usingFilesort;
+	}
+
+	public boolean isUsingTemporaryTable() {
+		return usingTemporaryTable;
+	}
+
+	public void setUsingTemporaryTable(boolean usingTemporaryTable) {
+		this.usingTemporaryTable = usingTemporaryTable;
+	}
+
+
 	
 }
