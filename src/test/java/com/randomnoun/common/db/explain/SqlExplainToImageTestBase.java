@@ -30,7 +30,7 @@ public abstract class SqlExplainToImageTestBase extends TestCase {
 
 	Logger logger = Logger.getLogger(SqlExplainToImageTestBase.class);
 	
-    private static boolean WRITE_EXPECTED_OUTPUT = true;	
+    private static boolean WRITE_EXPECTED_OUTPUT = false;	
 	
 	public void setUp() throws IOException {
 		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
