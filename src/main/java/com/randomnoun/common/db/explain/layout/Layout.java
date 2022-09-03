@@ -96,18 +96,30 @@ public class Layout {
 			  (n.getCostInfo() == null ? "" :"Query cost: " + n.getCostInfo().getQueryCost() + "\n");
 			
 			
-			Shape label = new Shape(); // label shape
-			label.setCssClass("queryBlock" + clazz);
+			Shape boxShape = new Shape(); // label shape
+			boxShape.setCssClass("queryBlock" + clazz);
 			if (child == null) {
-				label.setParentAndPosition(outer, 0, 0);
+				boxShape.setParentAndPosition(outer, 0, 0);
 				outer.setEdgeStartPosition(50, 0);
 			} else {
-				label.setParentAndPosition(outer, child.getEdgeStartX() - 50, 0);
+				boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 50, 0);
 				outer.setEdgeStartPosition(child.getEdgeStartX(), 0);
 			}
-			label.setSize(100, 30);
-			label.setLabel(labelText); 
-			label.setTooltip(tooltip);
+			boxShape.setSize(100, 30);
+			boxShape.setLabel(labelText); 
+			boxShape.setTooltip(tooltip);
+			
+			CostInfoNode costInfo = n.getCostInfo();
+			if (costInfo != null) {
+				DecimalFormat df = new DecimalFormat("0.00");
+				double cost = (costInfo.getQueryCost() == null ? (double) 0 : costInfo.getQueryCost());
+				Shape costLabel = new CShape(); // label shape
+				costLabel.setCssClass("lhsQueryCost"); costLabel.setTextAnchor("start");
+				costLabel.setParentAndPosition(boxShape, 0, -15);
+				costLabel.setLabel("Query cost: " + df.format(cost)); 
+				costLabel.setSize(w/2, 10);
+			}
+
 			
 			if (child == null) {
 				Shape noTableShape = new CShape(); // label shape
@@ -118,7 +130,7 @@ public class Layout {
 				noTableShape.setTooltip(tooltip);
 				
 			} else {
-				child.connectTo(label, "s");
+				child.connectTo(boxShape, "s");
 				child.setParentAndPosition(outer, 0, 60);
 			}
 		} else if (child != null) {
@@ -185,7 +197,7 @@ public class Layout {
 
 		int w = Math.max(totalWidth, 150);
 		
-		outer.setSize(w,  30 + maxHeight);
+		outer.setSize(w,  50 + maxHeight);
 		
 		connector.setParentAndPosition(outer, 0, 0);
 		connector.setSize(w,  30); 
@@ -198,9 +210,9 @@ public class Layout {
 		attachedSubqueries.setStrokeDashArray(Arrays.asList(new String[] { "2" }));
 		int offset = (w - totalWidth) / 2;
 		for (Shape qsShape : qsShapes) {
-			qsShape.setParentAndPosition(outer, offset, 30);
+			qsShape.setParentAndPosition(outer, offset, 50);
 			int sw = qsShape.getWidth();
-			qsShape.connectTo(connector, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
+			qsShape.connectTo(connector, "sv"); // south port, vertical line
 			offset += sw + 50;
 		}
 		outer.setEdgeStartPosition(0, 15);
