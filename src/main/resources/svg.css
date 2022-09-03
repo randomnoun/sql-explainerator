@@ -34,6 +34,10 @@ svg.sql g.groupingOperation > rect {
 	ry: 9; 
 }
 
+svg.sql g.orderingOperation.hasTempTable > rect { 
+	stroke: #bf4040;
+}
+
 svg.sql g.table.nonUniqueKey > text,
 svg.sql g.table.uniqueKey > text,
 svg.sql g.table.fullTableScan > text,
