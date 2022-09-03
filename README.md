@@ -14,6 +14,8 @@ Because diagrams are easier to comprehend than the tabular or JSON 'explain' out
 
 And becaue it's in java, so I might be able to hook it into a running app server to generate these things on the fly rather than having to start up MySQL Workbench and cut and pasting SQL across in order to click the explain query button on that.
 
+And, of course, because I'm a man, and apparently I live for explaining things.
+
 ## How do I use it ? 
 
 Usage text:
@@ -44,7 +46,7 @@ to generate the query plan JSON, then
 
   SqlExplainToImageCli --infile plan.json --outfile plan.svg
 or
-  cat plan.json | SqlPlainToImageCli > plan.svg
+  cat plan.json | SqlExplainToImageCli > plan.svg
 
 to generate the SVG diagram.
 
