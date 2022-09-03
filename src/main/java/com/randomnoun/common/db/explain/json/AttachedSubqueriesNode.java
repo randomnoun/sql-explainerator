@@ -1,18 +1,22 @@
 package com.randomnoun.common.db.explain.json;
 
-public class AttachedSubqueriesNode extends Node {
-	private QuerySpecificationNode querySpecification;
+import java.util.ArrayList;
+import java.util.List;
 
+public class AttachedSubqueriesNode extends Node {
+	
+	private List<QuerySpecificationNode> querySpecifications = new ArrayList<>();
+	
 	public AttachedSubqueriesNode() {
 		super("attached_subqueries", true);
 	}
 
-	public QuerySpecificationNode getQuerySpecification() {
-		return querySpecification;
+	public List<QuerySpecificationNode> getQuerySpecifications() {
+		return querySpecifications;
 	}
 
-	public void setQuerySpecification(QuerySpecificationNode querySpecification) {
-		this.querySpecification = querySpecification;
+	public void addQuerySpecification(QuerySpecificationNode querySpecification) {
+		this.querySpecifications.add(querySpecification);
 	}
 	
 

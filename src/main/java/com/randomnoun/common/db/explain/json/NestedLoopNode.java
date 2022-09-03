@@ -15,8 +15,8 @@ public class NestedLoopNode extends Node {
 		return tables;
 	}
 
-	public void setTables(List<TableNode> tables) {
-		this.tables = tables;
+	public void addTable(TableNode table) {
+		this.tables.add(table);
 	}
 	
 }

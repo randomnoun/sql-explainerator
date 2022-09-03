@@ -215,7 +215,7 @@ public class PlanParser {
 			JSONObject cobj = (JSONObject) o;
 			if (cobj.containsKey("table")) {
 				TableNode cn = parseTable((JSONObject) cobj.get("table"));
-				n.getTables().add(cn);
+				n.addTable(cn);
 				n.addChild(cn);
 			} else {
 				throw new IllegalArgumentException("expected table in nested_loop child");
@@ -340,7 +340,7 @@ public class PlanParser {
 			for (Object o : qs) {
 				JSONObject cobj = (JSONObject) o;
 				QuerySpecificationNode qsn = parseQuerySpecification((JSONObject) cobj);
-				sn.setQuerySpecification(qsn);
+				sn.addQuerySpecification(qsn);
 				sn.addChild(qsn);
 			}
 		}

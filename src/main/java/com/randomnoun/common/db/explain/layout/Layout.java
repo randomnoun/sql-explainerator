@@ -43,7 +43,7 @@ public class Layout {
 
 	public Shape getLayoutShape() {
 		Shape b = layout(topNode, "query_block", true);
-		// probably need to reposition everything so that it starts at 0,0
+		// probably need to reposition everything so that it starts at 0,0t
 		return b;
 	}
 
@@ -168,8 +168,7 @@ public class Layout {
 	}
 	
 	private Shape layout(AttachedSubqueriesNode n) {
-		// @TODO multiple qsns
-		List<QuerySpecificationNode> qsnList = Collections.singletonList(n.getQuerySpecification());
+		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
 		
 		Shape outer = new CShape(); // outer shape
 		Shape connector = new CShape(); // connector shape
@@ -184,23 +183,25 @@ public class Layout {
 			+ (qsShapes.size() - 1) * 50; // 50px padding
 		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
 
-		outer.setSize(totalWidth,  30 + maxHeight);
+		int w = Math.max(totalWidth, 150);
+		
+		outer.setSize(w,  30 + maxHeight);
 		
 		connector.setParentAndPosition(outer, 0, 0);
-		connector.setSize(totalWidth,  30); 
+		connector.setSize(w,  30); 
 		
 		Shape attachedSubqueries = new Shape();
 		attachedSubqueries.setParentAndPosition(connector,  0,  0);
 		attachedSubqueries.setLabel("attached_subqueries");
 		// b.setFill(new Color(0, 0, 0)); // #b3b3b3
-		attachedSubqueries.setSize(totalWidth, 30);
+		attachedSubqueries.setSize(w, 30);
 		attachedSubqueries.setStrokeDashArray(Arrays.asList(new String[] { "2" }));
-		int offset = 0;
-		for (Shape qsb : qsShapes) {
-			qsb.setParentAndPosition(outer, offset, 30);
-			int w = qsb.getWidth();
-			qsb.connectTo(connector, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
-			offset += w + 20;
+		int offset = (w - totalWidth) / 2;
+		for (Shape qsShape : qsShapes) {
+			qsShape.setParentAndPosition(outer, offset, 30);
+			int sw = qsShape.getWidth();
+			qsShape.connectTo(connector, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
+			offset += sw + 50;
 		}
 		outer.setEdgeStartPosition(0, 15);
 		
@@ -334,22 +335,23 @@ public class Layout {
 		int w = (n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? 100 :
 			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
 			(n.getAccessType()==AccessTypeEnum.NON_UNIQUE_KEY ? 150 :
-			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? 125 : 100)))); 
-		int h = 60;
+			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? 125 : 100))));
+		int lbsh = n.getAccessType()==AccessTypeEnum.CONST ? 45 : 30; // label box shape height
+		int h = lbsh + 30;
 		Shape outer = new CShape(); // outer shape
 		
 		if (n.getMaterialisedFromSubquery() == null) {
 			if (n.getTableName() != null) {
 				Shape label = new CShape(); // label shape
 				label.setCssClass("tableName");
-				label.setParentAndPosition(outer, 0, 32);
+				label.setParentAndPosition(outer, 0, lbsh + 2);
 				label.setLabel(n.getTableName()); 
 				label.setSize(w, 14);
 			}
 			if (n.getKey() != null) {
 				Shape label = new CShape(); // label shape
 				label.setCssClass("tableKey"); 
-				label.setParentAndPosition(outer, 0, 46);
+				label.setParentAndPosition(outer, 0, lbsh + 16);
 				label.setLabel(n.getKey()); 
 				label.setSize(w, 14);
 			}
@@ -397,18 +399,18 @@ public class Layout {
 
 		outer.setEdgeStartPosition(w / 2, 0);
 		
-		Shape b = new Shape(); 
-		b.setParentAndPosition(outer, 0, 0);
-		b.setSize(w, 30);
+		Shape labelBoxShape = new Shape(); 
+		labelBoxShape.setParentAndPosition(outer, 0, 0);
+		labelBoxShape.setSize(w, lbsh);
 		// b.setTextColor(Color.WHITE);
-		b.setCssClass("table " + n.getAccessType().getCssClass());
-		b.setLabel(n.getAccessType().getLabel());
+		labelBoxShape.setCssClass("table " + n.getAccessType().getCssClass());
+		labelBoxShape.setLabel(n.getAccessType().getLabel());
 
 		DecimalFormat df = new DecimalFormat("0.##");
 		String tooltip = 
 			n.getTableName() + "\n"  +
 		    "  Access Type: " + n.getAccessType().getJsonValue() + "\n" +
-			"    " + b.getLabel() + "\n" +
+			"    " + labelBoxShape.getLabel() + "\n" +
 		    "    Cost Hint: " + n.getAccessType().getCostHint() + "\n" +
 			"  Used Columns: " + Text.join(escapeHtml(n.getUsedColumns()), ",\n    ") + "\n" +
 		    "\n" +
@@ -426,7 +428,7 @@ public class Layout {
 			"  Eval: " + df.format(n.getCostInfo().getEvalCost()) + "\n" +
 			"  Prefix: " + df.format(n.getCostInfo().getPrefixCost()) + "\n" +
 			"  Data Read: " + n.getCostInfo().getDataReadPerJoin();
-		b.setTooltip(tooltip);
+		labelBoxShape.setTooltip(tooltip);
 		
 		// and we probably need a formatted tooltip here as well now. joy.
 		
@@ -454,7 +456,7 @@ public class Layout {
 		if (n.getAttachedSubqueries() != null) {
 			Shape qb = layout(n.getAttachedSubqueries());
 			qb.setParentAndPosition(outer, w + 50, 0);
-			qb.connectTo(b, "e");
+			qb.connectTo(labelBoxShape, "e");
 			w = w + 50 + qb.getWidth();
 			h = Math.max(h, qb.getHeight());
 		
