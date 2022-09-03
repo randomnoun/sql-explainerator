@@ -155,17 +155,28 @@ public class SvgShapeVisitor extends ShapeVisitor {
 
 		}
 		if (b.getLabel() != null) {
-			int tx = (b.getTextAnchor() == null ? (x + (b.getWidth()/2)) :
-				(b.getTextAnchor().equals("start") ? (x) :
-				(b.getTextAnchor().equals("end") ? (x + b.getWidth()) : 0)));
+			// default css for 'text' elements in our svg.css is
+			//   text-anchor: middle; dominant-baseline: middle; font-size: 14px;
+
+			int tx = (b.getTextAnchor() == null ? (b.getWidth()/2) :
+				(b.getTextAnchor().equals("start") ? 0 :
+				(b.getTextAnchor().equals("end") ? b.getWidth() : 0)));
 					
-			s += is + "    <text x=\"" + tx + "\"" +
-		      " y=\"" + (y + (b.getHeight()/2)) + "\"" +
-			  " style=\"" +
-		        (b.getTextColor() == null ? "" : "fill:" + toHex(b.getTextColor())+ ";") + 
-		        (b.getTextAnchor() == null ? "" : "text-anchor:" + b.getTextAnchor() + ";") +
-		      "\">" + 
-			  Text.escapeHtml(b.getLabel()) + "</text>\n";
+			// well this is annoying
+			// see https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
+			// except dx and dy co-ords don't work that well with text-anchor:middle; it turns out 
+			String[] tspans = b.getLabel().split("\n");
+			int ty = (b.getHeight() - (tspans.length * 14)) / 2 + 7;
+			for (int i = 0; i < tspans.length; i++) {
+				s += is + "    <text x=\"" + (x + tx) + "\"" + // tx
+			      " y=\"" + (y + ty + i * 14) + "\"" + // (y + (b.getHeight()/2))
+				  " style=\"" +
+			        (b.getTextColor() == null ? "" : "fill:" + toHex(b.getTextColor())+ ";") + 
+			        (b.getTextAnchor() == null ? "" : "text-anchor:" + b.getTextAnchor() + ";") +
+			      "\">\n";
+				s += Text.escapeHtml(tspans[i]);
+				s += is + "    </text>\n";
+			}
 		}
 		if (b.getConnectedTo() != null) {
 			Shape ctb = b.getConnectedTo();
