@@ -98,6 +98,10 @@ public class PlanParser {
 			Node cn = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
 			n.setQueryNode(cn);
 			n.addChild(cn);
+		} else if (obj.containsKey("nested_loop")) {
+			Node cn = parseNestedLoop((JSONArray) obj.get("nested_loop"));
+			n.setQueryNode(cn);
+			n.addChild(cn);
 		} else {
 			// can have 'no tables used' if this is a SELECT without a table
 			
@@ -157,6 +161,12 @@ public class PlanParser {
 			QueryBlockNode cn = parseQueryBlock((JSONObject) obj.get("query_block"));
 			n.setQueryBlock(cn);
 			n.addChild(cn);
+		} else if (obj.containsKey("table")) {
+			// this object is a table, which is also a queryBlock
+			QueryBlockNode cn = parseQueryBlock(obj);
+			n.setQueryBlock(cn);
+			n.addChild(cn);
+
 		} else {
 			throw new IllegalArgumentException("expected query_block in query_specification: " + obj.toString());
 		}
@@ -165,8 +175,12 @@ public class PlanParser {
 	
 	private MaterialisedFromSubqueryNode parseMaterialisedFromSubquery(JSONObject obj) {
 		MaterialisedFromSubqueryNode n = new MaterialisedFromSubqueryNode();
-		n.setDependent((Boolean) obj.get("dependent"));
-		n.setCacheable((Boolean) obj.get("cacheable"));
+		if (obj.containsKey("dependent")) {
+			n.setDependent((Boolean) obj.get("dependent"));
+		}
+		if (obj.containsKey("cacheable")) {
+			n.setCacheable((Boolean) obj.get("cacheable"));
+		}
 		n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
 		
 		n.getAttributes().put("dependent", obj.get("dependent"));
