@@ -14,8 +14,8 @@ import org.apache.log4j.Logger;
 
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
-import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.graph.CShape;
+import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.json.AttachedSubqueriesNode;
 import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
@@ -30,7 +30,6 @@ import com.randomnoun.common.db.explain.json.UnionResultNode;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 
 /** Converts a hierarchy of Nodes into a hierarchy of Shapes */
-
 public class Layout {
 
 	Logger logger = Logger.getLogger(Layout.class);
@@ -43,7 +42,7 @@ public class Layout {
 
 	public Shape getLayoutShape() {
 		Shape b = layout(topNode, "query_block", true);
-		// probably need to reposition everything so that it starts at 0,0t
+		// probably need to reposition everything so that it starts at 0,0
 		return b;
 	}
 
@@ -55,18 +54,20 @@ public class Layout {
 			.mapToObj(i -> children.get(children.size() - i - 1)); 
 	}
 
-	private String toSiUnits(long v) {
+	private String toSiUnits(Long v) {
 		DecimalFormat df =  new DecimalFormat("0.##");
+		if (v == null) { return "0"; }
 		if (v < 1_000) { return String.valueOf(v); }
-		else if (v < 1_000_000)                  { return df.format((double) v/1_000) + "K"; }
-		else if (v < 1_000_000_000)              { return df.format((double) v/1_000_000) + "M"; }
-		else if (v < 1_000_000_000_000L)         { return df.format((double) v/1_000_000_000) + "G"; }
-		else if (v < 1_000_000_000_000_000L)     { return df.format((double) v/1_000_000_000_000L) + "T"; }
-		else if (v < 1_000_000_000_000_000_000L) { return df.format((double) v/1_000_000_000_000_000L) + "P"; }
+		else if (v < 1_000_000)                  { return df.format((double) v / 1_000) + "K"; }
+		else if (v < 1_000_000_000)              { return df.format((double) v / 1_000_000) + "M"; }
+		else if (v < 1_000_000_000_000L)         { return df.format((double) v / 1_000_000_000) + "G"; }
+		else if (v < 1_000_000_000_000_000L)     { return df.format((double) v / 1_000_000_000_000L) + "T"; }
+		else if (v < 1_000_000_000_000_000_000L) { return df.format((double) v / 1_000_000_000_000_000L) + "P"; }
 		else { return String.valueOf(v); }
 	}
 	
 	private List<String> escapeHtml(List<String> list) {
+		if (list == null) { return Collections.emptyList(); }
 		return list.stream().map(s -> Text.escapeHtml(s)).collect(Collectors.toList());
 	}
 		
@@ -295,30 +296,33 @@ public class Layout {
 			diamond.setSize(60, 60); // diamond
 			diamond.setParentAndPosition(outer, tabelShape.getPosX() + tabelShape.getEdgeStartX() - 30, 50); // centered above table beneath it
 			diamond.setTooltip("nested_loop\n\n" +
-			   "Prefix Cost: " + qsn.getCostInfo().getPrefixCost());
+			   (qsn.getCostInfo() == null ? "" : "Prefix Cost: " + qsn.getCostInfo().getPrefixCost()));
 			nestedLoopShapes.add(diamond);
 			
-			Shape costShape = new CShape(); // label shape
-			costShape.setCssClass("queryCost");
-			costShape.setParentAndPosition(diamond, -10, -15);
-			costShape.setLabel(String.valueOf(qsn.getCostInfo().getPrefixCost())); 
-			costShape.setTextAnchor("start");
-			costShape.setSize(40, 10);
+			Shape costShape;
+			if (qsn.getCostInfo() != null) {
+				costShape = new CShape(); // label shape
+				costShape.setCssClass("queryCost");
+				costShape.setParentAndPosition(diamond, -10, -15);
+				costShape.setLabel(String.valueOf(qsn.getCostInfo().getPrefixCost())); 
+				costShape.setTextAnchor("start");
+				costShape.setSize(40, 10);
+			}
 
 			if (i == tableShapes.size() - 1) {
 				costShape = new CShape(); // label shape
 				costShape.setCssClass("queryCost");
 				costShape.setParentAndPosition(diamond, 40, -10);
-				costShape.setLabel(toSiUnits(qsn.getRowsProducedPerJoin()) +
-					(qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows")); 
+				costShape.setLabel(qsn == null || qsn.getRowsProducedPerJoin() == null ? "0 rows" :
+					(toSiUnits(qsn.getRowsProducedPerJoin()) + (qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows"))); 
 				costShape.setTextAnchor("start");
 				costShape.setSize(25, 10);
 			} else {
 				costShape = new CShape(); // label shape
 				costShape.setCssClass("queryCost");
 				costShape.setParentAndPosition(diamond, 65, 15);
-				costShape.setLabel(toSiUnits(qsn.getRowsProducedPerJoin()) +
-					(qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows")); 
+				costShape.setLabel(qsn == null || qsn.getRowsProducedPerJoin() == null ? "0 rows" :
+					(toSiUnits(qsn.getRowsProducedPerJoin()) + (qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows"))); 
 				costShape.setTextAnchor("start");
 				costShape.setSize(25, 10);
 			}
@@ -435,14 +439,16 @@ public class Layout {
 		    "\n" +
 			"Rows Examined per Scan: " + n.getRowsExaminedPerScan() + "\n" +
 		    "Rows Produced per Join: " + n.getRowsProducedPerJoin() + "\n" +
+			(n.getFiltered() == null ? "" : 
 			"Filtered (ratio of rows produced per rows examined): " + df.format(n.getFiltered()) + "%\n" +
 		    "  Hint: 100% is best, &lt;= 1% is worst\n" +
-			"  A low value means the query examines a lot of rows that are not returned.\n" +
+			"  A low value means the query examines a lot of rows that are not returned.\n") +
+			(n.getCostInfo() == null ? "" : 
 		    "Cost Info\n" +
 			"  Read: " + df.format(n.getCostInfo().getReadCost()) + "\n" +
 			"  Eval: " + df.format(n.getCostInfo().getEvalCost()) + "\n" +
 			"  Prefix: " + df.format(n.getCostInfo().getPrefixCost()) + "\n" +
-			"  Data Read: " + n.getCostInfo().getDataReadPerJoin();
+			"  Data Read: " + n.getCostInfo().getDataReadPerJoin());
 		labelBoxShape.setTooltip(tooltip);
 		
 		// and we probably need a formatted tooltip here as well now. joy.
@@ -592,7 +598,6 @@ public class Layout {
 	}
 
 	// call this if there is a choice of different Node types, which will then call a more strongly typed layout method
-	// vaguely thought Java would do this automatically, but I guess not
 	private Shape layout(Node node) {
 		Shape shape;
 		if (node instanceof UnionResultNode) { shape = layout((UnionResultNode) node); }
