@@ -49,8 +49,8 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			
 			// add 1 to max as 1px lines on the border have 0.5px of that line outside the max co-ordinates
 			// js tooltips take up entire width/height as the tooltips can extend outside the svg
-			String w = tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? "100%" : String.valueOf(rv.getMaxX() + 1);
-			String h = tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? "100%" : String.valueOf(rv.getMaxY() + 1);
+			String w = tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? "100vw" : String.valueOf(rv.getMaxX() + 1);
+			String h = tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? "100vh" : String.valueOf(rv.getMaxY() + 1);
 
 			// svg arrowhead modified from http://thenewcode.com/1068/Making-Arrows-in-SVG
 			// and https://stackoverflow.com/questions/13626748/how-to-prevent-a-svg-marker-arrow-head-to-inherit-paths-stroke-width
