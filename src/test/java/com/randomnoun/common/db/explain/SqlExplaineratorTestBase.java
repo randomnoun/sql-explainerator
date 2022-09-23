@@ -26,9 +26,9 @@ import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 import junit.framework.TestCase;
 
-public abstract class SqlExplainToImageTestBase extends TestCase {
+public abstract class SqlExplaineratorTestBase extends TestCase {
 
-	Logger logger = Logger.getLogger(SqlExplainToImageTestBase.class);
+	Logger logger = Logger.getLogger(SqlExplaineratorTestBase.class);
 	
     private static boolean WRITE_EXPECTED_OUTPUT = false;	
 	
@@ -38,7 +38,7 @@ public abstract class SqlExplainToImageTestBase extends TestCase {
 	}
 	
 	public void testParser(String resourceName) throws IOException, ParseException {
-		InputStream is = SqlExplainToImage.class.getResourceAsStream("/" + resourceName + ".json");
+		InputStream is = SqlExplainerator.class.getResourceAsStream("/" + resourceName + ".json");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
 		StreamUtil.copyStream(is, baos);
 		String json = baos.toString();
@@ -87,7 +87,7 @@ public abstract class SqlExplainToImageTestBase extends TestCase {
 	}
 	
 	public void testSvg(String resourceName) throws IOException, ParseException {
-		InputStream is = SqlExplainToImage.class.getResourceAsStream("/" + resourceName + ".json");
+		InputStream is = SqlExplainerator.class.getResourceAsStream("/" + resourceName + ".json");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
 		StreamUtil.copyStream(is, baos);
 		String json = baos.toString();

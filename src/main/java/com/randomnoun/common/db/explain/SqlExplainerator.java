@@ -25,9 +25,9 @@ import com.randomnoun.common.db.explain.visitor.SvgShapeVisitor;
  *
  * <p>Unit tests are based on the sakila database, which is BSD licensed.
  */
-public class SqlExplainToImage {
+public class SqlExplainerator {
 
-	static Logger logger = Logger.getLogger(SqlExplainToImage.class);
+	static Logger logger = Logger.getLogger(SqlExplainerator.class);
 	
 	// The shape class is how we're describing the resulting diagram. It contains shapes, which represent rectangles or other containers
 	Shape s;
@@ -35,7 +35,7 @@ public class SqlExplainToImage {
 	String css;
 	String script;
 	
-	public SqlExplainToImage() {
+	public SqlExplainerator() {
 	}
 	
 	// @TODO set options ( alternate css resources )

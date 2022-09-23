@@ -1,10 +1,10 @@
-# sql-explain-to-image
+# sql-explainerator
 
-**sql-explain-to-image**  converts query execution plans ( the output from an 'EXPLAIN' statement ) into pretty diagrams
+**sql-explainerator**  converts query execution plans ( the output from an 'EXPLAIN' statement ) into pretty diagrams
 
 It attempts to recreate the type of diagrams you get from the 'visual explain' pane in [MySQL Workbench](https://www.mysql.com/products/workbench/), and looks like this:
 
-![](https://raw.githubusercontent.com/randomnoun/sql-explain-to-image/master/src/site/readme/sakila-7g.png)
+![](https://raw.githubusercontent.com/randomnoun/sql-explainerator/master/src/site/readme/sakila-7g.png)
 
 The images are in SVG form, although you can also generate HTML output which wraps the SVG.
 
@@ -20,8 +20,8 @@ And, of course, because I'm a man, and apparently I live for explaining things.
 
 Usage text:
 ```
-C:\util\java> java -jar explain-to-image-0.0.1-with-dependencies.jar --help
-usage: SqlExplainToImageCli [options]
+C:\util\java> java -jar sql-explainerator-0.0.1-with-dependencies.jar --help
+usage: SqlExplainerator [options]
  -h,--help                  This usage text
  -i,--infile <infile>       input file, or '-' for stdin; default = stdin
  -o,--outfile <outfile>     output file, or '-' for stdout; default = stdout
@@ -44,29 +44,29 @@ server (2).
 
 to generate the query plan JSON, then
 
-  SqlExplainToImageCli --infile plan.json --outfile plan.svg
+  SqlExplainerator --infile plan.json --outfile plan.svg
 or
-  cat plan.json | SqlExplainToImageCli > plan.svg
+  cat plan.json | SqlExplainerator > plan.svg
 
 to generate the SVG diagram.
 
 (2) When supplying the SQL against a database instance, you must supply the connection string,
 username, password and sql, e.g.:
 
-  SqlExplainToImageCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \
+  SqlExplainerator --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \
     --sql "SELECT 1 fROM DUAL" --outfile plan.svg
 ```
 
 And some example command-lines:
 
 ```
-C:\util\java> java -jar explain-to-image-0.0.1-SNAPSHOT-with-dependencies.jar --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 --sql "SELECT 1 fROM DUAL" --outfile plan.svg
+C:\util\java> java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 --sql "SELECT 1 fROM DUAL" --outfile plan.svg
 ```
 
 ```
 C:\util\java>"c:\Program Files\MySQL\MySQL Server 8.0\bin\mysql" --user=root --password=abc123 --silent --raw --skip-column-names --execute "EXPLAIN FORMAT=JSON SELECT 1 FROM DUAL" sakila > plan.json
 
-C:\util\java>java -jar explain-to-image-0.0.1-SNAPSHOT-with-dependencies.jar --infile plan.json --outfile plan.svg
+C:\util\java>java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar --infile plan.json --outfile plan.svg
 ```
 
 ## Where can I get it ? 
@@ -95,5 +95,5 @@ But yes, you'd imagine this would already exist somewhere, wouldn't you.
 
 ## Licensing
 
-sql-explain-to-image is licensed under the BSD 2-clause license.
+sql-explainerator is licensed under the BSD 2-clause license.
 

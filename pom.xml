@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.randomnoun.db</groupId>
-	<artifactId>explain-to-image</artifactId>
+	<artifactId>sql-explainerator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<parent>
@@ -13,7 +13,7 @@
 	</parent>
 
 	<packaging>jar</packaging>
-	<name>explain-to-image</name>
+	<name>sql-explainerator</name>
 	<url>http://www.randomnoun.com/maven.html</url>
 
 	<dependencies>
@@ -133,17 +133,17 @@
 	</ciManagement>
 	<inceptionYear>2022-07-22</inceptionYear>
 	<scm>
-		<connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/explain-to-image.git</connection>
-		<developerConnection>scm:git:http://gitlab.dev.randomnoun/randomnoun/explain-to-image.git</developerConnection>
-		<url>http://gitlab.dev.randomnoun/randomnoun/explain-to-image</url>
-		<tag>explain-to-image-0.0.1</tag>
+		<connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git</connection>
+		<developerConnection>scm:git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git</developerConnection>
+		<url>http://gitlab.dev.randomnoun/randomnoun/sql-explainerator</url>
+		<tag>sql-explainerator-0.0.1</tag>
 	</scm>
 	<organization>
 		<name>randomnoun</name>
 		<url>http://www.randomnoun.com</url>
 	</organization>
 	<build>
-		<finalName>explain-to-image</finalName>
+		<finalName>sql-explainerator</finalName>
 
 		<plugins>
 			<plugin>
@@ -160,7 +160,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.randomnoun.common.db.explain.SqlExplainToImageCli</mainClass>
+									<mainClass>com.randomnoun.common.db.explain.SqlExplaineratorCli</mainClass>
 								</transformer>
 							</transformers>
 							<shadedArtifactAttached>true</shadedArtifactAttached>

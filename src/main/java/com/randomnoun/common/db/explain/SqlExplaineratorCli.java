@@ -31,7 +31,7 @@ import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 /** All the CLI options */
-public class SqlExplainToImageCli {
+public class SqlExplaineratorCli {
 
 	public static void main(String args[]) throws IOException, ParseException, ClassNotFoundException, SQLException {
 		// create the command line parser
@@ -176,7 +176,7 @@ public class SqlExplainToImageCli {
 		lprops.put("log4j.rootCategory", "WARN, CONSOLE");
 		lcc.init("[SqlExplainToImageCli]", lprops);
 		
-		SqlExplainToImage seti = new SqlExplainToImage();
+		SqlExplainerator seti = new SqlExplainerator();
 		seti.parseJson(r, "1.2.3");
 		seti.setTooltipType(tooltipType);
 		seti.setCss(css);
