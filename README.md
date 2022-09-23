@@ -12,7 +12,7 @@ The images are in SVG form, although you can also generate HTML output which wra
 
 Because diagrams are easier to comprehend than the tabular or JSON 'explain' output you get in MySQL.
 
-And becaue it's in java, so I might be able to hook it into a running app server to generate these things on the fly rather than having to start up MySQL Workbench and cut and pasting SQL across in order to click the explain query button on that.
+And becaue it's in java, so I might be able to hook it into a running app server to generate these things on the fly rather than having to start up MySQL Workbench and cut and paste SQL across in order to click the explain query button on that.
 
 And, of course, because I'm a man, and apparently I live for explaining things.
 
@@ -82,6 +82,16 @@ MySQL
 Well, MySQL Workbench exists, but that's not so easy to use from within a webapp.
 
 But yes, you'd imagine this would already exist somewhere, wouldn't you.
+
+## Futher reading
+
+* MariaDB EXPLAIN is not MySQL EXPLAIN: https://mariadb.com/kb/en/explain-format-json-differences/
+* More of that: https://mariadb.com/kb/en/differences-between-the-mysql-and-mariadb-query-optimizer/
+* More MariaDB EXPLAIN things: https://mariadb.com/kb/en/explain-format-json/
+* More MariaDB EXPLAIN things, in blog form: https://web.archive.org/web/20200218115814/http://s.petrunia.net/blog/?p=93
+* A not very useful EXPLAIN visualiser project: https://github.com/Preetam/explain-analyzer
+* Some EXPLAIN JSON tests from the mysql-server source: https://github.com/mysql/mysql-server/blob/8d8c986e5716e38cb776b627a8eee9e92241b4ce/mysql-test/r/window_std_var_optimized.result
+* Some more of those: https://github.com/mysql/mysql-server/search?p=2&q=ordering_operation
 
 ## Licensing
 
