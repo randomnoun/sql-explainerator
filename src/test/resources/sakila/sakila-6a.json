@@ -1,0 +1,63 @@
+{
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "5.10"
+    },
+    "nested_loop": [
+      {
+        "table": {
+          "table_name": "stf",
+          "access_type": "ALL",
+          "rows_examined_per_scan": 2,
+          "rows_produced_per_join": 2,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "3.00",
+            "eval_cost": "0.20",
+            "prefix_cost": "3.20",
+            "data_read_per_join": "1K"
+          },
+          "used_columns": [
+            "first_name",
+            "last_name",
+            "address_id"
+          ]
+        }
+      },
+      {
+        "table": {
+          "table_name": "adr",
+          "access_type": "eq_ref",
+          "possible_keys": [
+            "PRIMARY"
+          ],
+          "key": "PRIMARY",
+          "used_key_parts": [
+            "address_id"
+          ],
+          "key_length": "2",
+          "ref": [
+            "sakila.stf.address_id"
+          ],
+          "rows_examined_per_scan": 1,
+          "rows_produced_per_join": 2,
+          "filtered": "100.00",
+          "cost_info": {
+            "read_cost": "1.70",
+            "eval_cost": "0.20",
+            "prefix_cost": "5.10",
+            "data_read_per_join": "1K"
+          },
+          "used_columns": [
+            "address_id",
+            "address",
+            "district",
+            "city_id",
+            "postal_code"
+          ]
+        }
+      }
+    ]
+  }
+}
