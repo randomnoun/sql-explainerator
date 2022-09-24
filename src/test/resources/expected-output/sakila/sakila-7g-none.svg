@@ -39,8 +39,12 @@ svg.sql g.groupingOperation > rect {
 	ry: 9; 
 }
 
+
 svg.sql g.orderingOperation.hasTempTable > rect { 
 	stroke: #bf4040;
+}
+svg.sql g.groupingOperation.hasTempTable > rect { 
+    stroke: #bf8000;
 }
 
 svg.sql g.table.nonUniqueKey > text,
@@ -92,6 +96,26 @@ svg.sql g.tempTableName > text {
 	font-size: 10px; 
 	font-weight: bold; 
 }
+
+svg.sql g.tooltip div.tooltip {
+	font-size: 11px;
+	padding: 4px; 
+	white-space: pre; 
+	display: inline-block; 
+	background: white; 
+	border: 1px solid black; 
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+svg.sql g.tooltip div.tooltip .tableHeader,
+svg.sql g.tooltip div.tooltip .keyIndexHeader,
+svg.sql g.tooltip div.tooltip .costInfoHeader,
+svg.sql g.tooltip div.tooltip .groupingOperationHeader,
+svg.sql g.tooltip div.tooltip .orderingOperationHeader,
+svg.sql g.tooltip div.tooltip .attachedConditionHeader {
+	font-size: 11px;
+	font-weight: bold;
+} 
     ]]></style>
     <marker id="arrowhead" markerWidth="12" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 12 3.5, 0 7" />
@@ -111,18 +135,18 @@ Query cost: 116.04                </text>
         </g>
         <g>
             <rect x="0" y="75" width="995" height="560" style="stroke:transparent; "/>
-            <polyline points="835,75 835,57" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+            <polyline points="835,75 835,57" style="stroke:#000000; stroke-width:1.059686645113156;" marker-end="url(#arrowhead)"/>
             <g class="orderingOperation">
                 <rect x="795" y="75" width="80" height="40" style=""/>
                 <text x="835" y="95" style="">
 ORDER                </text>
             </g>
             <g>
-                <rect x="0" y="115" width="995" height="520" style="stroke:transparent; "/>
-                <polyline points="835,165 835,127" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                <rect x="0" y="165" width="995" height="470" style="stroke:transparent; "/>
+                <polyline points="835,165 835,127" style="stroke:#000000; stroke-width:1.059686645113156;" marker-end="url(#arrowhead)"/>
                 <g>
                     <rect x="0" y="275" width="100" height="60" style="stroke:transparent; "/>
-                    <polyline points="50,275 50,195 170,195" style="stroke:#000000; stroke-width:1.0050167224080269; fill: none;" marker-end="url(#arrowhead)"/>
+                    <polyline points="50,275 50,195 170,195" style="stroke:#000000; stroke-width:1.0001865207659786; fill: none;" marker-end="url(#arrowhead)"/>
                     <g class="tableName">
                         <rect x="0" y="307" width="100" height="14" style="stroke:transparent; "/>
                         <text x="50" y="314" style="">
@@ -238,7 +262,7 @@ Unique Key Lookup                        </text>
                 </g>
                 <g>
                     <rect x="675" y="275" width="320" height="360" style="stroke:transparent; "/>
-                    <polyline points="835,275 835,237" style="stroke:#000000; stroke-width:1.7976588628762542;" marker-end="url(#arrowhead)"/>
+                    <polyline points="835,275 835,237" style="stroke:#000000; stroke-width:1.0296568017905994;" marker-end="url(#arrowhead)"/>
                     <g class="dotted">
                         <rect x="675" y="275" width="320" height="360" style="stroke:#8c8c8c; stroke-dasharray:4; "/>
                     </g>
@@ -252,11 +276,11 @@ Unique Key Lookup                        </text>
 GROUP                                </text>
                             </g>
                             <g>
-                                <rect x="685" y="400" width="300" height="220" style="stroke:transparent; "/>
-                                <polyline points="910,450 910,412" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                                <rect x="685" y="450" width="300" height="170" style="stroke:transparent; "/>
+                                <polyline points="910,450 910,412" style="stroke:#000000; stroke-width:4.0;" marker-end="url(#arrowhead)"/>
                                 <g>
                                     <rect x="685" y="560" width="100" height="60" style="stroke:transparent; "/>
-                                    <polyline points="735,560 735,480 868,480" style="stroke:#000000; stroke-width:4.0; fill: none;" marker-end="url(#arrowhead)"/>
+                                    <polyline points="735,560 735,480 868,480" style="stroke:#000000; stroke-width:1.11153941805521; fill: none;" marker-end="url(#arrowhead)"/>
                                     <g class="tableName">
                                         <rect x="685" y="592" width="100" height="14" style="stroke:transparent; "/>
                                         <text x="735" y="599" style="">
@@ -285,7 +309,7 @@ Full Index Scan                                        </text>
                                 </g>
                                 <g>
                                     <rect x="835" y="560" width="150" height="60" style="stroke:transparent; "/>
-                                    <polyline points="910,560 910,522" style="stroke:#000000; stroke-width:1.125418060200669;" marker-end="url(#arrowhead)"/>
+                                    <polyline points="910,560 910,522" style="stroke:#000000; stroke-width:1.0046630191494652;" marker-end="url(#arrowhead)"/>
                                     <g class="tableName">
                                         <rect x="835" y="592" width="150" height="14" style="stroke:transparent; "/>
                                         <text x="910" y="599" style="">
@@ -432,11 +456,11 @@ Non-Unique Key Lookup                        </text>
             </g>
         </g>
     </g>
-<g id="tooltip" visibility="hidden" >
-		<foreignObject style="overflow: visible;">
-		    <body xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
-		      <div style="padding: 4px; white-space: pre; display: inline-block; background: white; border: 1px solid black; box-shadow: 2px 2px 2px #333;">Tooltip</div>
-		    </body>      
-		</foreignObject>
-	</g>
+<g class="tooltip" visibility="hidden" >
+    <foreignObject style="overflow: visible;">
+        <body xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
+            <div class="tooltip">Tooltip</div>
+        </body>
+    </foreignObject>
+</g>
 </svg>
