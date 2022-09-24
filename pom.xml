@@ -22,11 +22,43 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+            <groupId>com.randomnoun.common</groupId>
+            <artifactId>common-public</artifactId>
+            <version>1.0.0</version>
+        </dependency>
         <dependency>
             <groupId>com.randomnoun.common</groupId>
             <artifactId>log4j-one</artifactId>
             <version>1.0.0</version>
         </dependency>
+        <!-- spotify's DockerClient uses slf4j, pipe that to log4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>2.0.2</version>
+            <scope>test</scope>
+            <exclusions>
+            	<exclusion>
+            		<groupId>ch.qos.reload4j</groupId>
+            		<artifactId>reload4j</artifactId>
+            	</exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
+            <scope>test</scope>
+        </dependency>
+
+
 
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -39,6 +71,20 @@
 			<version>1.8.0</version>
 		</dependency>
 
+        <!-- going to run database tests in docker containers now -->
+        <dependency>
+          <groupId>com.spotify</groupId>
+          <artifactId>docker-client</artifactId>
+          <version>7.0.2</version>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        
 		<dependency>
 			<groupId>com.randomnoun.common</groupId>
 			<artifactId>common-public</artifactId>
