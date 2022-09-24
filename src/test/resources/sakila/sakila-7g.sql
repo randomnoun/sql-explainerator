@@ -21,4 +21,4 @@ join (
     group by cus.store_id
 ) B
 on A.store_id = B.store_id
-order by a.store_id;
+order by A.store_id;
