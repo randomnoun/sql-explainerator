@@ -113,7 +113,6 @@ public class SvgShapeVisitor extends ShapeVisitor {
 	
 	@Override
 	public void visit(Shape b) {
-		// TODO Auto-generated method stub
 		String is = "";
 		for (int i=0; i<indent; i++) { is += " "; }
 
@@ -140,13 +139,13 @@ public class SvgShapeVisitor extends ShapeVisitor {
 					s += " data-tooltip-html=\"" + Text.escapeHtml(b.getTooltip()) + "\" />\n";
 					
 				} else if (tooltipType == TooltipTypeEnum.SVG_TITLE) {
+					String unstyledTooltip = b.getTooltip().replaceAll("<[^>]+>", "");
 					s += ">\n" +
-						is + "        <title>" + Text.escapeHtml(b.getTooltip()) + "</title>\n" +
+						is + "        <title>" + unstyledTooltip + "</title>\n" +
 						is + "    </rect>\n";
 				}
 			}
 		} else if (b.getShape().equals("nestedLoop")) {
-			// s += is + "<path fill=\"none\" stroke=\"black\" d=\"M 30,0 L 60 30 L 30 60 L 0 30 L 30 0\"></path>\n";
 			s += is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\">\n";
 			s += is + "    <title>" + Text.escapeHtml(b.getTooltip())+ "</title>\n"; 
 			s += is + "</path>\n";
@@ -234,13 +233,13 @@ public class SvgShapeVisitor extends ShapeVisitor {
 		if (indent==4) {
 			// close off SVG and HTML elements
 			
-			s += "<g id=\"tooltip\" visibility=\"hidden\" >\n" +
-			  "		<foreignObject style=\"overflow: visible;\">\n" +
-			  "		    <body xmlns=\"http://www.w3.org/1999/xhtml\" style=\"margin: 0; padding: 0;\">\n" +
-			  "		      <div style=\"padding: 4px; white-space: pre; display: inline-block; background: white; border: 1px solid black; box-shadow: 2px 2px 2px #333;\">Tooltip</div>\n" +
-			  "		    </body>      \n" +
-			  "		</foreignObject>\n" +
-			  "	</g>\n";
+			s += "<g class=\"tooltip\" visibility=\"hidden\" >\n" +
+			  "    <foreignObject style=\"overflow: visible;\">\n" +
+			  "        <body xmlns=\"http://www.w3.org/1999/xhtml\" style=\"margin: 0; padding: 0;\">\n" +
+			  "            <div class=\"tooltip\">Tooltip</div>\n" +
+			  "        </body>\n" +
+		      "    </foreignObject>\n" +
+			  "</g>\n";
 			
 			if (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS) {
 				if (script == null) { script = getResource("/svg.js"); }
@@ -249,14 +248,14 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			}
 			if (script != null && !asHtml) {
 				s += "    <script type=\"text/ecmascript\"><![CDATA[\n" +
-						script + "\n" +
+					script + "\n" +
 					"    ]]></script>\n";
 			}
 			s += "</svg>\n";
 			if (asHtml) {
 				if (script != null) {
 					s += "<script type=\"text/ecmascript\">\n" +
-							script + "\n" +
+						script + "\n" +
 						"</script>\n";
 				}
 				s += "</body>\n" +

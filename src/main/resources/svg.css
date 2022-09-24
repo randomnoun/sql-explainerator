@@ -34,8 +34,12 @@ svg.sql g.groupingOperation > rect {
 	ry: 9; 
 }
 
+
 svg.sql g.orderingOperation.hasTempTable > rect { 
 	stroke: #bf4040;
+}
+svg.sql g.groupingOperation.hasTempTable > rect { 
+    stroke: #bf8000;
 }
 
 svg.sql g.table.nonUniqueKey > text,
@@ -87,3 +91,23 @@ svg.sql g.tempTableName > text {
 	font-size: 10px; 
 	font-weight: bold; 
 }
+
+svg.sql g.tooltip div.tooltip {
+	font-size: 11px;
+	padding: 4px; 
+	white-space: pre; 
+	display: inline-block; 
+	background: white; 
+	border: 1px solid black; 
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+svg.sql g.tooltip div.tooltip .tableHeader,
+svg.sql g.tooltip div.tooltip .keyIndexHeader,
+svg.sql g.tooltip div.tooltip .costInfoHeader,
+svg.sql g.tooltip div.tooltip .groupingOperationHeader,
+svg.sql g.tooltip div.tooltip .orderingOperationHeader,
+svg.sql g.tooltip div.tooltip .attachedConditionHeader {
+	font-size: 11px;
+	font-weight: bold;
+} 

@@ -11,7 +11,7 @@ function initSqlExplain(e) {
     svg = e.target.ownerDocument;
     svgRoot = e.target; // svg.documentElement
 
-    var tooltip = svg.getElementById('tooltip');
+    var tooltip = svg.querySelector('g.tooltip');
     var tooltipFo = tooltip.getElementsByTagName('foreignObject')[0];
     var tooltipDiv = tooltipFo.getElementsByTagName('div')[0];
     var triggers = svg.querySelectorAll('[data-tooltip-html]');
@@ -22,16 +22,17 @@ function initSqlExplain(e) {
     }
 
     function showTooltip(evt) {
-        var CTM = svgRoot.getScreenCTM();
-        var x = (evt.clientX - CTM.e + 6) / CTM.a;
-        var y = (evt.clientY - CTM.f + 20) / CTM.d;
-        tooltip.setAttributeNS(null, "transform", "translate(" + x + " " + y + ")");
-        tooltip.setAttributeNS(null, "visibility", "visible");
+        var ctm = svgRoot.getScreenCTM();
+        var x = (evt.clientX - ctm.e + 6) / ctm.a;
+        var y = (evt.clientY - ctm.f + 20) / ctm.d;
+        tooltip.setAttributeNS(null, 'transform', 'translate(' + x + ' ' + y + ')');
+        tooltip.setAttributeNS(null, 'visibility', 'visible');
 
-        tooltipDiv.innerHTML = evt.target.getAttributeNS(null, "data-tooltip-html");
+        // tooltipDiv.innerHTML = '<div class="tooltip">' + evt.target.getAttributeNS(null, 'data-tooltip-html') + '</div>';
+        tooltipDiv.innerHTML = evt.target.getAttributeNS(null, 'data-tooltip-html');
     }
 
     function hideTooltip(evt) {
-        tooltip.setAttributeNS(null, "visibility", "hidden");
+        tooltip.setAttributeNS(null, 'visibility', 'hidden');
     }
 }
