@@ -21,16 +21,19 @@ And, of course, because I'm a man, and apparently I live for explaining things.
 Usage text:
 ```
 C:\util\java> java -jar sql-explainerator-0.0.1-with-dependencies.jar --help
-usage: SqlExplainerator [options]
+usage: SqlExplaineratorCli [options]
  -h,--help                  This usage text
  -i,--infile <infile>       input file, or '-' for stdin; default = stdin
  -o,--outfile <outfile>     output file, or '-' for stdout; default = stdout
  -f,--format <format>       output format (svg or html); default = svg
+ -t,--tooltip <tooltip>     tooltip type (none, title, attribute, javascript); default = title
  -j,--jdbc <jdbc>           JDBC connection string
  -u,--username <username>   JDBC username
  -p,--password <password>   JDBC password
  -d,--driver <driver>       JDBC driver class name; default = org.mariadb.jdbc.Driver
  -q,--sql <sql>             SQL to explain
+ -c,--css <css>             alternate css file
+ -s,--script <script>       alternate javascript file
 
 This command will convert a MySQL JSON execution plan to diagram form.
 The execution plan can be supplied via stdin or --infile (1), or can be retrieved from a MySQL
@@ -44,16 +47,16 @@ server (2).
 
 to generate the query plan JSON, then
 
-  SqlExplainerator --infile plan.json --outfile plan.svg
+  SqlExplaineratorCli --infile plan.json --outfile plan.svg
 or
-  cat plan.json | SqlExplainerator > plan.svg
+  cat plan.json | SqlPlainToImageCli > plan.svg
 
 to generate the SVG diagram.
 
 (2) When supplying the SQL against a database instance, you must supply the connection string,
 username, password and sql, e.g.:
 
-  SqlExplainerator --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \
+  SqlExplaineratorCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \
     --sql "SELECT 1 fROM DUAL" --outfile plan.svg
 ```
 

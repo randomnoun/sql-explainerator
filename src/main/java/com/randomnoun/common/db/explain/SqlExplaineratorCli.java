@@ -33,7 +33,8 @@ import com.randomnoun.common.log4j.Log4jCliConfiguration;
 /** All the CLI options */
 public class SqlExplaineratorCli {
 
-	public static void main(String args[]) throws IOException, ParseException, ClassNotFoundException, SQLException {
+	@SuppressWarnings("java:S106") 
+	public static void main(String[] args) throws IOException, ParseException, ClassNotFoundException, SQLException {
 		// create the command line parser
 		CommandLineParser parser = new DefaultParser();
 
@@ -71,7 +72,7 @@ public class SqlExplaineratorCli {
 		  "\n" +
 		  "to generate the query plan JSON, then\n" +
 		  "\n" + 
-		  "  SqlExplainToImageCli --infile plan.json --outfile plan.svg\n" +
+		  "  SqlExplaineratorCli --infile plan.json --outfile plan.svg\n" +
 		  "or\n" +
 		  "  cat plan.json | SqlPlainToImageCli > plan.svg\n" +
 		  "\n" +
@@ -79,7 +80,7 @@ public class SqlExplaineratorCli {
 		  "\n" +
 		  "(2) When supplying the SQL against a database instance, you must supply the connection string, username, password and sql, e.g.:\n" +
 		  "\n" +
-		  "  SqlExplainToImageCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \\\n" +
+		  "  SqlExplaineratorCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \\\n" +
 		  "    --sql \"SELECT 1 fROM DUAL\" --outfile plan.svg" +
 		  "\n";
 	
@@ -114,7 +115,7 @@ public class SqlExplaineratorCli {
 			HelpFormatter formatter = new HelpFormatter();
 		    formatter.setWidth(100);
 		    formatter.setOptionComparator(null);
-		    formatter.printHelp( "SqlExplainToImageCli [options]", null, options, footer );
+		    formatter.printHelp( "SqlExplaineratorCli [options]", null, options, footer );
 		    System.exit(1);
 		}
 		if (!Text.isBlank(tooltipString)) {
@@ -128,66 +129,72 @@ public class SqlExplaineratorCli {
 			FileInputStream fis = new FileInputStream(cssfile);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			StreamUtil.copyStream(fis, baos);
-			css = new String(cssfile);
+			css = baos.toString();
 		}
 		if (!Text.isBlank(scriptfile)) {
-			FileInputStream fis = new FileInputStream(cssfile);
+			FileInputStream fis = new FileInputStream(scriptfile);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			StreamUtil.copyStream(fis, baos);
-			script = new String(cssfile);
+			script = baos.toString();
 		}
 		
 		if (!(format.equals("svg") || format.equals("html"))) {
 			System.err.println("Invalid --format; expected 'svg' or 'html'");
 			System.exit(1);
 		}
+		
+		Reader r = null;
+		PrintWriter pw = null;
+		try {
 			
-		Reader r;
-		PrintWriter pw;
-		
-		if (!Text.isBlank(infile) && !Text.isBlank(sql)) {
-			System.err.println("Cannot supply both --infile and --sql options");
-			System.exit(1);
+			
+			if (!Text.isBlank(infile) && !Text.isBlank(sql)) {
+				System.err.println("Cannot supply both --infile and --sql options");
+				System.exit(1);
+			}
+			if (!Text.isBlank(sql)) {
+				Class.forName(driverName);
+				Connection conn = DriverManager.getConnection(jdbc, username, password);
+				DataSource ds = new SingleConnectionDataSource(conn, false);
+				sql = "EXPLAIN FORMAT=JSON " + sql;
+				JdbcTemplate jt = new JdbcTemplate(ds);
+				String json = jt.queryForObject(sql, String.class);
+				r = new StringReader(json);
+			} else if (Text.isBlank(infile) || infile.equals("-")) {
+				r = new InputStreamReader(System.in);
+			} else {
+				FileInputStream fis = new FileInputStream(infile);
+				r = new InputStreamReader(fis);
+			}
+			
+			if (Text.isBlank(outfile) || outfile.equals("-")) {
+				pw = new PrintWriter(System.out);
+			} else {
+				FileOutputStream fos = new FileOutputStream(outfile);
+				pw = new PrintWriter(fos);
+			}
+			
+			Log4jCliConfiguration lcc = new Log4jCliConfiguration();
+			Properties lprops = new Properties();
+			lprops.put("log4j.rootCategory", "WARN, CONSOLE");
+			lcc.init("[SqlExplaineratorCli]", lprops);
+			
+			SqlExplainerator seti = new SqlExplainerator();
+			seti.parseJson(r, "1.2.3");
+			seti.setTooltipType(tooltipType);
+			seti.setCss(css);
+			seti.setScript(script);
+			if (format.equals("svg")) {
+				seti.writeSvg(pw);
+			} else {
+				seti.writeHtml(pw);
+			}
+			pw.flush();
+			
+		} finally {
+			if (pw!=null) { pw.close(); }
+			if (r!=null) { r.close(); }
 		}
-		if (!Text.isBlank(sql)) {
-			Class.forName(driverName);
-			Connection conn = DriverManager.getConnection(jdbc, username, password);
-			DataSource ds = new SingleConnectionDataSource(conn, false);
-			sql = "EXPLAIN FORMAT=JSON " + sql;
-			JdbcTemplate jt = new JdbcTemplate(ds);
-			String json = jt.queryForObject(sql, String.class);
-			r = new StringReader(json);
-		} else if (Text.isBlank(infile) || infile.equals("-")) {
-			r = new InputStreamReader(System.in);
-		} else {
-			FileInputStream fis = new FileInputStream(infile);
-			r = new InputStreamReader(fis);
-		}
-		
-		if (Text.isBlank(outfile) || outfile.equals("-")) {
-			pw = new PrintWriter(System.out);
-		} else {
-			FileOutputStream fos = new FileOutputStream(outfile);
-			pw = new PrintWriter(fos);
-		}
-		
-		Log4jCliConfiguration lcc = new Log4jCliConfiguration();
-		Properties lprops = new Properties();
-		lprops.put("log4j.rootCategory", "WARN, CONSOLE");
-		lcc.init("[SqlExplainToImageCli]", lprops);
-		
-		SqlExplainerator seti = new SqlExplainerator();
-		seti.parseJson(r, "1.2.3");
-		seti.setTooltipType(tooltipType);
-		seti.setCss(css);
-		seti.setScript(script);
-		if (format.equals("svg")) {
-			seti.writeSvg(pw);
-		} else {
-			seti.writeHtml(pw);
-		}
-		pw.flush();
-		pw.close();
 	}
 	
 }
