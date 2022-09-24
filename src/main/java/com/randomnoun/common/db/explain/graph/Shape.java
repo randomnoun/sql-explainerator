@@ -15,9 +15,9 @@ import com.randomnoun.common.db.explain.visitor.ShapeVisitor;
  */
 public class Shape {
 
-
-	private Shape connectedTo;   // draw a line to this shape
-	private Shape layoutParent;  // X and Y co-ordinates are relative to this shape ( layoutParent can be null, or parent, or parent.parent ... )
+	private Shape layoutParent;  // X and Y co-ordinates are relative to this shape ( layoutParent can be null )
+	
+	private Shape connectedTo;      // draw a line to this shape
 	private Double connectedWeight; // is converted to line width once we know the min/max
 	
 	private int posX = 0; // relative to parent
@@ -33,14 +33,14 @@ public class Shape {
 	private int edgeStartY;
 	
 	private String cssClass;
-	private Color stroke = null; // Color.BLACK;
-	private Color fill = null; // new Color(0, 0, 0, 0);
-	private Color textColor = null; // Color.BLACK;
+	private Color stroke = null; 
+	private Color fill = null; 
+	private Color textColor = null; 
 	private List<String> strokeDashArray = null;
 	private String textAnchor = null;
 	
 	
-	List<Shape> children = new ArrayList<Shape>();
+	List<Shape> children = new ArrayList<>();
 	
 	public void setLabel(String label) {
 		this.label = label;
@@ -56,10 +56,8 @@ public class Shape {
 	public void connectTo(Shape connectedTo, String targetPort) {
 		this.connectedTo = connectedTo;
 		this.targetPort = targetPort;
-	
-		//this.edgeStartX = edgeX;
-		//this.edgeStartY = edgeY;
 	}
+	
 	public void setParentAndPosition(Shape parent, int posX, int posY) {
 		if (this.layoutParent!=null) {
 			throw new IllegalStateException("twice");
@@ -88,7 +86,6 @@ public class Shape {
 			}
 			this.children.add(c);
 		}
-		// this.children.addAll(children);
 	}
 
 	
