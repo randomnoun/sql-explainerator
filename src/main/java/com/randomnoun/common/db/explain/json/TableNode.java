@@ -5,6 +5,7 @@ import java.util.List;
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
 
 public class TableNode extends Node {
+
 	private CostInfoNode costInfo;
 	private AccessTypeEnum accessType;
 	private String tableName;
@@ -12,9 +13,13 @@ public class TableNode extends Node {
 	private List<String> possibleKeys;
 	private List<String> usedKeyParts;
 	private List<String> usedColumns;
+	private List<String> refs;
+	private Long keyLength;
 	private Long rowsExaminedPerScan;
 	private Long rowsProducedPerJoin;
 	private Double filtered;
+	private String attachedCondition;
+	
 	private AttachedSubqueriesNode attachedSubqueries;
 	private MaterialisedFromSubqueryNode materialisedFromSubquery;
 
@@ -109,6 +114,14 @@ public class TableNode extends Node {
 	public void setUsedColumns(List<String> usedColumns) {
 		this.usedColumns = usedColumns;
 	}
+	
+	public List<String> getRefs() {
+		return refs;
+	}
+
+	public void setRefs(List<String> refs) {
+		this.refs = refs;
+	}
 
 	public Double getFiltered() {
 		return filtered;
@@ -117,5 +130,22 @@ public class TableNode extends Node {
 	public void setFiltered(Double filtered) {
 		this.filtered = filtered;
 	}
+
+	public Long getKeyLength() {
+		return keyLength;
+	}
+
+	public void setKeyLength(Long keyLength) {
+		this.keyLength = keyLength;
+	}
+
+	public String getAttachedCondition() {
+		return attachedCondition;
+	}
+
+	public void setAttachedCondition(String attachedCondition) {
+		this.attachedCondition = attachedCondition;
+	}
+
 
 }

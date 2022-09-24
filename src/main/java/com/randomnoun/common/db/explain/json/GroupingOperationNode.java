@@ -2,7 +2,9 @@ package com.randomnoun.common.db.explain.json;
 
 public class GroupingOperationNode extends Node {
 	private boolean usingFilesort = false;
-	private NestedLoopNode nestedLoop;
+	private boolean usingTemporaryTable;
+	private Node groupedNode;
+	
 	public GroupingOperationNode() {
 		super("gouping_operation", false); 
 	}
@@ -12,10 +14,16 @@ public class GroupingOperationNode extends Node {
 	public void setUsingFilesort(boolean usingFilesort) {
 		this.usingFilesort = usingFilesort;
 	}
-	public NestedLoopNode getNestedLoop() {
-		return nestedLoop;
+	public Node getGroupedNode() {
+		return groupedNode;
 	}
-	public void setNestedLoop(NestedLoopNode nestedLoop) {
-		this.nestedLoop = nestedLoop;
+	public void setGroupedNode(Node groupedNode) {
+		this.groupedNode = groupedNode;
+	}
+	public boolean isUsingTemporaryTable() {
+		return usingTemporaryTable;
+	}
+	public void setUsingTemporaryTable(boolean usingTemporaryTable) {
+		this.usingTemporaryTable = usingTemporaryTable;
 	}
 }

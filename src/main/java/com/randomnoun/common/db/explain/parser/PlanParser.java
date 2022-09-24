@@ -31,11 +31,14 @@ import com.randomnoun.common.db.explain.json.UnionResultNode;
 public class PlanParser {
 
 	private QueryBlockNode topNode;
+	String serverVersion;
 	
 	public PlanParser() {
+		// nothing to construct
 	}
 	
 	public void parse(String json, String serverVersion) throws ParseException {
+		this.serverVersion = serverVersion;
 		JSONParser jp = new JSONParser();
 		JSONObject obj = (JSONObject) jp.parse(json);
 		
@@ -49,6 +52,7 @@ public class PlanParser {
 	}
 
 	public void parse(Reader r, String serverVersion) throws ParseException, IOException {
+		this.serverVersion = serverVersion;
 		JSONParser jp = new JSONParser();
 		JSONObject obj = (JSONObject) jp.parse(r);
 		
@@ -206,7 +210,6 @@ public class PlanParser {
 				
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
-		// n.attributes.put("selectId", obj.get("select_id"));
 		if (obj.containsKey("cost_info")) {
 			n.setCostInfo(parseCostInfo((JSONObject) obj.get("cost_info")));
 			n.getAttributes().put("costInfo", n.getCostInfo()); 
@@ -225,7 +228,6 @@ public class PlanParser {
 	private NestedLoopNode parseNestedLoop(JSONArray loopItems) {
 		NestedLoopNode n = new NestedLoopNode();
 		
-		// JSONArray loopItems = (JSONArray) obj.get("nested_loop");
 		for (Object o : loopItems) {
 			JSONObject cobj = (JSONObject) o;
 			if (cobj.containsKey("table")) {
@@ -246,7 +248,6 @@ public class PlanParser {
 				
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
-		// n.attributes.put("selectId", obj.get("select_id"));
 		// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
 		
 		if (obj.containsKey("nested_loop")) {
@@ -257,6 +258,11 @@ public class PlanParser {
 			DuplicatesRemovalNode drn = parseDuplicatesRemoval((JSONObject) obj.get("duplicates_removal"));
 			n.setOrderedNode(drn);
 			n.addChild(drn);
+		} else if (obj.containsKey("grouping_operation")) {
+			Node gon = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
+			n.setOrderedNode(gon);
+			n.addChild(gon);
+			
 		} else {
 			throw new IllegalArgumentException("orderingOperation missing child");
 		}
@@ -266,20 +272,28 @@ public class PlanParser {
 	
 	private GroupingOperationNode parseGroupingOperation(JSONObject obj) {
 		GroupingOperationNode n = new GroupingOperationNode();
-		// n.usingTemporaryTable = (Boolean) obj.get("using_temporary_table");
-		// n.attributes.put("usingTemporaryTable", obj.get("using_temporary_table"));
+		if (obj.containsKey("using_temporary_table")) { n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table")); }
+		n.setUsingFilesort((Boolean) obj.get("using_filesort"));
 		
 		if (obj.containsKey("using_filesort")) { n.setUsingFilesort((Boolean) obj.get("using_filesort")); }
 		
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
-		// n.attributes.put("selectId", obj.get("select_id"));
 		// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
 		
 		if (obj.containsKey("nested_loop")) {
 			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.setNestedLoop(nln);
+			n.setGroupedNode(nln);
 			n.addChild(nln);
+		
+		} else if (obj.containsKey("table")) {
+			Node tn = parseTable((JSONObject) obj.get("table"));
+			n.setGroupedNode(tn);
+			n.addChild(tn);
+			
+		} else {
+			throw new IllegalArgumentException("groupingOperation missing child");
 		}
+		
 		return n;
 	}
 	
@@ -312,17 +326,26 @@ public class PlanParser {
 		n.setPossibleKeys(possibleKeys);
 		n.getAttributes().put("possibleKeys", possibleKeys); // List<String>
 		
-		if (obj.containsKey("key")) { n.setKey((String) obj.get("key")); n.getAttributes().put("key",  obj.get("key")); } // "PRIMARY"
+		if (obj.containsKey("key")) { // "PRIMARY" 
+			n.setKey((String) obj.get("key")); 
+			n.getAttributes().put("key", n.getKey()); 
+		} 
 		
-		List<String> usedKeyParts = parseNameList((JSONArray) obj.get("used_key_parts"));
-		n.setUsedKeyParts(usedKeyParts);
-		n.getAttributes().put("usedKeyParts", usedKeyParts); // List<String>, subset of above ?
+		n.setUsedKeyParts(parseNameList((JSONArray) obj.get("used_key_parts")));
+		n.getAttributes().put("usedKeyParts", n.getUsedKeyParts()); // List<String>, subset of above ?
 		
-		List<String> usedColumns = parseNameList((JSONArray) obj.get("used_columns"));
-		n.setUsedColumns(usedColumns);
-		n.getAttributes().put("usedColumns", usedColumns); // List<String>
-		if (obj.containsKey("key_length")) { n.getAttributes().put("keyLength", Long.parseLong((String) obj.get("key_length"))); }
-		if (obj.containsKey("ref")) { n.getAttributes().put("ref", parseNameList((JSONArray) obj.get("ref"))); } // List<String>
+		n.setUsedColumns(parseNameList((JSONArray) obj.get("used_columns")));
+		n.getAttributes().put("usedColumns", n.getUsedColumns());
+		
+		if (obj.containsKey("key_length")) {
+			n.setKeyLength(Long.parseLong((String) obj.get("key_length")));
+			n.getAttributes().put("keyLength", n.getKeyLength()); 
+		}
+		
+		if (obj.containsKey("ref")) {
+			n.setRefs(parseNameList((JSONArray) obj.get("ref")));
+			n.getAttributes().put("ref", n.getRefs()); 
+		}
 		
 		if (obj.containsKey("rows_examined_per_scan")) { 
 			n.setRowsExaminedPerScan(((Number) obj.get("rows_examined_per_scan")).longValue());
@@ -333,9 +356,8 @@ public class PlanParser {
 			n.getAttributes().put("rows_produced_per_join", n.getRowsProducedPerJoin()); 
 			}
 		if (obj.containsKey("filtered")) {
-			Double filtered = Double.parseDouble((String) obj.get("filtered"));
-			n.setFiltered(filtered);
-			n.getAttributes().put("filtered", filtered); 
+			n.setFiltered(Double.parseDouble((String) obj.get("filtered")));
+			n.getAttributes().put("filtered", n.getFiltered()); 
 		}
 		n.getAttributes().put("index_condition", obj.get("index_condition"));
 		
@@ -344,8 +366,8 @@ public class PlanParser {
 			n.getAttributes().put("costInfo", n.getCostInfo()); 
 		}
 
-		// @TODO object form ?
-		n.getAttributes().put("attachedCondition", obj.get("attached_condition"));
+		n.setAttachedCondition((String) obj.get("attached_condition"));
+		n.getAttributes().put("attachedCondition", n.getAttachedCondition());
 		
 		if (obj.containsKey("attached_subqueries")) {
 			AttachedSubqueriesNode sn = new AttachedSubqueriesNode();
@@ -354,7 +376,7 @@ public class PlanParser {
 			JSONArray qs = (JSONArray) obj.get("attached_subqueries");
 			for (Object o : qs) {
 				JSONObject cobj = (JSONObject) o;
-				QuerySpecificationNode qsn = parseQuerySpecification((JSONObject) cobj);
+				QuerySpecificationNode qsn = parseQuerySpecification(cobj);
 				sn.addQuerySpecification(qsn);
 				sn.addChild(qsn);
 			}

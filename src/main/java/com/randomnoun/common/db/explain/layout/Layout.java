@@ -263,38 +263,55 @@ public class Layout {
 	}
 	
 	private Shape layout(NestedLoopNode n) {
-		List<Shape> nestedLoopShapes = new ArrayList<Shape>();
+		List<Shape> nestedLoopShapes = new ArrayList<>();
 		List<TableNode> qsnList = n.getTables();
 		
+		/* distances:
+		 * 
+		 *                          ^
+		 *                          : topArrow
+		 *                          ^
+		 *    ___________________  / \ 
+		 *    :                    \ /
+		 *    :                     : bottomArrow
+		 * [     ]  tableMargin  [     ]
+		 */
 		List<Shape> tableShapes = qsnList.stream() // reverseStream(qsnList)
-			.map(c -> layout(c))
+			.map(this::layout)
 			.collect(Collectors.toList());
-		List<Integer> tableWidths = tableShapes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
-		List<Integer> tableHeights = tableShapes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+		List<Integer> tableWidths = tableShapes.stream().map(Shape::getWidth).collect(Collectors.toList());
+		List<Integer> tableHeights = tableShapes.stream().map(Shape::getHeight).collect(Collectors.toList());
 		
 		int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
 			+ (tableShapes.size() - 1) * 50; // 50px padding
 		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
-
+		
+		// should get these from the css
+		int topArrow = 0;
+		int bottomArrow = 50;
+		int tableMargin = 50;
+		int diamondWidth = 60;
+		
 		Shape outer = new CShape(); // outer shape
-		outer.setSize(totalWidth, 50 + 60 + 50 + maxHeight); // arrow + diamond + arrow + tables
+		outer.setSize(totalWidth, topArrow + diamondWidth + bottomArrow + maxHeight); // arrow + diamond + arrow + tables
 		
 		int offset = 0;
 		for (int i = 0; i < tableShapes.size(); i++) {
 			Shape tableShape = tableShapes.get(i);
-			tableShape.setParentAndPosition(outer, offset, 50 + 60 + 50);
-			offset += tableWidths.get(i) + 50;
+			tableShape.setParentAndPosition(outer, offset, topArrow + diamondWidth + bottomArrow);
+			offset += tableWidths.get(i) + tableMargin;
 		}
-		 
 				
 		Shape prevNestedLoopShape = null;
+		Shape lastTableShape = null;
+		TableNode qsn = null;
 		for (int i = 1 ; i < tableShapes.size(); i++) {
 			Shape tabelShape = tableShapes.get(i);
 			Shape diamond = new Shape(); 
-			TableNode qsn = n.getTables().get(i);
+			qsn = n.getTables().get(i);
 			diamond.setShape("nestedLoop");
-			diamond.setSize(60, 60); // diamond
-			diamond.setParentAndPosition(outer, tabelShape.getPosX() + tabelShape.getEdgeStartX() - 30, 50); // centered above table beneath it
+			diamond.setSize(diamondWidth, diamondWidth); // diamond
+			diamond.setParentAndPosition(outer, tabelShape.getPosX() + tabelShape.getEdgeStartX() - diamondWidth / 2, topArrow); // centered above table beneath it
 			diamond.setTooltip("nested_loop\n\n" +
 			   (qsn.getCostInfo() == null ? "" : "Prefix Cost: " + qsn.getCostInfo().getPrefixCost()));
 			nestedLoopShapes.add(diamond);
@@ -312,7 +329,7 @@ public class Layout {
 			if (i == tableShapes.size() - 1) {
 				costShape = new CShape(); // label shape
 				costShape.setCssClass("queryCost");
-				costShape.setParentAndPosition(diamond, 40, -10);
+				costShape.setParentAndPosition(diamond, diamondWidth / 2 + 10, -10);
 				costShape.setLabel(qsn == null || qsn.getRowsProducedPerJoin() == null ? "0 rows" :
 					(toSiUnits(qsn.getRowsProducedPerJoin()) + (qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows"))); 
 				costShape.setTextAnchor("start");
@@ -320,7 +337,7 @@ public class Layout {
 			} else {
 				costShape = new CShape(); // label shape
 				costShape.setCssClass("queryCost");
-				costShape.setParentAndPosition(diamond, 65, 15);
+				costShape.setParentAndPosition(diamond, diamondWidth + 5, 15);
 				costShape.setLabel(qsn == null || qsn.getRowsProducedPerJoin() == null ? "0 rows" :
 					(toSiUnits(qsn.getRowsProducedPerJoin()) + (qsn.getRowsProducedPerJoin() == 1 ? " row" : " rows"))); 
 				costShape.setTextAnchor("start");
@@ -338,23 +355,26 @@ public class Layout {
 				prevNestedLoopShape.setEdgeStartPosition(60, 30);
 			}
 			
-			Shape lastTableShape = tableShapes.get(i);
+			lastTableShape = tableShapes.get(i);
 			lastTableShape.setConnectedWeight((double) qsnList.get(i).getRowsExaminedPerScan());
-			lastTableShape.connectTo(diamond, "s"); // "up", 15, 30
-			
+			lastTableShape.connectTo(diamond, "s");
 			prevNestedLoopShape = diamond;
 		}
 
-		outer.setEdgeStartPosition(prevNestedLoopShape.getPosX() + 30, 50); // although the edge has already been drawn, so this is the edge end position really. maybe not. 
+		outer.setConnectedWeight((double) qsn.getRowsProducedPerJoin());
+		outer.setEdgeStartPosition(prevNestedLoopShape.getPosX() + diamondWidth / 2, topArrow); // although the edge has already been drawn, so this is the edge end position really. maybe not. 
 		return outer;
 	}
 			
 	private Shape layout(TableNode n) {
-		
-		int w = (n.getAccessType()==AccessTypeEnum.FULL_TABLE_SCAN ? 100 :
-			(n.getAccessType()==AccessTypeEnum.FULL_INDEX_SCAN ? 100 :
-			(n.getAccessType()==AccessTypeEnum.NON_UNIQUE_KEY ? 150 :
-			(n.getAccessType()==AccessTypeEnum.UNIQUE_KEY ? 125 : 100))));
+		int w;
+		switch (n.getAccessType()) {
+			case FULL_TABLE_SCAN: w = 100; break;
+			case FULL_INDEX_SCAN: w = 100; break;
+			case NON_UNIQUE_KEY: w = 150; break;
+			case UNIQUE_KEY: w = 125; break;
+			default: w = 100;
+		}
 		int lbsh = n.getAccessType()==AccessTypeEnum.CONST ? 45 : 30; // label box shape height
 		int h = lbsh + 30;
 		Shape outer = new CShape(); // outer shape
@@ -421,22 +441,25 @@ public class Layout {
 		Shape labelBoxShape = new Shape(); 
 		labelBoxShape.setParentAndPosition(outer, 0, 0);
 		labelBoxShape.setSize(w, lbsh);
-		// b.setTextColor(Color.WHITE);
 		labelBoxShape.setCssClass("table " + n.getAccessType().getCssClass());
 		labelBoxShape.setLabel(n.getAccessType().getLabel());
 
 		DecimalFormat df = new DecimalFormat("0.##");
 		String tooltip = 
-			n.getTableName() + "\n"  +
+			"<span class=\"tableHeader\">" + n.getTableName() + "</span>\n"  +
 		    "  Access Type: " + n.getAccessType().getJsonValue() + "\n" +
 			"    " + labelBoxShape.getLabel() + "\n" +
 		    "    Cost Hint: " + n.getAccessType().getCostHint() + "\n" +
 			"  Used Columns: " + Text.join(escapeHtml(n.getUsedColumns()), ",\n    ") + "\n" +
 		    "\n" +
-			"Key/Index: " + Text.escapeHtml(n.getKey()) + "\n" +
+			"<span class=\"keyIndexHeader\">Key/Index: " + Text.escapeHtml(n.getKey()) + "</span>\n" +
+		    (n.getRefs() == null ? "" : "  Ref.:" + Text.join(escapeHtml(n.getRefs()), ",\n    ") + "\n") +
 		    "  Used Key Parts: " + Text.join(escapeHtml(n.getUsedKeyParts()), ",\n    ") + "\n" +
 			"  Possible Keys: " + Text.join(escapeHtml(n.getPossibleKeys()), ",\n    ") + "\n" +
 		    "\n" +
+			(n.getAttachedCondition() == null ? "" : 
+				"<span class=\"attachedConditionHeader\">Attached condition:</span>\n" +
+				"  " + Text.escapeHtml(n.getAttachedCondition()) + "\n\n" ) +
 			"Rows Examined per Scan: " + n.getRowsExaminedPerScan() + "\n" +
 		    "Rows Produced per Join: " + n.getRowsProducedPerJoin() + "\n" +
 			(n.getFiltered() == null ? "" : 
@@ -444,16 +467,12 @@ public class Layout {
 		    "  Hint: 100% is best, &lt;= 1% is worst\n" +
 			"  A low value means the query examines a lot of rows that are not returned.\n") +
 			(n.getCostInfo() == null ? "" : 
-		    "Cost Info\n" +
+		    "<span class=\"costInfoHeader\">Cost Info</span>\n" +
 			"  Read: " + df.format(n.getCostInfo().getReadCost()) + "\n" +
 			"  Eval: " + df.format(n.getCostInfo().getEvalCost()) + "\n" +
 			"  Prefix: " + df.format(n.getCostInfo().getPrefixCost()) + "\n" +
 			"  Data Read: " + n.getCostInfo().getDataReadPerJoin());
 		labelBoxShape.setTooltip(tooltip);
-		
-		// and we probably need a formatted tooltip here as well now. joy.
-		
-		    
 		
 		CostInfoNode costInfo = n.getCostInfo();
 		if (costInfo != null) {
@@ -490,7 +509,6 @@ public class Layout {
 
 	private Shape layout(OrderingOperationNode n) {
 
-		// NestedLoopNode nln = n.nestedLoop; // 1 child only
 		Node cn = n.getOrderedNode();
 		
 		// for reasons I'm not entirely sure of, if cn is a DuplicatesRemovalNode ('DISTINCT'), 
@@ -510,7 +528,8 @@ public class Layout {
 		boxShape.setCssClass("orderingOperation" + (n.isUsingTemporaryTable() ? " hasTempTable" : ""));
 		boxShape.setLabel("ORDER"); 
 		boxShape.setSize(80, 40);
-		boxShape.setTooltip("Ordering operation\n\n" +
+		boxShape.setTooltip("<span class=\"orderingOperationHeader\">Ordering operation</span>\n\n" +
+		    (n.isUsingTemporaryTable() ? "Using Temporary Table: true\n" : "") +
 			"Using Filesort: " + n.isUsingFilesort());
 
 		if (n.isUsingTemporaryTable() || n.isUsingFilesort()) { 
@@ -523,7 +542,7 @@ public class Layout {
 			labelShape.setLabel(label); 
 		}
 		
-		if (cn instanceof DuplicatesRemovalNode) {
+		if (cn instanceof DuplicatesRemovalNode || cn instanceof GroupingOperationNode) {
 			// child is left of this node
 			int prevEdgeStartX = child.getEdgeStartX(); // edge would have started in middle of the 'DISTINCT' node
 			int newEdgeStartX = prevEdgeStartX + 40;    // now it starts on the right hand side of it
@@ -540,41 +559,47 @@ public class Layout {
 			
 		} else {
 			outer = new CShape(); // outer shape, nestedLoop exit edge is drawn inside the nestedLoop Shape
-			outer.setSize(w, h + 40);
+			outer.setSize(w, h + 90);
 			outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
 			
 			boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
 
 			child.connectTo(boxShape, "s"); // "up", 50, 30
-			child.setParentAndPosition(outer, 0, 40);
+			child.setParentAndPosition(outer, 0, 90);
 		}
 
 		
-		
+		outer.setConnectedWeight(child.getConnectedWeight());
 		return outer;
 		
 	}
 	private Shape layout(GroupingOperationNode n) {
 		
-		NestedLoopNode nln = n.getNestedLoop(); // 1 child only
-		Shape child = layout(nln);
+		Node nln = n.getGroupedNode(); // 1 child only
 		
+		Shape child = layout(nln);
 		int w = child.getWidth();
 		int h = child.getHeight();
 		
 		Shape outer = new CShape(); // outer shape 
-		outer.setSize(w, h + 40);
+		outer.setSize(w, h + 90);
 		outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
 		
-		Shape label = new Shape(); // label shape
-		label.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
-		label.setCssClass("groupingOperation");
-		label.setLabel("GROUP"); 
-		label.setSize(80, 40);
+		Shape boxShape = new Shape();
+		boxShape.setCssClass("groupingOperation" + (n.isUsingTemporaryTable() ? " hasTempTable" : ""));
+		boxShape.setLabel("GROUP"); 
+		boxShape.setSize(80, 40);
+		boxShape.setTooltip("<span class=\"groupingOperationHeader\">Grouping operation</span>\n\n" +
+		    (n.isUsingTemporaryTable() ? "Using Temporary Table: true\n" : "") +
+			"Using Filesort: " + n.isUsingFilesort());
 
-		child.connectTo(label, "s"); // "up", 50, 30
-		child.setParentAndPosition(outer, 0, 40);
+
+		boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
 		
+		child.connectTo(boxShape, "s"); // "up", 50, 30
+		child.setParentAndPosition(outer, 0, 90);
+		
+		outer.setConnectedWeight(child.getConnectedWeight());
 		return outer;
 		
 		
