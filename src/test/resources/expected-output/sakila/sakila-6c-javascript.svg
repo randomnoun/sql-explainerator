@@ -112,7 +112,8 @@ svg.sql g.tooltip div.tooltip .keyIndexHeader,
 svg.sql g.tooltip div.tooltip .costInfoHeader,
 svg.sql g.tooltip div.tooltip .groupingOperationHeader,
 svg.sql g.tooltip div.tooltip .orderingOperationHeader,
-svg.sql g.tooltip div.tooltip .attachedConditionHeader {
+svg.sql g.tooltip div.tooltip .attachedConditionHeader,
+svg.sql g.tooltip div.tooltip .nestedLoopHeader {
 	font-size: 11px;
 	font-weight: bold;
 } 
@@ -216,9 +217,7 @@ Non-Unique Key Lookup                            </text>
                         </g>
                     </g>
                     <g>
-                    <path fill="white" stroke="black" d="M 225,165 l 30 30 l -30 30 l -30 -30 l 30 -30">
-                        <title>nested_loop&#xa;&#xa;Prefix Cost: 1663.12</title>
-                    </path>
+                    <path fill="white" stroke="black" d="M 225,165 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 1663.12" />
                     <text x="225" y="190" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
                     <text x="225" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
                         <g class="queryCost">
