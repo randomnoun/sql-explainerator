@@ -32,6 +32,10 @@ public class SqlExplaineratorSaqilaTest extends SqlExplaineratorTestBase {
 	public void testSakila2() throws IOException, ParseException {
 		testParser("sakila2/sakila-2-1");
 		testSvg("sakila2/sakila-2-1");
+
+		testParser("sakila2/sakila-2-2");
+		testSvg("sakila2/sakila-2-2");
+
 	}
 	
 	

@@ -222,46 +222,6 @@ public class Layout {
 	}
 	
 	
-	private Shape layout(DuplicatesRemovalNode n) {
-		NestedLoopNode nln = n.getNestedLoop(); // 1 child only
-		Shape child = layout(nln);
-		
-		int w = child.getWidth();
-		int h = child.getHeight();
-		
-		Shape outer = new CShape(); // outer shape
-		outer.setSize(w, 40 + (n.isUsingTemporaryTable() ? 15 : 0) + 45 + h);
-		outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
-
-		Shape container = new CShape(); // container Shape
-		container.setParentAndPosition(outer,  child.getEdgeStartX() - 40, 0);
-		container.setSize(80, n.isUsingTemporaryTable() ? 55 : 40);
-		
-		Shape boxShape = new Shape(); // box shape
-		boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
-		boxShape.setCssClass("duplicatesRemoval");
-		boxShape.setLabel("DISTINCT"); 
-		boxShape.setSize(80, 40);
-		boxShape.setTooltip("Duplicates removal\n\n" +
-			"Using Temporary Table: " + n.isUsingTemporaryTable() + "\n" +
-			"Using Filesort: " + n.isUsingFilesort());
-		
-		if (n.isUsingTemporaryTable()) {
-			Shape ttShape = new CShape(); 
-			ttShape.setLabel("tmp table");
-			ttShape.setSize(80, 10);
-			ttShape.setCssClass("tempTableName");
-			ttShape.setTextAnchor("start");
-			ttShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 45);
-		}
-
-		child.connectTo(container, "s"); // "up", 50, 30
-		child.setParentAndPosition(outer, 0, 40 + (n.isUsingTemporaryTable() ? 15 : 0) + 45 );
-		
-		return outer;
-
-	}
-	
 	private Shape layout(NestedLoopNode n) {
 		List<Shape> nestedLoopShapes = new ArrayList<>();
 		List<TableNode> qsnList = n.getTables();
@@ -506,7 +466,6 @@ public class Layout {
 	}
 
 	private Shape layout(OrderingOperationNode n) {
-
 		Node cn = n.getOrderedNode();
 		
 		// for reasons I'm not entirely sure of, if cn is a DuplicatesRemovalNode ('DISTINCT'), 
@@ -540,11 +499,12 @@ public class Layout {
 			labelShape.setLabel(label); 
 		}
 		
+		outer = new CShape(); 
 		if (cn instanceof DuplicatesRemovalNode || cn instanceof GroupingOperationNode) {
 			// child is left of this node
 			int prevEdgeStartX = child.getEdgeStartX(); // edge would have started in middle of the 'DISTINCT' node
 			int newEdgeStartX = prevEdgeStartX + 40;    // now it starts on the right hand side of it
-			outer = new CShape(); // outer shape, nestedLoop exit edge is drawn inside the nestedLoop Shape
+			
 			child.setEdgeStartX(newEdgeStartX);    
 			child.setEdgeStartY(20);
 			outer.setSize(newEdgeStartX + 160, h); // w + 160
@@ -556,7 +516,7 @@ public class Layout {
 			child.setParentAndPosition(outer, 0, 0);
 			
 		} else {
-			outer = new CShape(); // outer shape, nestedLoop exit edge is drawn inside the nestedLoop Shape
+			// child is under this node
 			outer.setSize(w, h + 90);
 			outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
 			
@@ -569,10 +529,71 @@ public class Layout {
 		
 		outer.setConnectedWeight(child.getConnectedWeight());
 		return outer;
-		
 	}
-	private Shape layout(GroupingOperationNode n) {
+	
+	private Shape layout(DuplicatesRemovalNode n) {
+		Node cn = n.getChildNode(); // 1 child only
 		
+		Shape child = layout(cn);
+		int w = child.getWidth();
+		int h = child.getHeight();
+		
+		Shape boxShape = new Shape(); // box shape
+		Shape container = new CShape(); // container shape ( line connects to container, not box )
+		Shape labelShape = null; 
+		boxShape.setCssClass("duplicatesRemoval");
+		boxShape.setLabel("DISTINCT"); 
+		boxShape.setSize(80, 40);
+		boxShape.setTooltip("Duplicates removal\n\n" +
+			"Using Temporary Table: " + n.isUsingTemporaryTable() + "\n" +
+			"Using Filesort: " + n.isUsingFilesort());
+		container.setSize(80, 40);
+		
+		if (n.isUsingTemporaryTable()) {
+			labelShape = new CShape();
+			labelShape.setLabel("tmp table");
+			labelShape.setSize(80, 10);
+			labelShape.setCssClass("tempTableName");
+			labelShape.setTextAnchor("start");
+			labelShape.setParentAndPosition(boxShape, 0, 45); // child.getEdgeStartX() - 40
+			container.setSize(80, 55);
+		}
+
+		Shape outer = new CShape(); // outer shape
+		if (cn instanceof GroupingOperationNode) {
+			// child is left of this node
+			int prevEdgeStartX = child.getEdgeStartX(); // edge would have started in middle of the 'GROUP' node
+			int newEdgeStartX = prevEdgeStartX + 40;    // now it starts on the right hand side of it
+			child.setEdgeStartX(newEdgeStartX);    
+			child.setEdgeStartY(20);
+
+			outer.setSize(newEdgeStartX + 160, h); // w + 160
+			outer.setEdgeStartPosition(newEdgeStartX + 100, 0);
+
+			boxShape.setParentAndPosition(outer, newEdgeStartX + 60, 0);
+			container.setParentAndPosition(outer, newEdgeStartX + 60, 0);
+
+			child.connectTo(boxShape, "w"); // connects to box, not container
+			child.setParentAndPosition(outer, 0, 0);
+			
+		} else {
+			// child is underneath this node
+			outer.setSize(w, 40 + (n.isUsingTemporaryTable() ? 15 : 0) + 45 + h);
+			outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
+
+			boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
+			container.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
+
+			child.connectTo(container, "s"); 
+			child.setParentAndPosition(outer, 0, 40 + (n.isUsingTemporaryTable() ? 15 : 0) + 45 );
+
+		}
+		
+		return outer;
+
+	}
+	
+	private Shape layout(GroupingOperationNode n) {
 		Node nln = n.getGroupedNode(); // 1 child only
 		
 		Shape child = layout(nln);

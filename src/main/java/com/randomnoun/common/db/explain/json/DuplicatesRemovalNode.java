@@ -5,17 +5,17 @@ public class DuplicatesRemovalNode extends Node {
 	private boolean usingTemporaryTable;
 	private CostInfoNode costInfo;
 	
-	private NestedLoopNode nestedLoop;
+	private Node childNode;
 	
 	public DuplicatesRemovalNode() {
 		super("duplicates_removal", false); 
 	}
 
-	public NestedLoopNode getNestedLoop() {
-		return nestedLoop;
+	public Node getChildNode() {
+		return childNode;
 	}
-	public void setNestedLoop(NestedLoopNode nestedLoop) {
-		this.nestedLoop = nestedLoop;
+	public void setChildNode(Node childNode) {
+		this.childNode = childNode;
 	}
 	public CostInfoNode getCostInfo() {
 		return costInfo;

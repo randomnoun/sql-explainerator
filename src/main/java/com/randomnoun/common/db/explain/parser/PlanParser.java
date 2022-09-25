@@ -205,7 +205,9 @@ public class PlanParser {
 	
 	private DuplicatesRemovalNode parseDuplicatesRemoval(JSONObject obj) {
 		DuplicatesRemovalNode n = new DuplicatesRemovalNode();
-		n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
+		if (obj.containsKey("using_temporary_table") ) {
+			n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
+		}
 		n.setUsingFilesort((Boolean) obj.get("using_filesort"));
 				
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
@@ -217,8 +219,13 @@ public class PlanParser {
 		
 		if (obj.containsKey("nested_loop")) {
 			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.setNestedLoop(nln);
+			n.setChildNode(nln);
 			n.addChild(nln);
+		} else if (obj.containsKey("grouping_operation")) {
+			GroupingOperationNode gon = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
+			n.setChildNode(gon);
+			n.addChild(gon);
+
 		} else {
 			throw new IllegalArgumentException("expected nested_loop");
 		}
