@@ -88,8 +88,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			
 			indent += 4;
 		}
-		for (int i=0; i<indent; i++) { s += " "; }
-		
+		s += " ".repeat(indent);
 		s += "<g" + ( b.getCssClass() == null ? "" : " class=\"" + b.getCssClass() + "\"") + ">\n"; // SVG group
 		pw.print(s);
 	}
@@ -114,15 +113,14 @@ public class SvgShapeVisitor extends ShapeVisitor {
 	
 	@Override
 	public void visit(Shape b) {
-		String is = "";
-		for (int i=0; i<indent; i++) { is += " "; }
+		StringBuilder sb = new StringBuilder();
+		String is = " ".repeat(indent);
 
 		int x = b.getAbsoluteX();
 		int y = b.getAbsoluteY();
 		
-		String s = "";
 		if (b.getShape().equals("rect")) {
-			s += is + "    <rect x=\"" + x + "\"" +
+			sb.append(is + "    <rect x=\"" + x + "\"" +
 			    " y=\"" + y + "\"" +
 			    " width=\"" + b.getWidth() + "\"" +
 			    " height=\"" + b.getHeight() + "\"" +
@@ -130,37 +128,32 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			      (b.getStroke() == null ? "" : "stroke:" + toHex(b.getStroke()) + "; ") +
 				  (b.getFill() == null ? "" : "fill:" + toHex(b.getFill())+ "; ") +
 				  (b.getStrokeDashArray() == null ? "" : "stroke-dasharray:" + Text.escapeHtml(Text.join(b.getStrokeDashArray(), " ")) + "; ") +
-				"\"";
+				"\"");
 			
-			if (b.getTooltip() == null || tooltipType == TooltipTypeEnum.NONE) {
-				s += "/>\n";
-			} else {
-				if (tooltipType == TooltipTypeEnum.ATTRIBUTE || tooltipType == TooltipTypeEnum.ATTRIBUTE_JS) {
-					// replace newlines with &#10; ?
-					s += " data-tooltip-html=\"" + Text.escapeHtml(b.getTooltip()) + "\" />\n";
-					
-				} else if (tooltipType == TooltipTypeEnum.SVG_TITLE) {
-					String unstyledTooltip = b.getTooltip().replaceAll("<[^>]+>", "");
-					s += ">\n" +
-						is + "        <title>" + unstyledTooltip + "</title>\n" +
-						is + "    </rect>\n";
-				}
-			}
+			sb.append(getTooltipSvg(b, is, "rect"));
+
 		} else if (b.getShape().equals("nestedLoop")) {
-			s += is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\">\n";
-			s += is + "    <title>" + Text.escapeHtml(b.getTooltip())+ "</title>\n"; 
-			s += is + "</path>\n";
-			s += is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 25) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">nested</text>\n";
-			s += is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 35) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">loop</text>\n";
+			sb.append(is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\"");
+			sb.append(getTooltipSvg(b, is, "path"));
+			sb.append(is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 25) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">nested</text>\n");
+			sb.append(is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 35) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">loop</text>\n");
 
 		}
+		
 		if (b.getLabel() != null) {
 			// default css for 'text' elements in our svg.css is
 			//   text-anchor: middle; dominant-baseline: middle; font-size: 14px;
 
-			int tx = (b.getTextAnchor() == null ? (b.getWidth()/2) :
-				(b.getTextAnchor().equals("start") ? 0 :
-				(b.getTextAnchor().equals("end") ? b.getWidth() : 0)));
+			int tx;
+			if (b.getTextAnchor() == null) {
+				tx = (b.getWidth() / 2);
+			} else if (b.getTextAnchor().equals("start")) {
+				tx = 0;
+			} else if (b.getTextAnchor().equals("end")) {
+				tx = b.getWidth();
+			} else {
+				tx = 0;
+			}
 					
 			// well this is annoying
 			// see https://stackoverflow.com/questions/16701522/how-to-linebreak-an-svg-text-within-javascript
@@ -168,14 +161,14 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			String[] tspans = b.getLabel().split("\n");
 			int ty = (b.getHeight() - (tspans.length * 14)) / 2 + 7;
 			for (int i = 0; i < tspans.length; i++) {
-				s += is + "    <text x=\"" + (x + tx) + "\"" + // tx
+				sb.append(is + "    <text x=\"" + (x + tx) + "\"" + // tx
 			      " y=\"" + (y + ty + i * 14) + "\"" + // (y + (b.getHeight()/2))
 				  " style=\"" +
 			        (b.getTextColor() == null ? "" : "fill:" + toHex(b.getTextColor())+ ";") + 
 			        (b.getTextAnchor() == null ? "" : "text-anchor:" + b.getTextAnchor() + ";") +
-			      "\">\n";
-				s += Text.escapeHtml(tspans[i]);
-				s += is + "    </text>\n";
+			      "\">\n");
+				sb.append(Text.escapeHtml(tspans[i]));
+				sb.append(is + "    </text>\n");
 			}
 		}
 		if (b.getConnectedTo() != null) {
@@ -197,38 +190,57 @@ public class SvgShapeVisitor extends ShapeVisitor {
 				// adjust end of line to leave room for arrowhead
 				// (arrow is outside the polyline otherwise we don't get a sharp point)
 				int a = (y + b.getEdgeStartY() < lineTo[1]) ? -12 : 12; 
-				s += is + "    <polyline points=\"" + (x + b.getEdgeStartX()) + "," + (y + b.getEdgeStartY()) + " " +
+				sb.append(is + "    <polyline points=\"" + (x + b.getEdgeStartX()) + "," + (y + b.getEdgeStartY()) + " " +
 			      (lineTo[0]) + "," + (lineTo[1] + a) + "\"" +
-				  " style=\"stroke:#000000; stroke-width:" + strokeWeight + ";\" marker-end=\"url(#arrowhead)\"/>\n";
+				  " style=\"stroke:#000000; stroke-width:" + strokeWeight + ";\" marker-end=\"url(#arrowhead)\"/>\n");
 			} else if ((y + b.getEdgeStartY() == lineTo[1])) {
 				int a = (x + b.getEdgeStartX() < lineTo[0]) ? -12 : 12;
-				s += is + "    <polyline points=\"" + (x + b.getEdgeStartX()) + "," + (y + b.getEdgeStartY()) + " " +
+				sb.append(is + "    <polyline points=\"" + (x + b.getEdgeStartX()) + "," + (y + b.getEdgeStartY()) + " " +
 			      (lineTo[0] + a) + "," + (lineTo[1]) + "\"" +
-				  " style=\"stroke:#000000; stroke-width:" + strokeWeight + ";\" marker-end=\"url(#arrowhead)\"/>\n";
+				  " style=\"stroke:#000000; stroke-width:" + strokeWeight + ";\" marker-end=\"url(#arrowhead)\"/>\n");
 			} else if (y + b.getEdgeStartY() > lineTo[1]) { // up and horizontal
 				int a = (x + b.getEdgeStartX() < lineTo[0]) ? -12 : 12; 
-				s += is + "    <polyline points=\"" + (x + b.getEdgeStartX()) + "," + (y + b.getEdgeStartY()) + " " +
+				sb.append(is + "    <polyline points=\"" + (x + b.getEdgeStartX()) + "," + (y + b.getEdgeStartY()) + " " +
 			      (x + b.getEdgeStartX()) + "," + (lineTo[1]) + " " + 
 				  (lineTo[0] + a) + "," + (lineTo[1]) + "\"" +
-				  " style=\"stroke:#000000; stroke-width:" + strokeWeight + "; fill: none;\" marker-end=\"url(#arrowhead)\"/>\n";
+				  " style=\"stroke:#000000; stroke-width:" + strokeWeight + "; fill: none;\" marker-end=\"url(#arrowhead)\"/>\n");
 			} else {  // horizontal and down
 				int a = (y + b.getEdgeStartY() < lineTo[1]) ? -12 : 12;
-				s += is + "    <polyline points=\"" + (x + b.getEdgeStartX()) + "," + (y + b.getEdgeStartY()) + " " +
+				sb.append(is + "    <polyline points=\"" + (x + b.getEdgeStartX()) + "," + (y + b.getEdgeStartY()) + " " +
 			      (lineTo[0]) + "," + (y + b.getEdgeStartY()) + " " + 
 				  (lineTo[0]) + "," + (lineTo[1] + a) + "\"" +
-				  " style=\"stroke:#000000; stroke-width:" + strokeWeight + "; fill: none;\" marker-end=\"url(#arrowhead)\"/>\n";
+				  " style=\"stroke:#000000; stroke-width:" + strokeWeight + "; fill: none;\" marker-end=\"url(#arrowhead)\"/>\n");
 			}
 		}
 		
-		pw.print(s);
+		pw.print(sb.toString());
 		indent += 4;
+	}
+
+	private String getTooltipSvg(Shape b, String is, String tagName) {
+		String s = "";
+		if (b.getTooltip() == null || tooltipType == TooltipTypeEnum.NONE) {
+			s += "/>\n";
+		} else {
+			if (tooltipType == TooltipTypeEnum.ATTRIBUTE || tooltipType == TooltipTypeEnum.ATTRIBUTE_JS) {
+				// replace newlines with &#10; ?
+				s += " data-tooltip-html=\"" + Text.escapeHtml(b.getTooltip()) + "\" />\n";
+				
+			} else if (tooltipType == TooltipTypeEnum.SVG_TITLE) {
+				String unstyledTooltip = b.getTooltip().replaceAll("<[^>]+>", "");
+				s += ">\n" +
+					is + "        <title>" + unstyledTooltip + "</title>\n" +
+					is + "    </" + tagName + ">\n";
+			}
+		}
+		return s;
 	}
 
 	@Override
 	public void postVisit(Shape b) {
 		String s = "";
 		indent -= 4;
-		for (int i=0; i<indent; i++) { s += " "; }
+		s += " ".repeat(indent);
 		s += "</g>\n"; // end SVG group
 		
 		if (indent==4) {
