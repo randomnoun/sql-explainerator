@@ -272,7 +272,7 @@ public class Layout {
 			diamond.setShape("nestedLoop");
 			diamond.setSize(diamondWidth, diamondWidth); // diamond
 			diamond.setParentAndPosition(outer, tabelShape.getPosX() + tabelShape.getEdgeStartX() - diamondWidth / 2, topArrow); // centered above table beneath it
-			diamond.setTooltip("nested_loop\n\n" +
+			diamond.setTooltip("<span class=\"nestedLoopHeader\">nested_loop</span>\n\n" +
 			   (qsn.getCostInfo() == null ? "" : "Prefix Cost: " + qsn.getCostInfo().getPrefixCost()));
 			nestedLoopShapes.add(diamond);
 			
