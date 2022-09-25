@@ -1,0 +1,55 @@
+{
+  "query_block" : {
+    "costInfo" : {
+      "queryCost" : 17759.5
+    } ,
+    "ordering_operation" : {
+      "duplicates_removal" : {
+        "gouping_operation" : {
+          "nestedLoop" : [ {
+              "table" : {
+                "accessType" : "ALL",
+                "costInfo" : {
+                  "dataReadPerJoin" : "341K",
+                  "evalCost" : 59.9,
+                  "prefixCost" : 64.9,
+                  "readCost" : 5.0
+                } ,
+                "filtered" : 100.0,
+                "possibleKeys" : [ "PRIMARY", "idx_last_name" ],
+                "rows_examined_per_scan" : 599,
+                "rows_produced_per_join" : 599,
+                "tableName" : "customer",
+                "usedColumns" : [ "customer_id", "first_name", "last_name" ]
+              } 
+            } , 
+            {
+              "table" : {
+                "accessType" : "ref",
+                "costInfo" : {
+                  "dataReadPerJoin" : "377K",
+                  "evalCost" : 1608.6,
+                  "prefixCost" : 17759.5,
+                  "readCost" : 16086.0
+                } ,
+                "filtered" : 100.0,
+                "key" : "idx_fk_customer_id",
+                "keyLength" : 2,
+                "possibleKeys" : [ "idx_fk_customer_id" ],
+                "ref" : [ "sakila.customer.customer_id" ],
+                "rows_examined_per_scan" : 26,
+                "rows_produced_per_join" : 16085,
+                "tableName" : "payment",
+                "usedColumns" : [ "payment_id", "customer_id", "amount" ],
+                "usedKeyParts" : [ "customer_id" ]
+              } 
+            }  ],
+          "usingFilesort" : false
+        } ,
+        "usingFilesort" : false
+      } ,
+      "usingFilesort" : true
+    } ,
+    "selectId" : 1
+  } 
+} 
