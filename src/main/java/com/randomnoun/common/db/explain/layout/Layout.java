@@ -152,8 +152,8 @@ public class Layout {
 			.map(c -> layout(c, "query_block"))
 			.collect(Collectors.toList());
 		
-		List<Integer> tableWidths = qsShapes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
-		List<Integer> tableHeights = qsShapes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+		List<Integer> tableWidths = qsShapes.stream().map(Shape::getWidth).collect(Collectors.toList());
+		List<Integer> tableHeights = qsShapes.stream().map(Shape::getHeight).collect(Collectors.toList());
 		int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
 			+ (qsShapes.size() - 1) * 50; // 50px padding
 		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
@@ -190,8 +190,8 @@ public class Layout {
 			.map(c -> layout(c, "subquery"))
 			.collect(Collectors.toList());
 		
-		List<Integer> tableWidths = qsShapes.stream().map(b -> b.getWidth()).collect(Collectors.toList());
-		List<Integer> tableHeights = qsShapes.stream().map(b -> b.getHeight()).collect(Collectors.toList());
+		List<Integer> tableWidths = qsShapes.stream().map(Shape::getWidth).collect(Collectors.toList());
+		List<Integer> tableHeights = qsShapes.stream().map(Shape::getHeight).collect(Collectors.toList());
 		int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
 			+ (qsShapes.size() - 1) * 50; // 50px padding
 		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
@@ -208,7 +208,7 @@ public class Layout {
 		attachedSubqueries.setLabel("attached_subqueries");
 		// b.setFill(new Color(0, 0, 0)); // #b3b3b3
 		attachedSubqueries.setSize(w, 30);
-		attachedSubqueries.setStrokeDashArray(Arrays.asList(new String[] { "2" }));
+		attachedSubqueries.setStrokeDashArray(Arrays.asList("2"));
 		int offset = (w - totalWidth) / 2;
 		for (Shape qsShape : qsShapes) {
 			qsShape.setParentAndPosition(outer, offset, 50);
@@ -230,7 +230,7 @@ public class Layout {
 		int h = child.getHeight();
 		
 		Shape outer = new CShape(); // outer shape
-		outer.setSize(w, h + 10 + 45);
+		outer.setSize(w, 40 + (n.isUsingTemporaryTable() ? 15 : 0) + 45 + h);
 		outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
 
 		Shape container = new CShape(); // container Shape
@@ -256,7 +256,7 @@ public class Layout {
 		}
 
 		child.connectTo(container, "s"); // "up", 50, 30
-		child.setParentAndPosition(outer, 0, 40);
+		child.setParentAndPosition(outer, 0, 40 + (n.isUsingTemporaryTable() ? 15 : 0) + 45 );
 		
 		return outer;
 
@@ -402,8 +402,6 @@ public class Layout {
 			RangeShapeVisitor rv = new RangeShapeVisitor();
 			qbShape.traverse(rv);
 			logger.info("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
-			// qb.posX -= rv.getMinX();
-			// qb.posY -= rv.getMinY();
 
 			h = 80 + qbShape.getHeight() + 20; // 20px padding bottom
 			w = Math.max(w, qbShape.getWidth() + 20); // 10px padding left and right
@@ -411,7 +409,7 @@ public class Layout {
 			Shape box = new CShape();
 			box.setCssClass("dotted"); // dotted line Shape
 			box.setStroke(new Color(140, 140, 140)); // #8c8c8c
-			box.setStrokeDashArray(Arrays.asList(new String[] { "4" }));
+			box.setStrokeDashArray(Arrays.asList("4"));
 			box.setParentAndPosition(outer, 0, 0);
 			box.setSize(w, h);
 			
@@ -635,8 +633,6 @@ public class Layout {
 			throw new IllegalStateException("unexpected class " + node.getClass().getName() + " in layout()");
 		}
 		return shape;
-		
-		// throw new UnsupportedOperationException("layout for node " + n.getClass().getName() + " not implemented");
 	}
 	
 	

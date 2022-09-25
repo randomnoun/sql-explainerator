@@ -9,7 +9,7 @@ public class SqlExplaineratorSaqilaTest extends SqlExplaineratorTestBase {
 
 	Logger logger = Logger.getLogger(SqlExplaineratorSaqilaTest.class);
 	
-	public void testSomeThings() throws IOException, ParseException {
+	public void testSakilaExamQuestions() throws IOException, ParseException {
 		testParser("sakila/sakila-1");
 		testSvg("sakila/sakila-1");
 
@@ -28,5 +28,11 @@ public class SqlExplaineratorSaqilaTest extends SqlExplaineratorTestBase {
 		testParser("sakila/sakila-7g");
 		testSvg("sakila/sakila-7g");
 	}
+	
+	public void testSakila2() throws IOException, ParseException {
+		testParser("sakila2/sakila-2-1");
+		testSvg("sakila2/sakila-2-1");
+	}
+	
 	
 }
