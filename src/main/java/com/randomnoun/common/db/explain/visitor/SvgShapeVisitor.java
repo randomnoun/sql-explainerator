@@ -54,6 +54,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 
 			// svg arrowhead modified from http://thenewcode.com/1068/Making-Arrows-in-SVG
 			// and https://stackoverflow.com/questions/13626748/how-to-prevent-a-svg-marker-arrow-head-to-inherit-paths-stroke-width
+			String onload = (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? " onload=\"initSqlExplain(evt)\"" : "");
 			
 			s = (asHtml ? "<!DOCTYPE html>\n" +
 			  "<html>\n" +
@@ -63,7 +64,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			  "</style>\n" +
 			  "</head>\n" +
 			  "<body>\n" +
-			  "<svg width=\"" + w + "\" height=\"" + h + "\" class=\"sql\"" + (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? " onload=\"initSqlExplain(evt)\"" : "") +">\n" +
+			  "<svg width=\"" + w + "\" height=\"" + h + "\" class=\"sql\"" + onload + ">\n" +
 			  "  <defs>\n" + 
 			  "    <marker id=\"arrowhead\" markerWidth=\"12\" markerHeight=\"7\" refX=\"0\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\">\n" +
 			  "      <polygon points=\"0 0, 12 3.5, 0 7\" />\n" +
@@ -74,7 +75,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			  "<?xml version=\"1.0\" standalone=\"no\"?>\n" +
 			  "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n" +
 			  "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\"\n" +
-			  "  width=\"" + w + "\" height=\"" + h + "\" class=\"sql\"" + (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS ? " onload=\"initSqlExplain(evt)\"" : "") + ">\n" +
+			  "  width=\"" + w + "\" height=\"" + h + "\" class=\"sql\"" + onload + ">\n" +
 			  "  <defs>\n" +
 			  "    <style type=\"text/css\"><![CDATA[" +
 			  css +

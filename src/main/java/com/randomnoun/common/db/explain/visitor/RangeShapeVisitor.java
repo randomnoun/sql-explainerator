@@ -10,14 +10,19 @@ import com.randomnoun.common.db.explain.graph.Shape;
  */
 public class RangeShapeVisitor extends ShapeVisitor {
 	
-	int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
-	int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+	int minX = Integer.MAX_VALUE;
+	int minY = Integer.MAX_VALUE;
+	int maxX = Integer.MIN_VALUE;
+	int maxY = Integer.MIN_VALUE;
 	
 	double minWeight = Double.MAX_VALUE;
 	double maxWeight = Double.MIN_VALUE;
 	
 	public RangeShapeVisitor() {
+		// construct a new RangeShapeVisitor
 	}
+	
+	@Override
 	public void visit(Shape b) {
 		int x = b.getAbsoluteX();
 		int y = b.getAbsoluteY();
