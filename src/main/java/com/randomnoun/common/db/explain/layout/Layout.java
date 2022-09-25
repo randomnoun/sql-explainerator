@@ -321,7 +321,9 @@ public class Layout {
 			prevNestedLoopShape = diamond;
 		}
 
-		outer.setConnectedWeight((double) qsn.getRowsProducedPerJoin());
+		if (qsn != null && qsn.getRowsProducedPerJoin() != null) { 
+			outer.setConnectedWeight((double) qsn.getRowsProducedPerJoin()); 
+		}
 		outer.setEdgeStartPosition(prevNestedLoopShape.getPosX() + diamondWidth / 2, topArrow); // although the edge has already been drawn, so this is the edge end position really. maybe not. 
 		return outer;
 	}
