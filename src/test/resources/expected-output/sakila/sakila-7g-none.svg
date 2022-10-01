@@ -15,7 +15,7 @@ svg.sql {
     font-size: 14px;
 }
 svg.sql rect {
-    stroke: black;
+    /* stroke: black; */
     fill: transparent;
 }       
 svg.sql text {
@@ -23,10 +23,14 @@ svg.sql text {
     dominant-baseline: middle;
     fill: black;
 }
-svg.sql g.queryBlock.topNode > rect { 
+svg.sql g.queryBlock > rect {
+    stroke: black;
+}
+svg.sql g.queryBlock.topNode > rect {
 	fill: #cccccc; 
 }
 svg.sql g.union > rect { 
+	stroke: black;
 	fill: #b3b3b3; 
 }
 
@@ -47,6 +51,7 @@ svg.sql g.groupingOperation.hasTempTable > rect {
     stroke: #bf8000;
 }
 
+
 svg.sql g.table.nonUniqueKey > text,
 svg.sql g.table.uniqueKey > text,
 svg.sql g.table.fullTableScan > text,
@@ -54,6 +59,10 @@ svg.sql g.table.fullIndexScan > text,
 svg.sql g.table.singleRow > text { 
     fill: white;
     font-size: 11px; 
+}
+
+svg.sql g.table > rect { 
+    stroke: black; 
 }
 
 svg.sql g.table.nonUniqueKey > rect { 
@@ -107,6 +116,19 @@ svg.sql g.tooltip div.tooltip {
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
 
+svg.sql g.container > rect {
+    stroke: transparent;
+}
+svg.sql g.materialisedSubqueryBorder > rect {
+	stroke: #8c8c8c;
+	stroke-dasharray: 4;
+}
+svg.sql .materialisedTableName > rect {
+	fill: #e8e8e8;
+	
+}
+
+
 svg.sql g.tooltip div.tooltip .tableHeader,
 svg.sql g.tooltip div.tooltip .keyIndexHeader,
 svg.sql g.tooltip div.tooltip .costInfoHeader,
@@ -123,19 +145,19 @@ svg.sql g.tooltip div.tooltip .nestedLoopHeader {
     </marker>
   </defs>
     <g>
-        <rect x="0" y="15" width="995" height="620" style="stroke:transparent; "/>
+        <rect x="0" y="15" width="995" height="620" style=""/>
         <g class="queryBlock topNode">
             <rect x="785" y="15" width="100" height="30" style=""/>
             <text x="835" y="30" style="">
 query_block            </text>
             <g class="lhsQueryCost">
-                <rect x="785" y="0" width="497" height="10" style="stroke:transparent; "/>
+                <rect x="785" y="0" width="497" height="10" style=""/>
                 <text x="785" y="5" style="text-anchor:start;">
 Query cost: 116.04                </text>
             </g>
         </g>
         <g>
-            <rect x="0" y="75" width="995" height="560" style="stroke:transparent; "/>
+            <rect x="0" y="75" width="995" height="560" style=""/>
             <polyline points="835,75 835,57" style="stroke:#000000; stroke-width:1.059686645113156;" marker-end="url(#arrowhead)"/>
             <g class="orderingOperation">
                 <rect x="795" y="75" width="80" height="40" style=""/>
@@ -143,18 +165,18 @@ Query cost: 116.04                </text>
 ORDER                </text>
             </g>
             <g>
-                <rect x="0" y="165" width="995" height="470" style="stroke:transparent; "/>
+                <rect x="0" y="165" width="995" height="470" style=""/>
                 <polyline points="835,165 835,127" style="stroke:#000000; stroke-width:1.059686645113156;" marker-end="url(#arrowhead)"/>
                 <g>
-                    <rect x="0" y="275" width="100" height="60" style="stroke:transparent; "/>
+                    <rect x="0" y="275" width="100" height="60" style=""/>
                     <polyline points="50,275 50,195 170,195" style="stroke:#000000; stroke-width:1.0001865207659786; fill: none;" marker-end="url(#arrowhead)"/>
                     <g class="tableName">
-                        <rect x="0" y="307" width="100" height="14" style="stroke:transparent; "/>
+                        <rect x="0" y="307" width="100" height="14" style=""/>
                         <text x="50" y="314" style="">
 sto                        </text>
                     </g>
                     <g class="tableKey">
-                        <rect x="0" y="321" width="100" height="14" style="stroke:transparent; "/>
+                        <rect x="0" y="321" width="100" height="14" style=""/>
                         <text x="50" y="328" style="">
 PRIMARY                        </text>
                     </g>
@@ -164,26 +186,26 @@ PRIMARY                        </text>
 Full Index Scan                        </text>
                     </g>
                     <g class="lhsQueryCost">
-                        <rect x="0" y="260" width="50" height="10" style="stroke:transparent; "/>
+                        <rect x="0" y="260" width="50" height="10" style=""/>
                         <text x="0" y="265" style="text-anchor:start;">
 0.45                        </text>
                     </g>
                     <g class="rhsQueryCost">
-                        <rect x="50" y="260" width="50" height="10" style="stroke:transparent; "/>
+                        <rect x="50" y="260" width="50" height="10" style=""/>
                         <text x="100" y="265" style="text-anchor:end;">
 2 rows                        </text>
                     </g>
                 </g>
                 <g>
-                    <rect x="150" y="275" width="125" height="60" style="stroke:transparent; "/>
+                    <rect x="150" y="275" width="125" height="60" style=""/>
                     <polyline points="212,275 212,237" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
                     <g class="tableName">
-                        <rect x="150" y="307" width="125" height="14" style="stroke:transparent; "/>
+                        <rect x="150" y="307" width="125" height="14" style=""/>
                         <text x="212" y="314" style="">
 adr                        </text>
                     </g>
                     <g class="tableKey">
-                        <rect x="150" y="321" width="125" height="14" style="stroke:transparent; "/>
+                        <rect x="150" y="321" width="125" height="14" style=""/>
                         <text x="212" y="328" style="">
 PRIMARY                        </text>
                     </g>
@@ -193,26 +215,26 @@ PRIMARY                        </text>
 Unique Key Lookup                        </text>
                     </g>
                     <g class="lhsQueryCost">
-                        <rect x="150" y="260" width="62" height="10" style="stroke:transparent; "/>
+                        <rect x="150" y="260" width="62" height="10" style=""/>
                         <text x="150" y="265" style="text-anchor:start;">
 1.6                        </text>
                     </g>
                     <g class="rhsQueryCost">
-                        <rect x="212" y="260" width="62" height="10" style="stroke:transparent; "/>
+                        <rect x="212" y="260" width="62" height="10" style=""/>
                         <text x="274" y="265" style="text-anchor:end;">
 1 row                        </text>
                     </g>
                 </g>
                 <g>
-                    <rect x="325" y="275" width="125" height="60" style="stroke:transparent; "/>
+                    <rect x="325" y="275" width="125" height="60" style=""/>
                     <polyline points="387,275 387,237" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
                     <g class="tableName">
-                        <rect x="325" y="307" width="125" height="14" style="stroke:transparent; "/>
+                        <rect x="325" y="307" width="125" height="14" style=""/>
                         <text x="387" y="314" style="">
 cit                        </text>
                     </g>
                     <g class="tableKey">
-                        <rect x="325" y="321" width="125" height="14" style="stroke:transparent; "/>
+                        <rect x="325" y="321" width="125" height="14" style=""/>
                         <text x="387" y="328" style="">
 PRIMARY                        </text>
                     </g>
@@ -222,26 +244,26 @@ PRIMARY                        </text>
 Unique Key Lookup                        </text>
                     </g>
                     <g class="lhsQueryCost">
-                        <rect x="325" y="260" width="62" height="10" style="stroke:transparent; "/>
+                        <rect x="325" y="260" width="62" height="10" style=""/>
                         <text x="325" y="265" style="text-anchor:start;">
 0.7                        </text>
                     </g>
                     <g class="rhsQueryCost">
-                        <rect x="387" y="260" width="62" height="10" style="stroke:transparent; "/>
+                        <rect x="387" y="260" width="62" height="10" style=""/>
                         <text x="449" y="265" style="text-anchor:end;">
 1 row                        </text>
                     </g>
                 </g>
                 <g>
-                    <rect x="500" y="275" width="125" height="60" style="stroke:transparent; "/>
+                    <rect x="500" y="275" width="125" height="60" style=""/>
                     <polyline points="562,275 562,237" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
                     <g class="tableName">
-                        <rect x="500" y="307" width="125" height="14" style="stroke:transparent; "/>
+                        <rect x="500" y="307" width="125" height="14" style=""/>
                         <text x="562" y="314" style="">
 cou                        </text>
                     </g>
                     <g class="tableKey">
-                        <rect x="500" y="321" width="125" height="14" style="stroke:transparent; "/>
+                        <rect x="500" y="321" width="125" height="14" style=""/>
                         <text x="562" y="328" style="">
 PRIMARY                        </text>
                     </g>
@@ -251,44 +273,44 @@ PRIMARY                        </text>
 Unique Key Lookup                        </text>
                     </g>
                     <g class="lhsQueryCost">
-                        <rect x="500" y="260" width="62" height="10" style="stroke:transparent; "/>
+                        <rect x="500" y="260" width="62" height="10" style=""/>
                         <text x="500" y="265" style="text-anchor:start;">
 0.7                        </text>
                     </g>
                     <g class="rhsQueryCost">
-                        <rect x="562" y="260" width="62" height="10" style="stroke:transparent; "/>
+                        <rect x="562" y="260" width="62" height="10" style=""/>
                         <text x="624" y="265" style="text-anchor:end;">
 1 row                        </text>
                     </g>
                 </g>
                 <g>
-                    <rect x="675" y="275" width="320" height="360" style="stroke:transparent; "/>
+                    <rect x="675" y="275" width="320" height="360" style=""/>
                     <polyline points="835,275 835,237" style="stroke:#000000; stroke-width:1.0296568017905994;" marker-end="url(#arrowhead)"/>
-                    <g class="dotted">
-                        <rect x="675" y="275" width="320" height="360" style="stroke:#8c8c8c; stroke-dasharray:4; "/>
+                    <g class="materialisedSubqueryBorder">
+                        <rect x="675" y="275" width="320" height="360" style=""/>
                     </g>
                     <g>
-                        <rect x="685" y="360" width="300" height="260" style="stroke:transparent; "/>
+                        <rect x="685" y="360" width="300" height="260" style=""/>
                         <g>
-                            <rect x="685" y="360" width="300" height="260" style="stroke:transparent; "/>
+                            <rect x="685" y="360" width="300" height="260" style=""/>
                             <g class="groupingOperation">
                                 <rect x="870" y="360" width="80" height="40" style=""/>
                                 <text x="910" y="380" style="">
 GROUP                                </text>
                             </g>
                             <g>
-                                <rect x="685" y="450" width="300" height="170" style="stroke:transparent; "/>
+                                <rect x="685" y="450" width="300" height="170" style=""/>
                                 <polyline points="910,450 910,412" style="stroke:#000000; stroke-width:4.0;" marker-end="url(#arrowhead)"/>
                                 <g>
-                                    <rect x="685" y="560" width="100" height="60" style="stroke:transparent; "/>
+                                    <rect x="685" y="560" width="100" height="60" style=""/>
                                     <polyline points="735,560 735,480 868,480" style="stroke:#000000; stroke-width:1.11153941805521; fill: none;" marker-end="url(#arrowhead)"/>
                                     <g class="tableName">
-                                        <rect x="685" y="592" width="100" height="14" style="stroke:transparent; "/>
+                                        <rect x="685" y="592" width="100" height="14" style=""/>
                                         <text x="735" y="599" style="">
 cus                                        </text>
                                     </g>
                                     <g class="tableKey">
-                                        <rect x="685" y="606" width="100" height="14" style="stroke:transparent; "/>
+                                        <rect x="685" y="606" width="100" height="14" style=""/>
                                         <text x="735" y="613" style="">
 idx_fk_store_id                                        </text>
                                     </g>
@@ -298,26 +320,26 @@ idx_fk_store_id                                        </text>
 Full Index Scan                                        </text>
                                     </g>
                                     <g class="lhsQueryCost">
-                                        <rect x="685" y="545" width="50" height="10" style="stroke:transparent; "/>
+                                        <rect x="685" y="545" width="50" height="10" style=""/>
                                         <text x="685" y="550" style="text-anchor:start;">
 61.15                                        </text>
                                     </g>
                                     <g class="rhsQueryCost">
-                                        <rect x="735" y="545" width="50" height="10" style="stroke:transparent; "/>
+                                        <rect x="735" y="545" width="50" height="10" style=""/>
                                         <text x="785" y="550" style="text-anchor:end;">
 599 rows                                        </text>
                                     </g>
                                 </g>
                                 <g>
-                                    <rect x="835" y="560" width="150" height="60" style="stroke:transparent; "/>
+                                    <rect x="835" y="560" width="150" height="60" style=""/>
                                     <polyline points="910,560 910,522" style="stroke:#000000; stroke-width:1.0046630191494652;" marker-end="url(#arrowhead)"/>
                                     <g class="tableName">
-                                        <rect x="835" y="592" width="150" height="14" style="stroke:transparent; "/>
+                                        <rect x="835" y="592" width="150" height="14" style=""/>
                                         <text x="910" y="599" style="">
 pay                                        </text>
                                     </g>
                                     <g class="tableKey">
-                                        <rect x="835" y="606" width="150" height="14" style="stroke:transparent; "/>
+                                        <rect x="835" y="606" width="150" height="14" style=""/>
                                         <text x="910" y="613" style="">
 idx_fk_customer_id                                        </text>
                                     </g>
@@ -327,12 +349,12 @@ idx_fk_customer_id                                        </text>
 Non-Unique Key Lookup                                        </text>
                                     </g>
                                     <g class="lhsQueryCost">
-                                        <rect x="835" y="545" width="75" height="10" style="stroke:transparent; "/>
+                                        <rect x="835" y="545" width="75" height="10" style=""/>
                                         <text x="835" y="550" style="text-anchor:start;">
 5630.1                                        </text>
                                     </g>
                                     <g class="rhsQueryCost">
-                                        <rect x="910" y="545" width="75" height="10" style="stroke:transparent; "/>
+                                        <rect x="910" y="545" width="75" height="10" style=""/>
                                         <text x="985" y="550" style="text-anchor:end;">
 26 rows                                        </text>
                                     </g>
@@ -342,12 +364,12 @@ Non-Unique Key Lookup                                        </text>
                                 <text x="910" y="475" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
                                 <text x="910" y="485" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
                                     <g class="queryCost">
-                                        <rect x="870" y="435" width="40" height="10" style="stroke:transparent; "/>
+                                        <rect x="870" y="435" width="40" height="10" style=""/>
                                         <text x="870" y="440" style="text-anchor:start;">
 5691.25                                        </text>
                                     </g>
                                     <g class="queryCost">
-                                        <rect x="920" y="440" width="25" height="10" style="stroke:transparent; "/>
+                                        <rect x="920" y="440" width="25" height="10" style=""/>
                                         <text x="920" y="445" style="text-anchor:start;">
 16.09K rows                                        </text>
                                     </g>
@@ -356,12 +378,12 @@ Non-Unique Key Lookup                                        </text>
                         </g>
                     </g>
                     <g class="materialisedTableName">
-                        <rect x="675" y="307" width="320" height="20" style="stroke:transparent; fill:#e8e8e8; "/>
+                        <rect x="675" y="307" width="320" height="20" style=""/>
                         <text x="835" y="317" style="">
 B (materialised)                        </text>
                     </g>
                     <g class="tableKey">
-                        <rect x="675" y="327" width="320" height="14" style="stroke:transparent; "/>
+                        <rect x="675" y="327" width="320" height="14" style=""/>
                         <text x="835" y="334" style="">
 &lt;auto_key0&gt;                        </text>
                     </g>
@@ -371,12 +393,12 @@ B (materialised)                        </text>
 Non-Unique Key Lookup                        </text>
                     </g>
                     <g class="lhsQueryCost">
-                        <rect x="675" y="260" width="160" height="10" style="stroke:transparent; "/>
+                        <rect x="675" y="260" width="160" height="10" style=""/>
                         <text x="675" y="265" style="text-anchor:start;">
 112.59                        </text>
                     </g>
                     <g class="rhsQueryCost">
-                        <rect x="835" y="260" width="160" height="10" style="stroke:transparent; "/>
+                        <rect x="835" y="260" width="160" height="10" style=""/>
                         <text x="995" y="265" style="text-anchor:end;">
 160 rows                        </text>
                     </g>
@@ -387,12 +409,12 @@ Non-Unique Key Lookup                        </text>
                 <text x="212" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
                     <polyline points="242,195 345,195" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
                     <g class="queryCost">
-                        <rect x="172" y="150" width="40" height="10" style="stroke:transparent; "/>
+                        <rect x="172" y="150" width="40" height="10" style=""/>
                         <text x="172" y="155" style="text-anchor:start;">
 2.05                        </text>
                     </g>
                     <g class="queryCost">
-                        <rect x="247" y="180" width="25" height="10" style="stroke:transparent; "/>
+                        <rect x="247" y="180" width="25" height="10" style=""/>
                         <text x="247" y="185" style="text-anchor:start;">
 2 rows                        </text>
                     </g>
@@ -403,12 +425,12 @@ Non-Unique Key Lookup                        </text>
                 <text x="387" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
                     <polyline points="417,195 520,195" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
                     <g class="queryCost">
-                        <rect x="347" y="150" width="40" height="10" style="stroke:transparent; "/>
+                        <rect x="347" y="150" width="40" height="10" style=""/>
                         <text x="347" y="155" style="text-anchor:start;">
 2.75                        </text>
                     </g>
                     <g class="queryCost">
-                        <rect x="422" y="180" width="25" height="10" style="stroke:transparent; "/>
+                        <rect x="422" y="180" width="25" height="10" style=""/>
                         <text x="422" y="185" style="text-anchor:start;">
 2 rows                        </text>
                     </g>
@@ -419,12 +441,12 @@ Non-Unique Key Lookup                        </text>
                 <text x="562" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
                     <polyline points="592,195 793,195" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
                     <g class="queryCost">
-                        <rect x="522" y="150" width="40" height="10" style="stroke:transparent; "/>
+                        <rect x="522" y="150" width="40" height="10" style=""/>
                         <text x="522" y="155" style="text-anchor:start;">
 3.45                        </text>
                     </g>
                     <g class="queryCost">
-                        <rect x="597" y="180" width="25" height="10" style="stroke:transparent; "/>
+                        <rect x="597" y="180" width="25" height="10" style=""/>
                         <text x="597" y="185" style="text-anchor:start;">
 2 rows                        </text>
                     </g>
@@ -434,12 +456,12 @@ Non-Unique Key Lookup                        </text>
                 <text x="835" y="190" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
                 <text x="835" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
                     <g class="queryCost">
-                        <rect x="795" y="150" width="40" height="10" style="stroke:transparent; "/>
+                        <rect x="795" y="150" width="40" height="10" style=""/>
                         <text x="795" y="155" style="text-anchor:start;">
 116.05                        </text>
                     </g>
                     <g class="queryCost">
-                        <rect x="845" y="155" width="25" height="10" style="stroke:transparent; "/>
+                        <rect x="845" y="155" width="25" height="10" style=""/>
                         <text x="845" y="160" style="text-anchor:start;">
 321 rows                        </text>
                     </g>

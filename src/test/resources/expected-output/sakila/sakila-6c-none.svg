@@ -15,7 +15,7 @@ svg.sql {
     font-size: 14px;
 }
 svg.sql rect {
-    stroke: black;
+    /* stroke: black; */
     fill: transparent;
 }       
 svg.sql text {
@@ -23,10 +23,14 @@ svg.sql text {
     dominant-baseline: middle;
     fill: black;
 }
-svg.sql g.queryBlock.topNode > rect { 
+svg.sql g.queryBlock > rect {
+    stroke: black;
+}
+svg.sql g.queryBlock.topNode > rect {
 	fill: #cccccc; 
 }
 svg.sql g.union > rect { 
+	stroke: black;
 	fill: #b3b3b3; 
 }
 
@@ -47,6 +51,7 @@ svg.sql g.groupingOperation.hasTempTable > rect {
     stroke: #bf8000;
 }
 
+
 svg.sql g.table.nonUniqueKey > text,
 svg.sql g.table.uniqueKey > text,
 svg.sql g.table.fullTableScan > text,
@@ -54,6 +59,10 @@ svg.sql g.table.fullIndexScan > text,
 svg.sql g.table.singleRow > text { 
     fill: white;
     font-size: 11px; 
+}
+
+svg.sql g.table > rect { 
+    stroke: black; 
 }
 
 svg.sql g.table.nonUniqueKey > rect { 
@@ -107,6 +116,19 @@ svg.sql g.tooltip div.tooltip {
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
 
+svg.sql g.container > rect {
+    stroke: transparent;
+}
+svg.sql g.materialisedSubqueryBorder > rect {
+	stroke: #8c8c8c;
+	stroke-dasharray: 4;
+}
+svg.sql .materialisedTableName > rect {
+	fill: #e8e8e8;
+	
+}
+
+
 svg.sql g.tooltip div.tooltip .tableHeader,
 svg.sql g.tooltip div.tooltip .keyIndexHeader,
 svg.sql g.tooltip div.tooltip .costInfoHeader,
@@ -123,32 +145,32 @@ svg.sql g.tooltip div.tooltip .nestedLoopHeader {
     </marker>
   </defs>
     <g>
-        <rect x="0" y="15" width="425" height="320" style="stroke:transparent; "/>
+        <rect x="0" y="15" width="425" height="320" style=""/>
         <g class="queryBlock topNode">
             <rect x="315" y="15" width="100" height="30" style=""/>
             <text x="365" y="30" style="">
 query_block            </text>
             <g class="lhsQueryCost">
-                <rect x="315" y="0" width="212" height="10" style="stroke:transparent; "/>
+                <rect x="315" y="0" width="212" height="10" style=""/>
                 <text x="315" y="5" style="text-anchor:start;">
 Query cost: 1663.12                </text>
             </g>
         </g>
         <g>
-            <rect x="0" y="75" width="425" height="260" style="stroke:transparent; "/>
+            <rect x="0" y="75" width="425" height="260" style=""/>
             <polyline points="365,75 365,57" style="stroke:#000000; stroke-width:4.0;" marker-end="url(#arrowhead)"/>
             <g class="orderingOperation hasTempTable">
                 <rect x="325" y="75" width="80" height="40" style=""/>
                 <text x="365" y="95" style="">
 ORDER                </text>
                 <g class="tempTableName">
-                    <rect x="325" y="120" width="80" height="10" style="stroke:transparent; "/>
+                    <rect x="325" y="120" width="80" height="10" style=""/>
                     <text x="365" y="125" style="">
 tmp table, filesort                    </text>
                 </g>
             </g>
             <g>
-                <rect x="0" y="75" width="300" height="260" style="stroke:transparent; "/>
+                <rect x="0" y="75" width="300" height="260" style=""/>
                 <polyline points="265,95 313,95" style="stroke:#000000; stroke-width:4.0;" marker-end="url(#arrowhead)"/>
                 <g class="groupingOperation">
                     <rect x="185" y="75" width="80" height="40" style=""/>
@@ -156,18 +178,18 @@ tmp table, filesort                    </text>
 GROUP                    </text>
                 </g>
                 <g>
-                    <rect x="0" y="165" width="300" height="170" style="stroke:transparent; "/>
+                    <rect x="0" y="165" width="300" height="170" style=""/>
                     <polyline points="225,165 225,127" style="stroke:#000000; stroke-width:4.0;" marker-end="url(#arrowhead)"/>
                     <g>
-                        <rect x="0" y="275" width="100" height="60" style="stroke:transparent; "/>
+                        <rect x="0" y="275" width="100" height="60" style=""/>
                         <polyline points="50,275 50,195 183,195" style="stroke:#000000; stroke-width:1.5454047140507947; fill: none;" marker-end="url(#arrowhead)"/>
                         <g class="tableName">
-                            <rect x="0" y="307" width="100" height="14" style="stroke:transparent; "/>
+                            <rect x="0" y="307" width="100" height="14" style=""/>
                             <text x="50" y="314" style="">
 flm                            </text>
                         </g>
                         <g class="tableKey">
-                            <rect x="0" y="321" width="100" height="14" style="stroke:transparent; "/>
+                            <rect x="0" y="321" width="100" height="14" style=""/>
                             <text x="50" y="328" style="">
 idx_title                            </text>
                         </g>
@@ -177,26 +199,26 @@ idx_title                            </text>
 Full Index Scan                            </text>
                         </g>
                         <g class="lhsQueryCost">
-                            <rect x="0" y="260" width="50" height="10" style="stroke:transparent; "/>
+                            <rect x="0" y="260" width="50" height="10" style=""/>
                             <text x="0" y="265" style="text-anchor:start;">
 112                            </text>
                         </g>
                         <g class="rhsQueryCost">
-                            <rect x="50" y="260" width="50" height="10" style="stroke:transparent; "/>
+                            <rect x="50" y="260" width="50" height="10" style=""/>
                             <text x="100" y="265" style="text-anchor:end;">
 1K rows                            </text>
                         </g>
                     </g>
                     <g>
-                        <rect x="150" y="275" width="150" height="60" style="stroke:transparent; "/>
+                        <rect x="150" y="275" width="150" height="60" style=""/>
                         <polyline points="225,275 225,237" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
                         <g class="tableName">
-                            <rect x="150" y="307" width="150" height="14" style="stroke:transparent; "/>
+                            <rect x="150" y="307" width="150" height="14" style=""/>
                             <text x="225" y="314" style="">
 fim_act                            </text>
                         </g>
                         <g class="tableKey">
-                            <rect x="150" y="321" width="150" height="14" style="stroke:transparent; "/>
+                            <rect x="150" y="321" width="150" height="14" style=""/>
                             <text x="225" y="328" style="">
 idx_fk_film_id                            </text>
                         </g>
@@ -206,12 +228,12 @@ idx_fk_film_id                            </text>
 Non-Unique Key Lookup                            </text>
                         </g>
                         <g class="lhsQueryCost">
-                            <rect x="150" y="260" width="75" height="10" style="stroke:transparent; "/>
+                            <rect x="150" y="260" width="75" height="10" style=""/>
                             <text x="150" y="265" style="text-anchor:start;">
 1551.12                            </text>
                         </g>
                         <g class="rhsQueryCost">
-                            <rect x="225" y="260" width="75" height="10" style="stroke:transparent; "/>
+                            <rect x="225" y="260" width="75" height="10" style=""/>
                             <text x="300" y="265" style="text-anchor:end;">
 5 rows                            </text>
                         </g>
@@ -221,12 +243,12 @@ Non-Unique Key Lookup                            </text>
                     <text x="225" y="190" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
                     <text x="225" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
                         <g class="queryCost">
-                            <rect x="185" y="150" width="40" height="10" style="stroke:transparent; "/>
+                            <rect x="185" y="150" width="40" height="10" style=""/>
                             <text x="185" y="155" style="text-anchor:start;">
 1663.12                            </text>
                         </g>
                         <g class="queryCost">
-                            <rect x="235" y="155" width="25" height="10" style="stroke:transparent; "/>
+                            <rect x="235" y="155" width="25" height="10" style=""/>
                             <text x="235" y="160" style="text-anchor:start;">
 5.48K rows                            </text>
                         </g>
