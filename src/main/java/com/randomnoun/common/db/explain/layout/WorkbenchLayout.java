@@ -22,6 +22,7 @@ import com.randomnoun.common.db.explain.json.Node;
 import com.randomnoun.common.db.explain.json.OrderingOperationNode;
 import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
+import com.randomnoun.common.db.explain.json.SharingTemporaryTableWithNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
@@ -353,39 +354,61 @@ public class WorkbenchLayout implements Layout {
 				label.setSize(w, 14);
 			}
 		} else {
-			QueryBlockNode queryBlock = n.getMaterialisedFromSubquery().getQueryBlock();
-			Shape qbShape = layout(queryBlock, null); // query_blocks in materialised queries aren't drawn for some reason
-			// reset to 0,0
-
-			RangeShapeVisitor rv = new RangeShapeVisitor();
-			qbShape.traverse(rv);
-			logger.info("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
-
-			h = 80 + qbShape.getHeight() + 20; // 20px padding bottom
-			w = Math.max(w, qbShape.getWidth() + 20); // 10px padding left and right
-			w = Math.max(w, 300);
-
-			Shape box = new Shape();
-			box.setCssClass("materialisedFromSubqueryBorder"); // dotted line Shape
-			box.setParentAndPosition(outer, 0, 0);
-			box.setSize(w, h);
-			
-			// qb after lb in the diagram so that tooltips work
-			qbShape.setParentAndPosition(outer, /*10 - rv.getMinX()*/ (w - qbShape.getWidth()) / 2 - rv.getMinX(), 85);
-
-			if (n.getTableName() != null) {
+			Node subquery = n.getMaterialisedFromSubquery().getSubquery();
+			if (subquery instanceof SharingTemporaryTableWithNode) {
+				// @XXX this isn't from workbench
+				SharingTemporaryTableWithNode sttw = (SharingTemporaryTableWithNode) subquery;
+				
+				Shape box = new Shape();
+				box.setCssClass("materialisedFromSubqueryBorder"); // dotted line Shape
+				box.setParentAndPosition(outer, 0, 42);
+				box.setSize(w, h); 
+				
 				Shape label = new Shape(); // label shape
 				label.setCssClass("materialisedTableName");
 				label.setParentAndPosition(outer, 0, 32);
-				label.setLabel(n.getTableName() + " (materialised)"); 
+				label.setLabel(n.getTableName() + " (shared with #" + sttw.getSelectId() + ")"); 
 				label.setSize(w, 20);
-			}
-			if (n.getKey() != null) {
-				Shape label = new Shape(); // label shape
-				label.setCssClass("tableKey"); 
-				label.setParentAndPosition(outer, 0, 52);
-				label.setLabel(n.getKey()); 
-				label.setSize(w, 14);
+				
+			} else if (subquery instanceof QueryBlockNode) {
+				QueryBlockNode queryBlock = (QueryBlockNode) subquery;
+			
+				Shape qbShape = layout(queryBlock, null); // query_blocks in materialised queries aren't drawn for some reason
+				// reset to 0,0
+	
+				RangeShapeVisitor rv = new RangeShapeVisitor();
+				qbShape.traverse(rv);
+				logger.info("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
+	
+				h = 80 + qbShape.getHeight() + 20; // 20px padding bottom
+				w = Math.max(w, qbShape.getWidth() + 20); // 10px padding left and right
+				w = Math.max(w, 300);
+	
+				Shape box = new Shape();
+				box.setCssClass("materialisedFromSubqueryBorder"); // dotted line Shape
+				box.setParentAndPosition(outer, 0, 0);
+				box.setSize(w, h);
+				
+				// qb after lb in the diagram so that tooltips work
+				qbShape.setParentAndPosition(outer, /*10 - rv.getMinX()*/ (w - qbShape.getWidth()) / 2 - rv.getMinX(), 85);
+	
+				if (n.getTableName() != null) {
+					Shape label = new Shape(); // label shape
+					label.setCssClass("materialisedTableName");
+					label.setParentAndPosition(outer, 0, 32);
+					label.setLabel(n.getTableName() + " (materialised)"); 
+					label.setSize(w, 20);
+				}
+				if (n.getKey() != null) {
+					Shape label = new Shape(); // label shape
+					label.setCssClass("tableKey"); 
+					label.setParentAndPosition(outer, 0, 52);
+					label.setLabel(n.getKey()); 
+					label.setSize(w, 14);
+				}
+			} else {
+				throw new IllegalStateException("unexpected subquery node " + n.getMaterialisedFromSubquery().getSubquery().getClass() +
+					"; expected SharingTemporaryTableWithNode or QueryBlockNode");
 			}
 
 		}
