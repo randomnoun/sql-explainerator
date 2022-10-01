@@ -208,7 +208,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 		JdbcTemplate jt = new JdbcTemplate(ds);
 		logger.info("databases are " + jt.queryForList("SHOW DATABASES"));
 
-		String sqlFilename = "/sakila-setup/sakila-schema.sql";
+		String sqlFilename = "/setup/sakila-schema.sql";
 		try (InputStream is = this.getClass().getResourceAsStream(sqlFilename);
 			Reader r = new InputStreamReader(is)) {
 			SqlParser sp = new SqlParser();
@@ -220,7 +220,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 			});
 		} 
 		
-		sqlFilename = "/sakila-setup/sakila-data.sql";
+		sqlFilename = "/setup/sakila-data.sql";
 		try (InputStream is = this.getClass().getResourceAsStream(sqlFilename);
 			Reader r = new InputStreamReader(is)) {
 			SqlParser sp = new SqlParser();
