@@ -13,6 +13,7 @@ import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.layout.Layout;
+import com.randomnoun.common.db.explain.layout.WindowingLayout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightShapeVisitor;
@@ -34,6 +35,7 @@ public class SqlExplainerator {
 	TooltipTypeEnum tooltipType = TooltipTypeEnum.SVG_TITLE;
 	String css;
 	String script;
+	Layout layout;
 	
 	public SqlExplainerator() {
 	}
@@ -58,7 +60,11 @@ public class SqlExplainerator {
 
 	private void createDiagram(QueryBlockNode qbn) {
 		// create the layout
-		Layout layout = new Layout(qbn);
+		// RandomnounLayout layout = new RandomnounLayout(qbn);
+		if (layout == null) {
+			 layout = new WindowingLayout();
+		}
+		layout.setQueryBlockNode(qbn);
 		s = layout.getLayoutShape();
 		
 		// translate diagram so that top-left is 0, 0
@@ -125,6 +131,14 @@ public class SqlExplainerator {
 
 	public void setScript(String script) {
 		this.script = script;
+	}
+
+	public Layout getLayout() {
+		return layout;
+	}
+
+	public void setLayout(Layout layout) {
+		this.layout = layout;
 	}
 
 

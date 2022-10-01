@@ -28,6 +28,9 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
+import com.randomnoun.common.db.explain.layout.Layout;
+import com.randomnoun.common.db.explain.layout.WindowingLayout;
+import com.randomnoun.common.db.explain.layout.WorkbenchLayout;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 /** All the CLI options */
@@ -43,6 +46,7 @@ public class SqlExplaineratorCli {
 		options.addOption( Option.builder("h").longOpt( "help" ).desc( "This usage text" ).build() );
 		options.addOption( Option.builder("i").longOpt( "infile" ).desc( "input file, or '-' for stdin; default = stdin" ).hasArg().argName("infile").build() );
 		options.addOption( Option.builder("o").longOpt( "outfile" ).desc( "output file, or '-' for stdout; default = stdout" ).hasArg().argName("outfile").build() );
+		options.addOption( Option.builder("l").longOpt( "layout" ).desc( "layout format (workbench or windowing); default = windowing" ).hasArg().argName("layout").build() );
 		options.addOption( Option.builder("f").longOpt( "format" ).desc( "output format (svg or html); default = svg" ).hasArg().argName("format").build() );
 		options.addOption( Option.builder("t").longOpt( "tooltip" ).desc( "tooltip type (none, title, attribute, javascript); default = title" ).hasArg().argName("tooltip").build() );
 		options.addOption( Option.builder("j").longOpt( "jdbc" ).desc( "JDBC connection string" ).hasArg().argName("jdbc").build() );
@@ -62,23 +66,25 @@ public class SqlExplaineratorCli {
 			// maybe get these from the script itself. although, why ?
 		
 		String footer = "\n" +
-		  "This command will convert a MySQL JSON execution plan to diagram form.\n" +
-		  "The execution plan can be supplied via stdin or --infile (1), or can be retrieved from a MySQL server (2).\n" +
+		  "This command will convert a MySQL JSON execution plan into an SVG diagram.\n" +
+		  "There are two layout methods: 'workbench' which will try to mimic the diagrams generated from MySQL Workbench, " +
+		  "or 'windowing', which also adds support for window functions. Or at least it will once I've written that bit.\n" + 
 		  "\n" +
-		  "(1): When supplying the execution plan via stdin or --infile, use the JSON generated via the 'EXPLAIN FORMAT=JSON (query)' statement, e.g.\n" +
+		  "The execution plan can be supplied via stdin or --infile (Example 1), or can be retrieved from a MySQL server (Example 2).\n" +
+		  "\n" +
+		  "Example 1: To generate the query plan JSON, execute an 'EXPLAIN FORMAT=JSON' statement:\n" +
 		  "\n" +
 		  "  mysql --user=root --password=abc123 --silent --raw --skip-column-names \\\n" +
 		  "    --execute \"EXPLAIN FORMAT=JSON SELECT 1 FROM DUAL\" sakila > plan.json\n" +
 		  "\n" +
-		  "to generate the query plan JSON, then\n" +
+		  "then to generate the SVG diagram, supply this JSON as input to SqlExplaineratorCli:\n" +
 		  "\n" + 
 		  "  SqlExplaineratorCli --infile plan.json --outfile plan.svg\n" +
 		  "or\n" +
 		  "  cat plan.json | SqlPlainToImageCli > plan.svg\n" +
 		  "\n" +
-		  "to generate the SVG diagram.\n" +
 		  "\n" +
-		  "(2) When supplying the SQL against a database instance, you must supply the connection string, username, password and sql, e.g.:\n" +
+		  "Example 2: To generate the diagram from an SQL statement, you will need to also supply a JDBC connection string and any credentials required to connect, e.g.:\n" +
 		  "\n" +
 		  "  SqlExplaineratorCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \\\n" +
 		  "    --sql \"SELECT 1 fROM DUAL\" --outfile plan.svg" +
@@ -98,6 +104,10 @@ public class SqlExplaineratorCli {
 		String driverName = line.getOptionValue("driverName", "org.mariadb.jdbc.Driver");
 		boolean help = line.hasOption("help");
 		String infile = line.getOptionValue("infile");
+		String outfile = line.getOptionValue("outfile");
+		String layoutString = line.getOptionValue("layout", "randomnoun");
+		String format = line.getOptionValue("format", "svg");
+		
 		String tooltipString = line.getOptionValue("tooltip");
 		String jdbc = line.getOptionValue("jdbc");
 		String username = line.getOptionValue("username");
@@ -106,10 +116,6 @@ public class SqlExplaineratorCli {
 		
 		String cssfile = line.getOptionValue("css");
 		String scriptfile = line.getOptionValue("script");
-		
-		String outfile = line.getOptionValue("outfile");
-		
-		String format = line.getOptionValue("format", "svg");
 		
 		if (help || usage) {
 			HelpFormatter formatter = new HelpFormatter();
@@ -138,8 +144,17 @@ public class SqlExplaineratorCli {
 			script = baos.toString();
 		}
 		
+		Layout layout = null;
 		if (!(format.equals("svg") || format.equals("html"))) {
 			System.err.println("Invalid --format; expected 'svg' or 'html'");
+			System.exit(1);
+		}
+		if (layoutString.equals("workbench")) {
+			layout = new WorkbenchLayout();
+		} else if (layoutString.equals("windowing")) {
+			layout = new WindowingLayout();
+		} else {
+			System.err.println("Invalid --layout; expected 'workbench' or 'windowing'");
 			System.exit(1);
 		}
 		
@@ -180,7 +195,9 @@ public class SqlExplaineratorCli {
 			lcc.init("[SqlExplaineratorCli]", lprops);
 			
 			SqlExplainerator seti = new SqlExplainerator();
+			seti.setLayout(layout);
 			seti.parseJson(r, "1.2.3");
+			
 			seti.setTooltipType(tooltipType);
 			seti.setCss(css);
 			seti.setScript(script);
