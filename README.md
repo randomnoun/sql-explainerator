@@ -25,6 +25,7 @@ usage: SqlExplaineratorCli [options]
  -h,--help                  This usage text
  -i,--infile <infile>       input file, or '-' for stdin; default = stdin
  -o,--outfile <outfile>     output file, or '-' for stdout; default = stdout
+ -l,--layout <layout>       layout format (workbench or windowing); default = windowing
  -f,--format <format>       output format (svg or html); default = svg
  -t,--tooltip <tooltip>     tooltip type (none, title, attribute, javascript); default = title
  -j,--jdbc <jdbc>           JDBC connection string
@@ -35,26 +36,28 @@ usage: SqlExplaineratorCli [options]
  -c,--css <css>             alternate css file
  -s,--script <script>       alternate javascript file
 
-This command will convert a MySQL JSON execution plan to diagram form.
-The execution plan can be supplied via stdin or --infile (1), or can be retrieved from a MySQL
-server (2).
+This command will convert a MySQL JSON execution plan into an SVG diagram.
+There are two layout methods: 'workbench' which will try to mimic the diagrams generated from MySQL
+Workbench, or 'windowing', which also adds support for window functions. Or at least it will once
+I've written that bit.
 
-(1): When supplying the execution plan via stdin or --infile, use the JSON generated via the
-'EXPLAIN FORMAT=JSON (query)' statement, e.g.
+The execution plan can be supplied via stdin or --infile (Example 1), or can be retrieved from a
+MySQL server (Example 2).
+
+Example 1: To generate the query plan JSON, execute an 'EXPLAIN FORMAT=JSON' statement:
 
   mysql --user=root --password=abc123 --silent --raw --skip-column-names \
     --execute "EXPLAIN FORMAT=JSON SELECT 1 FROM DUAL" sakila > plan.json
 
-to generate the query plan JSON, then
+then to generate the SVG diagram, supply this JSON as input to SqlExplaineratorCli:
 
   SqlExplaineratorCli --infile plan.json --outfile plan.svg
 or
   cat plan.json | SqlPlainToImageCli > plan.svg
 
-to generate the SVG diagram.
 
-(2) When supplying the SQL against a database instance, you must supply the connection string,
-username, password and sql, e.g.:
+Example 2: To generate the diagram from an SQL statement, you will need to also supply a JDBC
+connection string and any credentials required to connect, e.g.:
 
   SqlExplaineratorCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \
     --sql "SELECT 1 fROM DUAL" --outfile plan.svg
