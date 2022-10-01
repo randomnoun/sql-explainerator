@@ -87,7 +87,7 @@ public class Layout {
 		outer.setSize(w, h + (queryBlockLabel == null ? 0 : 30 + 30));
 		
 		if (queryBlockLabel != null) {
-			String labelText = queryBlockLabel + (topNode ? "" : " #" + n.getSelectId()); // n.selectId == null || n.selectId == 1
+			String labelText = queryBlockLabel + (topNode || n.getSelectId() == null ? "" : " #" + n.getSelectId()); // n.selectId == null || n.selectId == 1
 			String clazz = (topNode ? " topNode" : ""); // n.selectId == null || n.selectId == 1
 			String tooltip = "Select ID: " + n.getSelectId() + "\n" +
 			  (n.getCostInfo() == null ? "" :"Query cost: " + n.getCostInfo().getQueryCost() + "\n");
@@ -201,6 +201,7 @@ public class Layout {
 		connector.setSize(w,  30); 
 		
 		Shape attachedSubqueries = new Shape();
+		attachedSubqueries.setCssClass("attachedSubqueries");
 		attachedSubqueries.setParentAndPosition(connector,  0,  0);
 		attachedSubqueries.setLabel("attached_subqueries");
 		// b.setFill(new Color(0, 0, 0)); // #b3b3b3
@@ -364,14 +365,15 @@ public class Layout {
 
 			h = 80 + qbShape.getHeight() + 20; // 20px padding bottom
 			w = Math.max(w, qbShape.getWidth() + 20); // 10px padding left and right
+			w = Math.max(w, 300);
 
 			Shape box = new Shape();
-			box.setCssClass("materialisedSubqueryBorder"); // dotted line Shape
+			box.setCssClass("materialisedFromSubqueryBorder"); // dotted line Shape
 			box.setParentAndPosition(outer, 0, 0);
 			box.setSize(w, h);
 			
 			// qb after lb in the diagram so that tooltips work
-			qbShape.setParentAndPosition(outer, 10 - rv.getMinX(), 85);
+			qbShape.setParentAndPosition(outer, /*10 - rv.getMinX()*/ (w - qbShape.getWidth()) / 2 - rv.getMinX(), 85);
 
 			if (n.getTableName() != null) {
 				Shape label = new Shape(); // label shape

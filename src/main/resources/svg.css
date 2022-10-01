@@ -10,7 +10,6 @@ svg.sql {
     font-size: 14px;
 }
 svg.sql rect {
-    /* stroke: black; */
     fill: transparent;
 }       
 svg.sql text {
@@ -114,11 +113,12 @@ svg.sql g.tooltip div.tooltip {
 svg.sql g.container > rect {
     stroke: transparent;
 }
-svg.sql g.materialisedSubqueryBorder > rect {
+svg.sql g.materialisedFromSubqueryBorder > rect {
 	stroke: #8c8c8c;
 	stroke-dasharray: 4;
 }
-svg.sql g.attached_subqueries > rect {
+svg.sql g.attachedSubqueries > rect {
+	stroke: black;
 	stroke-dasharray: 2;
 }
 svg.sql .materialisedTableName > rect {
