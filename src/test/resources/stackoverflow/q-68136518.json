@@ -1,0 +1,328 @@
+{
+  "query_block": {
+    "union_result": {
+      "using_temporary_table": true,
+      "table_name": "<union1,9>",
+      "access_type": "ALL",
+      "query_specifications": [
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 1,
+            "cost_info": {
+              "query_cost": "38.50"
+            },
+            "table": {
+              "insert": true,
+              "table_name": "t_stats_trades",
+              "access_type": "ALL"
+            },
+            "insert_from": {
+              "nested_loop": [
+                {
+                  "table": {
+                    "table_name": "CTE2",
+                    "access_type": "ref",
+                    "possible_keys": [
+                      "<auto_key0>"
+                    ],
+                    "key": "<auto_key0>",
+                    "used_key_parts": [
+                      "SIG"
+                    ],
+                    "key_length": "1",
+                    "ref": [
+                      "const"
+                    ],
+                    "rows_examined_per_scan": 10,
+                    "rows_produced_per_join": 10,
+                    "filtered": "100.00",
+                    "cost_info": {
+                      "read_cost": "2.50",
+                      "eval_cost": "1.00",
+                      "prefix_cost": "3.50",
+                      "data_read_per_join": "960"
+                    },
+                    "used_columns": [
+                      "ROWNUM",
+                      "IND",
+                      "SIG",
+                      "START"
+                    ],
+                    "materialized_from_subquery": {
+                      "using_temporary_table": true,
+                      "dependent": false,
+                      "cacheable": true,
+                      "query_block": {
+                        "select_id": 4,
+                        "cost_info": {
+                          "query_cost": "551476781.20"
+                        },
+                        "ordering_operation": {
+                          "using_filesort": true,
+                          "windowing": {
+                            "windows": [
+                              {
+                                "name": "<unnamed window>",
+                                "using_temporary_table": true,
+                                "using_filesort": true,
+                                "filesort_key": [
+                                  "year(`DT`)",
+                                  "dayofyear(`DT`)",
+                                  "`IND`",
+                                  "`IND`"
+                                ],
+                                "functions": [
+                                  "row_number"
+                                ]
+                              }
+                            ],
+                            "cost_info": {
+                              "sort_cost": "495709464.00"
+                            },
+                            "grouping_operation": {
+                              "using_temporary_table": true,
+                              "using_filesort": false,
+                              "table": {
+                                "table_name": "CTE",
+                                "access_type": "ALL",
+                                "rows_examined_per_scan": 495709464,
+                                "rows_produced_per_join": 495709464,
+                                "filtered": "100.00",
+                                "cost_info": {
+                                  "read_cost": "6196370.80",
+                                  "eval_cost": "49570946.40",
+                                  "prefix_cost": "55767317.20",
+                                  "data_read_per_join": "44G"
+                                },
+                                "used_columns": [
+                                  "IND",
+                                  "SIG",
+                                  "DT",
+                                  "GRP"
+                                ],
+                                "materialized_from_subquery": {
+                                  "using_temporary_table": true,
+                                  "dependent": false,
+                                  "cacheable": true,
+                                  "query_block": {
+                                    "select_id": 5,
+                                    "cost_info": {
+                                      "query_cost": "1538413897.65"
+                                    },
+                                    "ordering_operation": {
+                                      "using_filesort": true,
+                                      "cost_info": {
+                                        "sort_cost": "495709464.00"
+                                      },
+                                      "windowing": {
+                                        "windows": [
+                                          {
+                                            "name": "<unnamed window>",
+                                            "definition_position": 1,
+                                            "using_temporary_table": true,
+                                            "using_filesort": true,
+                                            "filesort_key": [
+                                              "year(`dt`)",
+                                              "dayofyear(`dt`)",
+                                              "`ind`",
+                                              "`dt`"
+                                            ],
+                                            "functions": [
+                                              "dense_rank"
+                                            ]
+                                          },
+                                          {
+                                            "name": "<unnamed window>",
+                                            "definition_position": 2,
+                                            "last_executed_window": true,
+                                            "using_temporary_table": true,
+                                            "using_filesort": true,
+                                            "filesort_key": [
+                                              "year(`dt`)",
+                                              "dayofyear(`dt`)",
+                                              "`ind`",
+                                              "`sig`",
+                                              "`dt`"
+                                            ],
+                                            "functions": [
+                                              "dense_rank"
+                                            ]
+                                          }
+                                        ],
+                                        "cost_info": {
+                                          "sort_cost": "991418928.00"
+                                        },
+                                        "table": {
+                                          "table_name": "t_stats_csv",
+                                          "access_type": "index",
+                                          "key": "ind_sig_dt",
+                                          "used_key_parts": [
+                                            "ind",
+                                            "sig",
+                                            "dt"
+                                          ],
+                                          "key_length": "80",
+                                          "rows_examined_per_scan": 495709464,
+                                          "rows_produced_per_join": 495709464,
+                                          "filtered": "100.00",
+                                          "using_index": true,
+                                          "cost_info": {
+                                            "read_cost": "1714559.25",
+                                            "eval_cost": "49570946.40",
+                                            "prefix_cost": "51285505.65",
+                                            "data_read_per_join": "44G"
+                                          },
+                                          "used_columns": [
+                                            "PK",
+                                            "ind",
+                                            "sig",
+                                            "dt"
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "table": {
+                    "table_name": "CTE2",
+                    "access_type": "ref",
+                    "possible_keys": [
+                      "<auto_key0>"
+                    ],
+                    "key": "<auto_key0>",
+                    "used_key_parts": [
+                      "SIG"
+                    ],
+                    "key_length": "1",
+                    "ref": [
+                      "const"
+                    ],
+                    "rows_examined_per_scan": 10,
+                    "rows_produced_per_join": 10,
+                    "filtered": "10.00",
+                    "cost_info": {
+                      "read_cost": "25.00",
+                      "eval_cost": "1.00",
+                      "prefix_cost": "38.50",
+                      "data_read_per_join": "960"
+                    },
+                    "used_columns": [
+                      "ROWNUM",
+                      "IND",
+                      "SIG",
+                      "START"
+                    ],
+                    "attached_condition": "((cast(`cte2`.`START` as date) = cast(`cte2`.`START` as date)) and (`cte2`.`ROWNUM` = (`cte2`.`ROWNUM` + 1)))",
+                    "materialized_from_subquery": {
+                      "sharing_temporary_table_with": {
+                        "select_id": 4
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 9,
+            "cost_info": {
+              "query_cost": "38.50"
+            },
+            "nested_loop": [
+              {
+                "table": {
+                  "table_name": "CTE2",
+                  "access_type": "ref",
+                  "possible_keys": [
+                    "<auto_key0>"
+                  ],
+                  "key": "<auto_key0>",
+                  "used_key_parts": [
+                    "SIG"
+                  ],
+                  "key_length": "1",
+                  "ref": [
+                    "const"
+                  ],
+                  "rows_examined_per_scan": 10,
+                  "rows_produced_per_join": 10,
+                  "filtered": "100.00",
+                  "cost_info": {
+                    "read_cost": "2.50",
+                    "eval_cost": "1.00",
+                    "prefix_cost": "3.50",
+                    "data_read_per_join": "960"
+                  },
+                  "used_columns": [
+                    "ROWNUM",
+                    "IND",
+                    "SIG",
+                    "START"
+                  ],
+                  "materialized_from_subquery": {
+                    "sharing_temporary_table_with": {
+                      "select_id": 4
+                    }
+                  }
+                }
+              },
+              {
+                "table": {
+                  "table_name": "CTE2",
+                  "access_type": "ref",
+                  "possible_keys": [
+                    "<auto_key0>"
+                  ],
+                  "key": "<auto_key0>",
+                  "used_key_parts": [
+                    "SIG"
+                  ],
+                  "key_length": "1",
+                  "ref": [
+                    "const"
+                  ],
+                  "rows_examined_per_scan": 10,
+                  "rows_produced_per_join": 10,
+                  "filtered": "10.00",
+                  "cost_info": {
+                    "read_cost": "25.00",
+                    "eval_cost": "1.00",
+                    "prefix_cost": "38.50",
+                    "data_read_per_join": "960"
+                  },
+                  "used_columns": [
+                    "ROWNUM",
+                    "IND",
+                    "SIG",
+                    "START"
+                  ],
+                  "attached_condition": "((cast(`cte2`.`START` as date) = cast(`cte2`.`START` as date)) and (`cte2`.`ROWNUM` = (`cte2`.`ROWNUM` + 1)))",
+                  "materialized_from_subquery": {
+                    "sharing_temporary_table_with": {
+                      "select_id": 4
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
