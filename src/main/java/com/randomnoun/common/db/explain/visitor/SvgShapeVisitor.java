@@ -125,9 +125,9 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			    " width=\"" + b.getWidth() + "\"" +
 			    " height=\"" + b.getHeight() + "\"" +
 				" style=\"" + 
-			      (b.getStroke() == null ? "" : "stroke:" + toHex(b.getStroke()) + "; ") +
-				  (b.getFill() == null ? "" : "fill:" + toHex(b.getFill())+ "; ") +
-				  (b.getStrokeDashArray() == null ? "" : "stroke-dasharray:" + Text.escapeHtml(Text.join(b.getStrokeDashArray(), " ")) + "; ") +
+			      // (b.getStroke() == null ? "" : "stroke:" + toHex(b.getStroke()) + "; ") +
+				  // (b.getFill() == null ? "" : "fill:" + toHex(b.getFill())+ "; ") +
+				  // (b.getStrokeDashArray() == null ? "" : "stroke-dasharray:" + Text.escapeHtml(Text.join(b.getStrokeDashArray(), " ")) + "; ") +
 				"\"");
 			
 			sb.append(getTooltipSvg(b, is, "rect"));
@@ -164,7 +164,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 				sb.append(is + "    <text x=\"" + (x + tx) + "\"" + // tx
 			      " y=\"" + (y + ty + i * 14) + "\"" + // (y + (b.getHeight()/2))
 				  " style=\"" +
-			        (b.getTextColor() == null ? "" : "fill:" + toHex(b.getTextColor())+ ";") + 
+			        // (b.getTextColor() == null ? "" : "fill:" + toHex(b.getTextColor())+ ";") + 
 			        (b.getTextAnchor() == null ? "" : "text-anchor:" + b.getTextAnchor() + ";") +
 			      "\">\n");
 				sb.append(Text.escapeHtml(tspans[i]));

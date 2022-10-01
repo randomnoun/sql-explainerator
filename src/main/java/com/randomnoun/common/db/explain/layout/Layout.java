@@ -1,9 +1,7 @@
 package com.randomnoun.common.db.explain.layout;
 
-import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +12,6 @@ import org.apache.log4j.Logger;
 
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
-import com.randomnoun.common.db.explain.graph.CShape;
 import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.json.AttachedSubqueriesNode;
 import com.randomnoun.common.db.explain.json.CostInfoNode;
@@ -41,9 +38,8 @@ public class Layout {
 	}
 
 	public Shape getLayoutShape() {
-		Shape b = layout(topNode, "query_block", true);
 		// probably need to reposition everything so that it starts at 0,0
-		return b;
+		return layout(topNode, "query_block", true);
 	}
 
 	private <T> Stream<T> reverseStream(List<T> children) {
@@ -68,7 +64,7 @@ public class Layout {
 	
 	private List<String> escapeHtml(List<String> list) {
 		if (list == null) { return Collections.emptyList(); }
-		return list.stream().map(s -> Text.escapeHtml(s)).collect(Collectors.toList());
+		return list.stream().map(Text::escapeHtml).collect(Collectors.toList());
 	}
 		
 
@@ -79,7 +75,7 @@ public class Layout {
 	private Shape layout(QueryBlockNode n, String queryBlockLabel, boolean topNode) {
 		Node c = n.getQueryNode(); // 1 child only
 		
-		Shape outer = new CShape(); // outer shape
+		Shape outer = new Shape(); // outer shape
 		Shape child = null; // child shape
 		int w = 100, h = 0;
 		if (c != null) {
@@ -114,7 +110,7 @@ public class Layout {
 			if (costInfo != null) {
 				DecimalFormat df = new DecimalFormat("0.00");
 				double cost = (costInfo.getQueryCost() == null ? (double) 0 : costInfo.getQueryCost());
-				Shape costLabel = new CShape(); // label shape
+				Shape costLabel = new Shape(); // label shape
 				costLabel.setCssClass("lhsQueryCost"); costLabel.setTextAnchor("start");
 				costLabel.setParentAndPosition(boxShape, 0, -15);
 				costLabel.setLabel("Query cost: " + df.format(cost)); 
@@ -123,7 +119,7 @@ public class Layout {
 
 			
 			if (child == null) {
-				Shape noTableShape = new CShape(); // label shape
+				Shape noTableShape = new Shape(); // label shape
 				noTableShape.setCssClass("tableName" + clazz);
 				noTableShape.setParentAndPosition(outer, 0, 35);
 				noTableShape.setSize(100, 10);
@@ -145,8 +141,8 @@ public class Layout {
 	private Shape layout(UnionResultNode n) {
 		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
 		
-		Shape outer = new CShape(); // outer shape
-		Shape connector = new CShape(); // connector shape
+		Shape outer = new Shape(); // outer shape
+		Shape connector = new Shape(); // connector shape
 		
 		List<Shape> qsShapes = reverseStream(qsnList)
 			.map(c -> layout(c, "query_block"))
@@ -164,9 +160,10 @@ public class Layout {
 		connector.setSize(totalWidth,  60); 
 		
 		Shape union = new Shape();
+		union.setCssClass("union");
 		union.setParentAndPosition(connector,  0,  0);
 		union.setLabel("UNION");
-		union.setFill(new Color(179, 179, 179)); // #b3b3b3
+		// union.setFill(new Color(179, 179, 179)); // #b3b3b3
 		union.setSize(totalWidth, 30);
 		int offset = 0;
 		for (Shape qsb : qsShapes) {
@@ -183,8 +180,8 @@ public class Layout {
 	private Shape layout(AttachedSubqueriesNode n) {
 		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
 		
-		Shape outer = new CShape(); // outer shape
-		Shape connector = new CShape(); // connector shape
+		Shape outer = new Shape(); // outer shape
+		Shape connector = new Shape(); // connector shape
 		
 		List<Shape> qsShapes = reverseStream(qsnList)
 			.map(c -> layout(c, "subquery"))
@@ -208,7 +205,7 @@ public class Layout {
 		attachedSubqueries.setLabel("attached_subqueries");
 		// b.setFill(new Color(0, 0, 0)); // #b3b3b3
 		attachedSubqueries.setSize(w, 30);
-		attachedSubqueries.setStrokeDashArray(Arrays.asList("2"));
+		// attachedSubqueries.setStrokeDashArray(Arrays.asList("2"));
 		int offset = (w - totalWidth) / 2;
 		for (Shape qsShape : qsShapes) {
 			qsShape.setParentAndPosition(outer, offset, 50);
@@ -252,7 +249,7 @@ public class Layout {
 		int tableMargin = 50;
 		int diamondWidth = 60;
 		
-		Shape outer = new CShape(); // outer shape
+		Shape outer = new Shape(); // outer shape
 		outer.setSize(totalWidth, topArrow + diamondWidth + bottomArrow + maxHeight); // arrow + diamond + arrow + tables
 		
 		int offset = 0;
@@ -278,7 +275,7 @@ public class Layout {
 			
 			Shape costShape;
 			if (qsn.getCostInfo() != null) {
-				costShape = new CShape(); // label shape
+				costShape = new Shape(); // label shape
 				costShape.setCssClass("queryCost");
 				costShape.setParentAndPosition(diamond, -10, -15);
 				costShape.setLabel(String.valueOf(qsn.getCostInfo().getPrefixCost())); 
@@ -287,7 +284,7 @@ public class Layout {
 			}
 
 			if (i == tableShapes.size() - 1) {
-				costShape = new CShape(); // label shape
+				costShape = new Shape(); // label shape
 				costShape.setCssClass("queryCost");
 				costShape.setParentAndPosition(diamond, diamondWidth / 2 + 10, -10);
 				costShape.setLabel(qsn == null || qsn.getRowsProducedPerJoin() == null ? "0 rows" :
@@ -295,7 +292,7 @@ public class Layout {
 				costShape.setTextAnchor("start");
 				costShape.setSize(25, 10);
 			} else {
-				costShape = new CShape(); // label shape
+				costShape = new Shape(); // label shape
 				costShape.setCssClass("queryCost");
 				costShape.setParentAndPosition(diamond, diamondWidth + 5, 15);
 				costShape.setLabel(qsn == null || qsn.getRowsProducedPerJoin() == null ? "0 rows" :
@@ -339,18 +336,18 @@ public class Layout {
 		}
 		int lbsh = n.getAccessType()==AccessTypeEnum.CONST ? 45 : 30; // label box shape height
 		int h = lbsh + 30;
-		Shape outer = new CShape(); // outer shape
+		Shape outer = new Shape(); // outer shape
 		
 		if (n.getMaterialisedFromSubquery() == null) {
 			if (n.getTableName() != null) {
-				Shape label = new CShape(); // label shape
+				Shape label = new Shape(); // label shape
 				label.setCssClass("tableName");
 				label.setParentAndPosition(outer, 0, lbsh + 2);
 				label.setLabel(n.getTableName()); 
 				label.setSize(w, 14);
 			}
 			if (n.getKey() != null) {
-				Shape label = new CShape(); // label shape
+				Shape label = new Shape(); // label shape
 				label.setCssClass("tableKey"); 
 				label.setParentAndPosition(outer, 0, lbsh + 16);
 				label.setLabel(n.getKey()); 
@@ -368,10 +365,8 @@ public class Layout {
 			h = 80 + qbShape.getHeight() + 20; // 20px padding bottom
 			w = Math.max(w, qbShape.getWidth() + 20); // 10px padding left and right
 
-			Shape box = new CShape();
-			box.setCssClass("dotted"); // dotted line Shape
-			box.setStroke(new Color(140, 140, 140)); // #8c8c8c
-			box.setStrokeDashArray(Arrays.asList("4"));
+			Shape box = new Shape();
+			box.setCssClass("materialisedSubqueryBorder"); // dotted line Shape
 			box.setParentAndPosition(outer, 0, 0);
 			box.setSize(w, h);
 			
@@ -379,15 +374,15 @@ public class Layout {
 			qbShape.setParentAndPosition(outer, 10 - rv.getMinX(), 85);
 
 			if (n.getTableName() != null) {
-				Shape label = new CShape(); // label shape
+				Shape label = new Shape(); // label shape
 				label.setCssClass("materialisedTableName");
-				label.setFill(new Color(232, 232, 232));
+				// label.setFill(new Color(232, 232, 232)); // #e8e8e8
 				label.setParentAndPosition(outer, 0, 32);
 				label.setLabel(n.getTableName() + " (materialised)"); 
 				label.setSize(w, 20);
 			}
 			if (n.getKey() != null) {
-				Shape label = new CShape(); // label shape
+				Shape label = new Shape(); // label shape
 				label.setCssClass("tableKey"); 
 				label.setParentAndPosition(outer, 0, 52);
 				label.setLabel(n.getKey()); 
@@ -438,14 +433,14 @@ public class Layout {
 		if (costInfo != null) {
 			double cost = (costInfo.getEvalCost() == null ? (double) 0 : costInfo.getEvalCost()) +
 				(costInfo.getReadCost() == null ? (double) 0 : costInfo.getReadCost());
-			Shape costLabel = new CShape(); // label shape
+			Shape costLabel = new Shape(); // label shape
 			costLabel.setCssClass("lhsQueryCost"); costLabel.setTextAnchor("start");
 			costLabel.setParentAndPosition(outer, 0, -15);
 			costLabel.setLabel(df.format(cost)); 
 			costLabel.setSize(w/2, 10);
 		}
 		if (n.getRowsExaminedPerScan() != null) {
-			Shape costLabel = new CShape(); // label shape
+			Shape costLabel = new Shape(); // label shape
 			costLabel.setCssClass("rhsQueryCost");  costLabel.setTextAnchor("end");
 			costLabel.setParentAndPosition(outer, w/2, -15);
 			costLabel.setLabel(toSiUnits(n.getRowsExaminedPerScan()) + 
@@ -492,7 +487,7 @@ public class Layout {
 			"Using Filesort: " + n.isUsingFilesort());
 
 		if (n.isUsingTemporaryTable() || n.isUsingFilesort()) { 
-			Shape labelShape = new CShape(); // label underneath the box
+			Shape labelShape = new Shape(); // label underneath the box
 			String label = n.isUsingTemporaryTable() ? "tmp table" : "";
 			label += n.isUsingFilesort() ? (label.equals("") ? "" : ", ") + "filesort" : "";
 			labelShape.setParentAndPosition(boxShape, 0, 45); 
@@ -501,7 +496,7 @@ public class Layout {
 			labelShape.setLabel(label); 
 		}
 		
-		outer = new CShape(); 
+		outer = new Shape(); 
 		if (cn instanceof DuplicatesRemovalNode || cn instanceof GroupingOperationNode) {
 			// child is left of this node
 			int prevEdgeStartX = child.getEdgeStartX(); // edge would have started in middle of the 'DISTINCT' node
@@ -541,7 +536,7 @@ public class Layout {
 		int h = child.getHeight();
 		
 		Shape boxShape = new Shape(); // box shape
-		Shape container = new CShape(); // container shape ( line connects to container, not box )
+		Shape container = new Shape(); // container shape ( line connects to container, not box )
 		Shape labelShape = null; 
 		boxShape.setCssClass("duplicatesRemoval");
 		boxShape.setLabel("DISTINCT"); 
@@ -552,7 +547,7 @@ public class Layout {
 		container.setSize(80, 40);
 		
 		if (n.isUsingTemporaryTable()) {
-			labelShape = new CShape();
+			labelShape = new Shape();
 			labelShape.setLabel("tmp table");
 			labelShape.setSize(80, 10);
 			labelShape.setCssClass("tempTableName");
@@ -561,7 +556,7 @@ public class Layout {
 			container.setSize(80, 55);
 		}
 
-		Shape outer = new CShape(); // outer shape
+		Shape outer = new Shape(); // outer shape
 		if (cn instanceof GroupingOperationNode) {
 			// child is left of this node
 			int prevEdgeStartX = child.getEdgeStartX(); // edge would have started in middle of the 'GROUP' node
@@ -602,7 +597,7 @@ public class Layout {
 		int w = child.getWidth();
 		int h = child.getHeight();
 		
-		Shape outer = new CShape(); // outer shape 
+		Shape outer = new Shape(); // outer shape 
 		outer.setSize(w, h + 90);
 		outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
 		
@@ -635,7 +630,7 @@ public class Layout {
 		int w = child.getWidth();
 		int h = child.getHeight();
 		
-		Shape outer = new CShape(); 
+		Shape outer = new Shape(); 
 		outer.setSize(w, h + 40);
 		outer.setEdgeStartPosition(child.getEdgeStartX(),  40);
 

@@ -10,7 +10,7 @@ svg.sql {
     font-size: 14px;
 }
 svg.sql rect {
-    stroke: black;
+    /* stroke: black; */
     fill: transparent;
 }       
 svg.sql text {
@@ -18,10 +18,14 @@ svg.sql text {
     dominant-baseline: middle;
     fill: black;
 }
-svg.sql g.queryBlock.topNode > rect { 
+svg.sql g.queryBlock > rect {
+    stroke: black;
+}
+svg.sql g.queryBlock.topNode > rect {
 	fill: #cccccc; 
 }
 svg.sql g.union > rect { 
+	stroke: black;
 	fill: #b3b3b3; 
 }
 
@@ -42,6 +46,7 @@ svg.sql g.groupingOperation.hasTempTable > rect {
     stroke: #bf8000;
 }
 
+
 svg.sql g.table.nonUniqueKey > text,
 svg.sql g.table.uniqueKey > text,
 svg.sql g.table.fullTableScan > text,
@@ -49,6 +54,10 @@ svg.sql g.table.fullIndexScan > text,
 svg.sql g.table.singleRow > text { 
     fill: white;
     font-size: 11px; 
+}
+
+svg.sql g.table > rect { 
+    stroke: black; 
 }
 
 svg.sql g.table.nonUniqueKey > rect { 
@@ -101,6 +110,22 @@ svg.sql g.tooltip div.tooltip {
 	border: 1px solid black; 
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
+
+svg.sql g.container > rect {
+    stroke: transparent;
+}
+svg.sql g.materialisedSubqueryBorder > rect {
+	stroke: #8c8c8c;
+	stroke-dasharray: 4;
+}
+svg.sql g.attached_subqueries > rect {
+	stroke-dasharray: 2;
+}
+svg.sql .materialisedTableName > rect {
+	fill: #e8e8e8;
+	
+}
+
 
 svg.sql g.tooltip div.tooltip .tableHeader,
 svg.sql g.tooltip div.tooltip .keyIndexHeader,

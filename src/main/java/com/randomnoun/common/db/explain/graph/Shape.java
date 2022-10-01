@@ -1,6 +1,5 @@
 package com.randomnoun.common.db.explain.graph;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +31,10 @@ public class Shape {
 	private int edgeStartX; // draw edges from this shape from this point
 	private int edgeStartY;
 	
+	// styles are mostly class-based now
 	private String cssClass;
-	private Color stroke = null; 
-	private Color fill = null; 
-	private Color textColor = null; 
-	private List<String> strokeDashArray = null;
+	
+	// keep textAnchor as we need it to set the text x,y pos
 	private String textAnchor = null;
 	
 	
@@ -49,9 +47,6 @@ public class Shape {
 		this.width = width;
 		this.height = height;
 	}
-	public void setStroke(Color c) { this.stroke = c; }
-	public void setFill(Color c) { this.fill = c; }
-	public void setTextColor(Color c) { this.textColor = c; }
 	
 	public void connectTo(Shape connectedTo, String targetPort) {
 		this.connectedTo = connectedTo;
@@ -152,12 +147,6 @@ public class Shape {
 	public void setCssClass(String cssClass) {
 		this.cssClass = cssClass;
 	}
-	public List<String> getStrokeDashArray() {
-		return strokeDashArray;
-	}
-	public void setStrokeDashArray(List<String> strokeDashArray) {
-		this.strokeDashArray = strokeDashArray;
-	}
 	public String getTooltip() {
 		return tooltip;
 	}
@@ -169,15 +158,6 @@ public class Shape {
 	}
 	public void setConnectedWeight(Double connectedWeight) {
 		this.connectedWeight = connectedWeight;
-	}
-	public Color getStroke() {
-		return stroke;
-	}
-	public Color getFill() {
-		return fill;
-	}
-	public Color getTextColor() {
-		return textColor;
 	}
 	public String getLabel() {
 		return label;
