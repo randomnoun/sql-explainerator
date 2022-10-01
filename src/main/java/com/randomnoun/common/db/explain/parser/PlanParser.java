@@ -24,6 +24,7 @@ import com.randomnoun.common.db.explain.json.Node;
 import com.randomnoun.common.db.explain.json.OrderingOperationNode;
 import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
+import com.randomnoun.common.db.explain.json.SharingTemporaryTableWithNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
 
@@ -185,15 +186,22 @@ public class PlanParser {
 		if (obj.containsKey("cacheable")) {
 			n.setCacheable((Boolean) obj.get("cacheable"));
 		}
-		n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
+		if (obj.containsKey("using_temporary_table")) {
+			n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
+		}
 		
 		n.getAttributes().put("dependent", obj.get("dependent"));
 		n.getAttributes().put("cacheable", obj.get("cacheable"));
 		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table")); // boolean
 		if (obj.containsKey("query_block")) {
 			QueryBlockNode cn = parseQueryBlock((JSONObject) obj.get("query_block"));
-			n.setQueryBlock(cn);
+			n.setSubquery(cn);
 			n.addChild(cn);
+		} else if (obj.containsKey("sharing_temporary_table_with")) {
+			SharingTemporaryTableWithNode sttwn = parseSharingTemporaryTableWithNode((JSONObject) obj.get("sharing_temporary_table_with"));
+			n.setSubquery(sttwn);
+			n.addChild(sttwn);
+			
 		} else {
 			throw new IllegalArgumentException("expected query_block in query_specification: " + obj.toString());
 		}
@@ -201,7 +209,12 @@ public class PlanParser {
 		return n;
 	}
 	 
-			
+	private SharingTemporaryTableWithNode parseSharingTemporaryTableWithNode(JSONObject obj) {
+		SharingTemporaryTableWithNode n = new SharingTemporaryTableWithNode();
+		n.setSelectId(toLong(obj.get("select_id")));
+		n.getAttributes().put("selectId", n.getSelectId());
+		return n;
+	}
 	
 	private DuplicatesRemovalNode parseDuplicatesRemoval(JSONObject obj) {
 		DuplicatesRemovalNode n = new DuplicatesRemovalNode();

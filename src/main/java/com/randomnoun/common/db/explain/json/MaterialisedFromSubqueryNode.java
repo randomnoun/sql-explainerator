@@ -1,21 +1,14 @@
 package com.randomnoun.common.db.explain.json;
 
 public class MaterialisedFromSubqueryNode extends Node {
-	private QueryBlockNode queryBlock;
 	private boolean dependent;
 	private boolean cacheable;
 	private boolean usingTemporaryTable;
+	
+	private Node subquery; // either a QueryBlockNode or a SharingTemporaryTableWithNode
 
 	public MaterialisedFromSubqueryNode() {
 		super("materialized_from_subquery", false);
-	}
-
-	public QueryBlockNode getQueryBlock() {
-		return queryBlock;
-	}
-
-	public void setQueryBlock(QueryBlockNode queryBlock) {
-		this.queryBlock = queryBlock;
 	}
 
 	public boolean isDependent() {
@@ -40,5 +33,13 @@ public class MaterialisedFromSubqueryNode extends Node {
 
 	public void setUsingTemporaryTable(boolean usingTemporaryTable) {
 		this.usingTemporaryTable = usingTemporaryTable;
+	}
+
+	public Node getSubquery() {
+		return subquery;
+	}
+
+	public void setSubquery(Node subquery) {
+		this.subquery = subquery;
 	}
 }
