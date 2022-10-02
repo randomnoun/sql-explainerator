@@ -21,7 +21,9 @@ public class TableNode extends Node {
 	private String attachedCondition;
 	
 	private AttachedSubqueriesNode attachedSubqueries;
+	
 	private MaterialisedFromSubqueryNode materialisedFromSubquery;
+	
 
 	public TableNode() {
 		super("table", false);
@@ -146,6 +148,5 @@ public class TableNode extends Node {
 	public void setAttachedCondition(String attachedCondition) {
 		this.attachedCondition = attachedCondition;
 	}
-
 
 }

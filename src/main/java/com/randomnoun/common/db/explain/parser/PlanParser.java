@@ -17,6 +17,7 @@ import com.randomnoun.common.db.explain.json.BufferResultNode;
 import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
 import com.randomnoun.common.db.explain.json.GroupingOperationNode;
+import com.randomnoun.common.db.explain.json.HavingSubqueriesNode;
 import com.randomnoun.common.db.explain.json.ListNode;
 import com.randomnoun.common.db.explain.json.MaterialisedFromSubqueryNode;
 import com.randomnoun.common.db.explain.json.NameList;
@@ -305,6 +306,19 @@ public class PlanParser {
 			n.setGroupedNode(cn);
 			n.addChild(cn);
 		}
+		
+		if (obj.containsKey("having_subqueries")) {
+			HavingSubqueriesNode sn = new HavingSubqueriesNode();
+			n.setHavingSubqueries(sn);
+			n.addChild(sn);
+			JSONArray qs = (JSONArray) obj.get("having_subqueries");
+			for (Object o : qs) {
+				JSONObject cobj = (JSONObject) o;
+				QuerySpecificationNode qsn = parseQuerySpecification(cobj);
+				sn.addQuerySpecification(qsn);
+				sn.addChild(qsn);
+			}
+		}
 
 		return n;
 	}
@@ -442,7 +456,7 @@ public class PlanParser {
 				sn.addChild(qsn);
 			}
 		}
-		
+
 		// can we have attached_subqueries and a materialised view at the same time ?
 		
 		if (obj.containsKey("materialized_from_subquery")) {

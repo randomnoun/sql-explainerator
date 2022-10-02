@@ -18,6 +18,7 @@ import com.randomnoun.common.db.explain.json.BufferResultNode;
 import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
 import com.randomnoun.common.db.explain.json.GroupingOperationNode;
+import com.randomnoun.common.db.explain.json.HavingSubqueriesNode;
 import com.randomnoun.common.db.explain.json.NestedLoopNode;
 import com.randomnoun.common.db.explain.json.Node;
 import com.randomnoun.common.db.explain.json.OrderingOperationNode;
@@ -149,7 +150,7 @@ public class WorkbenchLayout implements Layout {
 		Node cn = n.getChildNode();
 		
 		List<Shape> windowShapes = windowList.stream()
-			.map(this::layout)
+			.map(c -> layout(c))
 			.collect(Collectors.toList());
 			
 		List<Integer> windowWidths = windowShapes.stream().map(Shape::getWidth).collect(Collectors.toList());
@@ -179,8 +180,10 @@ public class WorkbenchLayout implements Layout {
 		windowing.setSize(totalWidth, 30);
 		
 		Shape child = layout(cn);
-		child.connectTo(outer, "sv"); // not really the outer any more 
-		child.setParentAndPosition(outer, (totalWidth - child.getWidth()) / 2, 90 + 50);
+		child.connectTo(outer, "sv"); // not really the outer any more
+		child.setParentAndPosition(outer, totalWidth / 2 - child.getEdgeStartX(), 90 + 50);
+		
+		// child.setParentAndPosition(outer, /*(totalWidth - child.getWidth()) / 2*/ child.getEdgeStartX() / 2, 90 + 50);
 		
 		return outer;
 	}
@@ -281,6 +284,46 @@ public class WorkbenchLayout implements Layout {
 		attachedSubqueries.setParentAndPosition(connector,  0,  0);
 		attachedSubqueries.setLabel("attached_subqueries");
 		attachedSubqueries.setSize(w, 30);
+		int offset = (w - totalWidth) / 2;
+		for (Shape qsShape : qsShapes) {
+			qsShape.setParentAndPosition(outer, offset, 50);
+			int sw = qsShape.getWidth();
+			qsShape.connectTo(connector, "sv"); // south port, vertical line
+			offset += sw + 50;
+		}
+		outer.setEdgeStartPosition(0, 15);
+		
+		return outer;
+	}
+	
+	private Shape layout(HavingSubqueriesNode n) {
+		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
+		
+		Shape outer = new Shape(); // outer shape
+		Shape connector = new Shape(); // connector shape
+		
+		List<Shape> qsShapes = reverseStream(qsnList)
+			.map(c -> layout(c, "subquery"))
+			.collect(Collectors.toList());
+		
+		List<Integer> tableWidths = qsShapes.stream().map(Shape::getWidth).collect(Collectors.toList());
+		List<Integer> tableHeights = qsShapes.stream().map(Shape::getHeight).collect(Collectors.toList());
+		int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
+			+ (qsShapes.size() - 1) * 50; // 50px padding
+		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
+
+		int w = Math.max(totalWidth, 150);
+		
+		outer.setSize(w,  50 + maxHeight);
+		
+		connector.setParentAndPosition(outer, 0, 0);
+		connector.setSize(w,  30); 
+		
+		Shape havingSubqueries = new Shape();
+		havingSubqueries.setCssClass("havingSubqueries");
+		havingSubqueries.setParentAndPosition(connector,  0,  0);
+		havingSubqueries.setLabel("having_subqueries");
+		havingSubqueries.setSize(w, 30);
 		int offset = (w - totalWidth) / 2;
 		for (Shape qsShape : qsShapes) {
 			qsShape.setParentAndPosition(outer, offset, 50);
@@ -544,16 +587,16 @@ public class WorkbenchLayout implements Layout {
 				(n.getRowsExaminedPerScan() == 1 ? " row" : " rows")); 
 			costLabel.setSize(w/2, 10);
 		}
-		
+
+		// @TODO attached on the lhs, having on the rhs
 		if (n.getAttachedSubqueries() != null) {
 			Shape qb = layout(n.getAttachedSubqueries());
 			qb.setParentAndPosition(outer, w + 50, 0);
 			qb.connectTo(labelBoxShape, "e");
 			w = w + 50 + qb.getWidth();
 			h = Math.max(h, qb.getHeight());
-		
 		}
-		
+
 		outer.setSize(w, h);
 		return outer;
 		
@@ -692,10 +735,9 @@ public class WorkbenchLayout implements Layout {
 		
 		Shape child = layout(nln);
 		int w = child.getWidth();
-		int h = child.getHeight();
+		int h = child.getHeight() + 90;
 		
 		Shape outer = new Shape(); // outer shape 
-		outer.setSize(w, h + 90);
 		outer.setEdgeStartPosition(child.getEdgeStartX(),  0);
 		
 		Shape boxShape = new Shape();
@@ -705,9 +747,17 @@ public class WorkbenchLayout implements Layout {
 		boxShape.setTooltip("<span class=\"groupingOperationHeader\">Grouping operation</span>\n\n" +
 		    (n.isUsingTemporaryTable() ? "Using Temporary Table: true\n" : "") +
 			"Using Filesort: " + n.isUsingFilesort());
-
-
 		boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
+		
+		if (n.getHavingSubqueries() != null) {
+			Shape qb = layout(n.getHavingSubqueries());
+			qb.setParentAndPosition(outer, w + 50, 5);
+			qb.connectTo(boxShape, "e");
+			w = w + 50 + qb.getWidth();
+			h = Math.max(h, qb.getHeight());
+		}
+
+		outer.setSize(w, h + 90);		
 		
 		child.connectTo(boxShape, "s"); // "up", 50, 30
 		child.setParentAndPosition(outer, 0, 90);

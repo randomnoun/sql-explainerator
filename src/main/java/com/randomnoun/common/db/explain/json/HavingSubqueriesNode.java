@@ -3,12 +3,12 @@ package com.randomnoun.common.db.explain.json;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AttachedSubqueriesNode extends Node {
+public class HavingSubqueriesNode extends Node {
 	
 	private List<QuerySpecificationNode> querySpecifications = new ArrayList<>();
 	
-	public AttachedSubqueriesNode() {
-		super("having_subqueries", true);
+	public HavingSubqueriesNode() {
+		super("attached_subqueries", true);
 	}
 
 	public List<QuerySpecificationNode> getQuerySpecifications() {
