@@ -4,8 +4,7 @@ package com.randomnoun.common.db.explain.json;
 public class SharingTemporaryTableWithNode extends Node {
 	
 	public SharingTemporaryTableWithNode() {
-		super("sharingTemporaryTableWithNode", false);
-		// TODO Auto-generated constructor stub
+		super("sharing_temporary_table_with", false);
 	}
 
 	private Long selectId;

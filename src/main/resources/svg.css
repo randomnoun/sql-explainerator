@@ -37,11 +37,24 @@ svg.sql g.groupingOperation > rect {
 	ry: 9; 
 }
 
+svg.sql g.window > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2; 
+    rx: 9; 
+    ry: 9; 
+}
+svg.sql g.window > text { 
+} 
+
+	
 
 svg.sql g.orderingOperation.hasTempTable > rect { 
 	stroke: #bf4040;
 }
 svg.sql g.groupingOperation.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+svg.sql g.window.hasTempTable > rect { 
     stroke: #bf8000;
 }
 
@@ -99,6 +112,10 @@ svg.sql g.tempTableName > text {
 	font-size: 10px; 
 	font-weight: bold; 
 }
+svg.sql g.windowName > text { 
+    font-size: 10px; 
+    font-weight: bold; 
+}
 
 svg.sql g.tooltip div.tooltip {
 	font-size: 11px;
@@ -120,6 +137,13 @@ svg.sql g.materialisedFromSubqueryBorder > rect {
 svg.sql g.attachedSubqueries > rect {
 	stroke: black;
 	stroke-dasharray: 2;
+}
+svg.sql g.windowingBorder > rect {
+	stroke: #8c8c8c;
+    stroke-dasharray: 4;
+}
+svg.sql .windowing > rect {
+	fill: #e8e8e8;
 }
 svg.sql .materialisedTableName > rect {
 	fill: #e8e8e8;

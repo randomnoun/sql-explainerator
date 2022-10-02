@@ -13,6 +13,7 @@ import org.json.simple.parser.ParseException;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
 import com.randomnoun.common.db.explain.json.AttachedSubqueriesNode;
+import com.randomnoun.common.db.explain.json.BufferResultNode;
 import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
 import com.randomnoun.common.db.explain.json.GroupingOperationNode;
@@ -27,6 +28,9 @@ import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
 import com.randomnoun.common.db.explain.json.SharingTemporaryTableWithNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
+import com.randomnoun.common.db.explain.json.WindowNode;
+import com.randomnoun.common.db.explain.json.WindowingNode;
+import com.randomnoun.common.db.explain.json.WindowsNode;
 
 /** Convert JSON to a hierarchy of Nodes */
 public class PlanParser {
@@ -82,37 +86,38 @@ public class PlanParser {
 		// ok so my theory is that the qbn can contain exactly one of these things
 		// which is always drawn underneath the query block rectangle
 		
-		if (obj.containsKey("union_result")) {
-			Node cn = parseUnionResult((JSONObject) obj.get("union_result"));
+		Node cn = parseQueryNode(obj);
+		if (cn != null) {
 			n.setQueryNode(cn);
 			n.addChild(cn);
-		} else if (obj.containsKey("duplicates_removal")) { // DISTINCT node
-			Node cn = parseDuplicatesRemoval((JSONObject) obj.get("duplicates_removal"));
-			n.setQueryNode(cn);
-			n.addChild(cn);
-			// other nodes
-		} else if (obj.containsKey("table")) {
-			Node cn = parseTable((JSONObject) obj.get("table"));
-			n.setQueryNode(cn);
-			n.addChild(cn);
-		} else if (obj.containsKey("ordering_operation")) {
-			Node cn = parseOrderingOperation((JSONObject) obj.get("ordering_operation"));
-			n.setQueryNode(cn);
-			n.addChild(cn);
-		} else if (obj.containsKey("grouping_operation")) {
-			Node cn = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
-			n.setQueryNode(cn);
-			n.addChild(cn);
-		} else if (obj.containsKey("nested_loop")) {
-			Node cn = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.setQueryNode(cn);
-			n.addChild(cn);
-		} else {
-			// can have 'no tables used' if this is a SELECT without a table
-			
-			// throw new IllegalStateException("Expected 'union_result', 'duplicates_removal', 'table', 'ordering_operation', 'grouping_operation' in query block " + n.selectId);
 		}
 		return n;
+	}
+	
+	private Node parseQueryNode(JSONObject obj) {
+		Node cn = null;
+		if (obj.containsKey("union_result")) {
+			cn = parseUnionResult((JSONObject) obj.get("union_result"));
+		} else if (obj.containsKey("duplicates_removal")) { // DISTINCT node
+			cn = parseDuplicatesRemoval((JSONObject) obj.get("duplicates_removal"));
+		} else if (obj.containsKey("table")) {
+			cn = parseTable((JSONObject) obj.get("table"));
+		} else if (obj.containsKey("ordering_operation")) {
+			cn = parseOrderingOperation((JSONObject) obj.get("ordering_operation"));
+		} else if (obj.containsKey("grouping_operation")) {
+			cn = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
+		} else if (obj.containsKey("nested_loop")) {
+			cn = parseNestedLoop((JSONArray) obj.get("nested_loop"));
+		} else if (obj.containsKey("windowing")) {
+			cn = parseWindowing((JSONObject) obj.get("windowing"));
+		} else if (obj.containsKey("buffer_result")) {
+			cn = parseBufferResult((JSONObject) obj.get("buffer_result"));
+			
+		} else {
+			// can have 'no tables used' if this is a SELECT without a table
+			// throw new IllegalStateException("Expected 'union_result', 'duplicates_removal', 'table', 'ordering_operation', 'grouping_operation' in query block " + n.selectId);
+		}
+		return cn;
 	}
 	
 	private Long toLong(Object object) {
@@ -148,6 +153,14 @@ public class PlanParser {
 		return n;
 	}
 	
+	private BufferResultNode parseBufferResult(JSONObject obj) {
+		BufferResultNode brn = new BufferResultNode();
+		QueryBlockNode cn = parseQueryBlock(obj);
+		brn.setQueryBlock(cn);
+		brn.addChild(cn);
+		return brn;
+	}
+	
 	private List<QuerySpecificationNode> parseQuerySpecifications(JSONArray qs) {
 		List<QuerySpecificationNode> qsnList = new ArrayList<>();
 		for (Object o : qs) {
@@ -167,7 +180,7 @@ public class PlanParser {
 			n.setQueryBlock(cn);
 			n.addChild(cn);
 		} else if (obj.containsKey("table")) {
-			// this object is a table, which is also a queryBlock
+			// this object is a table, which is also a queryBlock. hrm.
 			QueryBlockNode cn = parseQueryBlock(obj);
 			n.setQueryBlock(cn);
 			n.addChild(cn);
@@ -229,18 +242,12 @@ public class PlanParser {
 			n.setCostInfo(parseCostInfo((JSONObject) obj.get("cost_info")));
 			n.getAttributes().put("costInfo", n.getCostInfo()); 
 		}
-		
-		if (obj.containsKey("nested_loop")) {
-			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.setChildNode(nln);
-			n.addChild(nln);
-		} else if (obj.containsKey("grouping_operation")) {
-			GroupingOperationNode gon = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
-			n.setChildNode(gon);
-			n.addChild(gon);
-
+		Node cn = parseQueryNode(obj);
+		if (cn == null) {
+			throw new IllegalArgumentException("expected duplicates_removal child");
 		} else {
-			throw new IllegalArgumentException("expected nested_loop");
+			n.setChildNode(cn);
+			n.addChild(cn);
 		}
 		return n;
 	}
@@ -270,21 +277,12 @@ public class PlanParser {
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
 		// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
 		
-		if (obj.containsKey("nested_loop")) {
-			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.setOrderedNode(nln);
-			n.addChild(nln);
-		} else if (obj.containsKey("duplicates_removal")) { // DISTINCT node
-			DuplicatesRemovalNode drn = parseDuplicatesRemoval((JSONObject) obj.get("duplicates_removal"));
-			n.setOrderedNode(drn);
-			n.addChild(drn);
-		} else if (obj.containsKey("grouping_operation")) {
-			Node gon = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
-			n.setOrderedNode(gon);
-			n.addChild(gon);
-			
+		Node cn = parseQueryNode(obj);
+		if (cn == null) {
+			throw new IllegalArgumentException("expected ordering_operation child");
 		} else {
-			throw new IllegalArgumentException("orderingOperation missing child");
+			n.setOrderedNode(cn);
+			n.addChild(cn);
 		}
 
 		return n;
@@ -299,21 +297,64 @@ public class PlanParser {
 		
 		n.getAttributes().put("usingFilesort", obj.get("using_filesort"));
 		// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
-		
-		if (obj.containsKey("nested_loop")) {
-			NestedLoopNode nln = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-			n.setGroupedNode(nln);
-			n.addChild(nln);
-		
-		} else if (obj.containsKey("table")) {
-			Node tn = parseTable((JSONObject) obj.get("table"));
-			n.setGroupedNode(tn);
-			n.addChild(tn);
-			
+
+		Node cn = parseQueryNode(obj);
+		if (cn == null) {
+			throw new IllegalArgumentException("expected grouping_operation child");
 		} else {
-			throw new IllegalArgumentException("groupingOperation missing child");
+			n.setGroupedNode(cn);
+			n.addChild(cn);
+		}
+
+		return n;
+	}
+	
+	private WindowingNode parseWindowing(JSONObject obj) {
+		WindowingNode n = new WindowingNode();
+		if (obj.containsKey("windows")) {
+			WindowsNode wn = parseWindows((JSONArray) obj.get("windows"));
+			n.setWindows(wn);
+			n.addChild(wn);
 		}
 		
+		Node cn = parseQueryNode(obj);
+		if (cn == null) {
+			throw new IllegalArgumentException("expected windowing child");
+		} else {
+			n.setChildNode(cn);
+			n.addChild(cn);
+		}
+		return n;
+	}
+	
+	private WindowsNode parseWindows(JSONArray windowItems) {
+		WindowsNode n = new WindowsNode();
+		
+		for (Object o : windowItems) {
+			JSONObject cobj = (JSONObject) o;
+			WindowNode cn = parseWindow(cobj);
+			n.addWindow(cn);
+			n.addChild(cn);
+		}
+		return n;
+	}
+	
+	private WindowNode parseWindow(JSONObject obj) {
+		WindowNode n = new WindowNode();
+		n.setName((String) obj.get("name"));
+		n.getAttributes().put("name", n.getName());
+		
+		n.setDefinitionPosition(toLong(obj.get("definition_position")));
+		n.getAttributes().put("definition_position", n.getDefinitionPosition());
+		
+		if (obj.containsKey("using_temporary_table")) {
+			n.setUsingTemporaryTable((Boolean) obj.get("using_temporary_table"));
+		}
+		n.getAttributes().put("usingTemporaryTable", obj.get("using_temporary_table"));
+
+		List<String> functions = parseNameList((JSONArray) obj.get("functions"));
+		n.setFunctions(functions);
+		n.getAttributes().put("functions", functions);
 		return n;
 	}
 	

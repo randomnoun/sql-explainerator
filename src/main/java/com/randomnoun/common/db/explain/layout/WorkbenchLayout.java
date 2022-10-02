@@ -14,6 +14,7 @@ import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.AccessTypeEnum;
 import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.json.AttachedSubqueriesNode;
+import com.randomnoun.common.db.explain.json.BufferResultNode;
 import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
 import com.randomnoun.common.db.explain.json.GroupingOperationNode;
@@ -25,6 +26,9 @@ import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
 import com.randomnoun.common.db.explain.json.SharingTemporaryTableWithNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
+import com.randomnoun.common.db.explain.json.WindowNode;
+import com.randomnoun.common.db.explain.json.WindowingNode;
+import com.randomnoun.common.db.explain.json.WindowsNode;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 
 /** Converts a hierarchy of Nodes into a hierarchy of Shapes */
@@ -137,6 +141,77 @@ public class WorkbenchLayout implements Layout {
 			throw new IllegalStateException("drawQueryBlock = false and no child block present");
 		}
 		return outer;
+	}
+	
+	private Shape layout(WindowingNode n) {
+		WindowsNode windowsNode = n.getWindows();
+		List<WindowNode> windowList = windowsNode.getWindows();
+		Node cn = n.getChildNode();
+		
+		List<Shape> windowShapes = windowList.stream()
+			.map(this::layout)
+			.collect(Collectors.toList());
+			
+		List<Integer> windowWidths = windowShapes.stream().map(Shape::getWidth).collect(Collectors.toList());
+		List<Integer> windowHeights = windowShapes.stream().map(Shape::getHeight).collect(Collectors.toList());
+		int totalWidth = windowWidths.stream().mapToInt(i -> i).sum() 
+			+ (windowShapes.size() - 1) * 20 + 20; // 20px padding between, 10px outer margin both side
+		
+		int h = windowHeights.stream().mapToInt(i -> i).max().orElse(0) + 30 + 20 ; // 10px outer margin top and bottom + label + windows
+		
+		Shape outer = new Shape(); // outer shape
+		outer.setCssClass("windowingBorder");
+		outer.setSize(totalWidth, h);
+		outer.setEdgeStartPosition(totalWidth / 2, 0);
+		
+		int offset = 10;
+		for (Shape ws : windowShapes) {
+			ws.setParentAndPosition(outer, offset, 10);
+			// qsb.connectTo(connector, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
+			offset += ws.getWidth() + 20;
+		}
+		
+		Shape windowing = new Shape();
+		windowing.setCssClass("windowing");
+		windowing.setParentAndPosition(outer,  0,  h - 30);
+		windowing.setLabel("windowing");
+		// union.setFill(new Color(179, 179, 179)); // #b3b3b3
+		windowing.setSize(totalWidth, 30);
+		
+		Shape child = layout(cn);
+		child.connectTo(outer, "sv"); // not really the outer any more 
+		child.setParentAndPosition(outer, (totalWidth - child.getWidth()) / 2, 90 + 50);
+		
+		return outer;
+	}
+	
+	private Shape layout(WindowNode n) {
+		Shape outer;
+		Shape boxShape;
+
+		outer = new Shape();
+		boxShape = new Shape(); 
+		boxShape.setCssClass("window" + (n.isUsingTemporaryTable() ? " hasTempTable" : ""));
+		boxShape.setLabel("window"); // <unnamed window>  
+		boxShape.setSize(120, 40);
+		boxShape.setTooltip("<span class=\"windowHeader\">Window</span>\n\n" +
+		    (n.isUsingTemporaryTable() ? "Using Temporary Table: true\n" : "") +
+			"Definition position: " + n.getDefinitionPosition() + "\n\n" +
+		    "Functions:\n  " + Text.join(n.getFunctions(), ", "));
+		
+		Shape labelShape = new Shape(); // label underneath the box
+		// String label = n.isUsingTemporaryTable() ? "tmp table" : "";
+		// label += n.isUsingFilesort() ? (label.equals("") ? "" : ", ") + "filesort" : "";
+		labelShape.setParentAndPosition(boxShape, 0, 45); 
+		labelShape.setSize(120, 10);
+		labelShape.setCssClass("windowName");
+		labelShape.setLabel(n.getName()); 
+		
+		outer.setSize(120, 55); // w + 160
+		// outer.setEdgeStartPosition(newEdgeStartX + 100, 0);
+		boxShape.setParentAndPosition(outer, 0, 0);
+		return outer;
+		
 	}
 	
 	private Shape layout(UnionResultNode n) {
@@ -659,6 +734,12 @@ public class WorkbenchLayout implements Layout {
 		child.setParentAndPosition(outer, 0, 40);
 		return outer;
 	}
+	
+	// ignore the buffer result container, just layout the queryBlock within
+	private Shape layout(BufferResultNode brn) {
+		QueryBlockNode qbn = brn.getQueryBlock();
+		return layout(qbn.getQueryNode());
+	}
 
 	// call this if there is a choice of different Node types, which will then call a more strongly typed layout method
 	private Shape layout(Node node) {
@@ -669,6 +750,8 @@ public class WorkbenchLayout implements Layout {
 		else if (node instanceof OrderingOperationNode) { shape = layout((OrderingOperationNode) node); }
 		else if (node instanceof GroupingOperationNode) { shape = layout((GroupingOperationNode) node); }
 		else if (node instanceof NestedLoopNode) { shape = layout((NestedLoopNode) node); }
+		else if (node instanceof WindowingNode) { shape = layout((WindowingNode) node); }
+		else if (node instanceof BufferResultNode) { shape = layout((BufferResultNode) node); }
 		else {
 			throw new IllegalStateException("unexpected class " + node.getClass().getName() + " in layout()");
 		}
