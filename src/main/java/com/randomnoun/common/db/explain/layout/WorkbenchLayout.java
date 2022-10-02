@@ -83,14 +83,15 @@ public class WorkbenchLayout implements Layout {
 		
 		Shape outer = new Shape(); // outer shape
 		Shape child = null; // child shape
-		int w = 100, h = 0;
+		Shape insertFromShape = null; // insert from shape
+		int w = 100;
+		int h = 0;
 		if (c != null) {
 			child = layout(c);
 
 			w = child.getWidth();
 			h = child.getHeight();
 		}
-		outer.setSize(w, h + (queryBlockLabel == null ? 0 : 30 + 30));
 		
 		if (queryBlockLabel != null) {
 			String labelText = queryBlockLabel + (topNode || n.getSelectId() == null ? "" : " #" + n.getSelectId()); // n.selectId == null || n.selectId == 1
@@ -98,7 +99,7 @@ public class WorkbenchLayout implements Layout {
 			String tooltip = "Select ID: " + n.getSelectId() + "\n" +
 			  (n.getCostInfo() == null ? "" :"Query cost: " + n.getCostInfo().getQueryCost() + "\n");
 			
-			
+			h += 30;
 			Shape boxShape = new Shape(); // label shape
 			boxShape.setCssClass("queryBlock" + clazz);
 			if (child == null) {
@@ -133,6 +134,7 @@ public class WorkbenchLayout implements Layout {
 				noTableShape.setTooltip(tooltip);
 				
 			} else {
+				h += 50; // 30 for the arrow and 20 bottom padding
 				child.connectTo(boxShape, "s");
 				child.setParentAndPosition(outer, 0, 60);
 			}
@@ -141,6 +143,20 @@ public class WorkbenchLayout implements Layout {
 		} else {
 			throw new IllegalStateException("drawQueryBlock = false and no child block present");
 		}
+		
+		if (n.getInsertFromNode() != null) {
+			outer.setCssClass("insertQueryBlock");
+			
+			insertFromShape = layout(n.getInsertFromNode().getQueryNode());
+
+			insertFromShape.connectTo(outer, "sv"); // not really the outer any more
+			insertFromShape.setParentAndPosition(outer, 0, h + 30);
+			
+			w = Math.max(w, insertFromShape.getWidth());
+			h += 50 + insertFromShape.getHeight();
+		}
+		
+		outer.setSize(w, h);
 		return outer;
 	}
 	
@@ -537,7 +553,7 @@ public class WorkbenchLayout implements Layout {
 		labelBoxShape.setParentAndPosition(outer, 0, 0);
 		labelBoxShape.setSize(w, lbsh);
 		labelBoxShape.setCssClass("table " + n.getAccessType().getCssClass());
-		labelBoxShape.setLabel(n.getAccessType().getLabel());
+		labelBoxShape.setLabel(n.getAccessType().getLabel() + (n.isInsert() ? " insert" : ""));
 
 		DecimalFormat df = new DecimalFormat("0.##");
 		String tooltip = 

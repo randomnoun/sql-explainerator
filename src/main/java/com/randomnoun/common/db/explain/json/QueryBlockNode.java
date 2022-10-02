@@ -6,6 +6,7 @@ public class QueryBlockNode extends Node {
 	private Object message;
 	private CostInfoNode costInfo;
 	private Node queryNode;
+	private InsertFromNode insertFromNode;
 	
 	public QueryBlockNode() {
 		super("query_block", false);
@@ -42,6 +43,16 @@ public class QueryBlockNode extends Node {
 	public void setQueryNode(Node queryNode) {
 		this.queryNode = queryNode;
 	}
+
+	public InsertFromNode getInsertFromNode() {
+		return insertFromNode;
+	}
+
+	public void setInsertFromNode(InsertFromNode insertFromNode) {
+		this.insertFromNode = insertFromNode;
+	}
+
+	
 
 
 }

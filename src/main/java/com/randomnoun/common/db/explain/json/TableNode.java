@@ -8,6 +8,7 @@ public class TableNode extends Node {
 
 	private CostInfoNode costInfo;
 	private AccessTypeEnum accessType;
+	private boolean insert;
 	private String tableName;
 	private String key;
 	private List<String> possibleKeys;
@@ -21,8 +22,8 @@ public class TableNode extends Node {
 	private String attachedCondition;
 	
 	private AttachedSubqueriesNode attachedSubqueries;
-	
 	private MaterialisedFromSubqueryNode materialisedFromSubquery;
+	private Node insertFrom;
 	
 
 	public TableNode() {
@@ -148,5 +149,23 @@ public class TableNode extends Node {
 	public void setAttachedCondition(String attachedCondition) {
 		this.attachedCondition = attachedCondition;
 	}
+
+	public boolean isInsert() {
+		return insert;
+	}
+
+	public void setInsert(boolean insert) {
+		this.insert = insert;
+	}
+
+	public Node getInsertFrom() {
+		return insertFrom;
+	}
+
+	public void setInsertFrom(Node insertFrom) {
+		this.insertFrom = insertFrom;
+	}
+
+
 
 }

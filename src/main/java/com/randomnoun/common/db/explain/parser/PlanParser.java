@@ -18,6 +18,7 @@ import com.randomnoun.common.db.explain.json.CostInfoNode;
 import com.randomnoun.common.db.explain.json.DuplicatesRemovalNode;
 import com.randomnoun.common.db.explain.json.GroupingOperationNode;
 import com.randomnoun.common.db.explain.json.HavingSubqueriesNode;
+import com.randomnoun.common.db.explain.json.InsertFromNode;
 import com.randomnoun.common.db.explain.json.ListNode;
 import com.randomnoun.common.db.explain.json.MaterialisedFromSubqueryNode;
 import com.randomnoun.common.db.explain.json.NameList;
@@ -92,7 +93,20 @@ public class PlanParser {
 			n.setQueryNode(cn);
 			n.addChild(cn);
 		}
+		if (obj.containsKey("insert_from")) {
+			n.setInsertFromNode(parseInsertFromNode((JSONObject) obj.get("insert_from")));
+			n.getAttributes().put("insert_from",  n.getInsertFromNode());
+		}
+		
 		return n;
+	}
+	
+	private InsertFromNode parseInsertFromNode(JSONObject obj) {
+		InsertFromNode ifn = new InsertFromNode();
+		Node qn = parseQueryNode(obj);
+		ifn.setQueryNode(qn);
+		ifn.addChild(qn);
+		return ifn;
 	}
 	
 	private Node parseQueryNode(JSONObject obj) {
@@ -389,10 +403,15 @@ public class PlanParser {
 		// either a table table, or a materialized_from_subquery table (tableName is the alias I guess)
 		n.setTableName((String) obj.get("table_name"));
 		n.getAttributes().put("tableName", obj.get("table_name"));
-		
+
+		if (obj.containsKey("insert")) {
+			n.setInsert((Boolean) obj.get("insert"));
+			n.getAttributes().put("insert", n.isInsert());
+		}
 		
 		n.getAttributes().put("distinct", obj.get("distinct")); // boolean
 		n.getAttributes().put("usingIndex", obj.get("using_index")); // boolean
+		
 		
 		n.setAccessType(AccessTypeEnum.fromJsonValue((String) obj.get("access_type")));
 		n.getAttributes().put("accessType", obj.get("access_type")); // "ALL", "ref", "eq_ref"
