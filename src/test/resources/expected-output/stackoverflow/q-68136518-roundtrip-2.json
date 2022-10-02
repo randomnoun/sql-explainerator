@@ -10,9 +10,150 @@
               "costInfo" : {
                 "queryCost" : 38.5
               } ,
+              "insert_from" : {
+                "nestedLoop" : [ {
+                    "table" : {
+                      "accessType" : "ref",
+                      "costInfo" : {
+                        "dataReadPerJoin" : "960",
+                        "evalCost" : 1.0,
+                        "prefixCost" : 3.5,
+                        "readCost" : 2.5
+                      } ,
+                      "filtered" : 100.0,
+                      "key" : "<auto_key0>",
+                      "keyLength" : 1,
+                      "materialized_from_subquery" : {
+                        "cacheable" : true,
+                        "dependent" : false,
+                        "query_block" : {
+                          "costInfo" : {
+                            "queryCost" : 5.514767812E8
+                          } ,
+                          "ordering_operation" : {
+                            "usingFilesort" : true,
+                            "windowing" : {
+                              "grouping_operation" : {
+                                "table" : {
+                                  "accessType" : "ALL",
+                                  "costInfo" : {
+                                    "dataReadPerJoin" : "44G",
+                                    "evalCost" : 4.95709464E7,
+                                    "prefixCost" : 5.57673172E7,
+                                    "readCost" : 6196370.8
+                                  } ,
+                                  "filtered" : 100.0,
+                                  "materialized_from_subquery" : {
+                                    "cacheable" : true,
+                                    "dependent" : false,
+                                    "query_block" : {
+                                      "costInfo" : {
+                                        "queryCost" : 1.53841389765E9
+                                      } ,
+                                      "ordering_operation" : {
+                                        "usingFilesort" : true,
+                                        "windowing" : {
+                                          "table" : {
+                                            "accessType" : "index",
+                                            "costInfo" : {
+                                              "dataReadPerJoin" : "44G",
+                                              "evalCost" : 4.95709464E7,
+                                              "prefixCost" : 5.128550565E7,
+                                              "readCost" : 1714559.25
+                                            } ,
+                                            "filtered" : 100.0,
+                                            "key" : "ind_sig_dt",
+                                            "keyLength" : 80,
+                                            "rows_examined_per_scan" : 495709464,
+                                            "rows_produced_per_join" : 495709464,
+                                            "tableName" : "t_stats_csv",
+                                            "usedColumns" : [ "PK", "ind", "sig", "dt" ],
+                                            "usedKeyParts" : [ "ind", "sig", "dt" ],
+                                            "usingIndex" : true
+                                          } ,
+                                          "windows" : [ {
+                                              "window" : {
+                                                "definition_position" : 1,
+                                                "functions" : [ "dense_rank" ],
+                                                "name" : "<unnamed window>",
+                                                "usingTemporaryTable" : true
+                                              } 
+                                            } , 
+                                            {
+                                              "window" : {
+                                                "definition_position" : 2,
+                                                "functions" : [ "dense_rank" ],
+                                                "name" : "<unnamed window>",
+                                                "usingTemporaryTable" : true
+                                              } 
+                                            }  ]
+                                        } 
+                                      } ,
+                                      "selectId" : 5
+                                    } ,
+                                    "usingTemporaryTable" : true
+                                  } ,
+                                  "rows_examined_per_scan" : 495709464,
+                                  "rows_produced_per_join" : 495709464,
+                                  "tableName" : "CTE",
+                                  "usedColumns" : [ "IND", "SIG", "DT", "GRP" ]
+                                } ,
+                                "usingFilesort" : false
+                              } ,
+                              "windows" : [ {
+                                  "window" : {
+                                    "functions" : [ "row_number" ],
+                                    "name" : "<unnamed window>",
+                                    "usingTemporaryTable" : true
+                                  } 
+                                }  ]
+                            } 
+                          } ,
+                          "selectId" : 4
+                        } ,
+                        "usingTemporaryTable" : true
+                      } ,
+                      "possibleKeys" : [ "<auto_key0>" ],
+                      "ref" : [ "const" ],
+                      "rows_examined_per_scan" : 10,
+                      "rows_produced_per_join" : 10,
+                      "tableName" : "CTE2",
+                      "usedColumns" : [ "ROWNUM", "IND", "SIG", "START" ],
+                      "usedKeyParts" : [ "SIG" ]
+                    } 
+                  } , 
+                  {
+                    "table" : {
+                      "accessType" : "ref",
+                      "attachedCondition" : "((cast(`cte2`.`START` as date) = cast(`cte2`.`START` as date)) and (`cte2`.`ROWNUM` = (`cte2`.`ROWNUM` + 1)))",
+                      "costInfo" : {
+                        "dataReadPerJoin" : "960",
+                        "evalCost" : 1.0,
+                        "prefixCost" : 38.5,
+                        "readCost" : 25.0
+                      } ,
+                      "filtered" : 10.0,
+                      "key" : "<auto_key0>",
+                      "keyLength" : 1,
+                      "materialized_from_subquery" : {
+                        "sharing_temporary_table_with" : {
+                          "selectId" : 4
+                        } 
+                      } ,
+                      "possibleKeys" : [ "<auto_key0>" ],
+                      "ref" : [ "const" ],
+                      "rows_examined_per_scan" : 10,
+                      "rows_produced_per_join" : 10,
+                      "tableName" : "CTE2",
+                      "usedColumns" : [ "ROWNUM", "IND", "SIG", "START" ],
+                      "usedKeyParts" : [ "SIG" ]
+                    } 
+                  }  ]
+              } ,
               "selectId" : 1,
               "table" : {
                 "accessType" : "ALL",
+                "insert" : true,
                 "tableName" : "t_stats_trades"
               } 
             } 
@@ -39,7 +180,7 @@
                     "key" : "<auto_key0>",
                     "keyLength" : 1,
                     "materialized_from_subquery" : {
-                      "sharingTemporaryTableWithNode" : {
+                      "sharing_temporary_table_with" : {
                         "selectId" : 4
                       } 
                     } ,
@@ -66,7 +207,7 @@
                     "key" : "<auto_key0>",
                     "keyLength" : 1,
                     "materialized_from_subquery" : {
-                      "sharingTemporaryTableWithNode" : {
+                      "sharing_temporary_table_with" : {
                         "selectId" : 4
                       } 
                     } ,

@@ -43,10 +43,11 @@ svg.sql g.window > rect {
     rx: 9; 
     ry: 9; 
 }
-svg.sql g.window > text { 
-} 
 
-	
+svg.sql g.insertQueryBlock > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2; 
+}
 
 svg.sql g.orderingOperation.hasTempTable > rect { 
 	stroke: #bf4040;
@@ -86,6 +87,9 @@ svg.sql g.table.fullIndexScan > rect {
 }
 svg.sql g.table.singleRow > rect { 
     fill: #4080bf;
+}
+svg.sql g.table.insert > rect { 
+    fill: black;
 }
 
 
@@ -138,6 +142,11 @@ svg.sql g.attachedSubqueries > rect {
 	stroke: black;
 	stroke-dasharray: 2;
 }
+svg.sql g.havingSubqueries > rect {
+    stroke: black;
+    stroke-dasharray: 2;
+}
+
 svg.sql g.windowingBorder > rect {
 	stroke: #8c8c8c;
     stroke-dasharray: 4;

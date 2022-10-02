@@ -83,14 +83,25 @@ public class WorkbenchLayout implements Layout {
 		
 		Shape outer = new Shape(); // outer shape
 		Shape child = null; // child shape
+		Shape insertIntoShape = null;   // insert into shape
 		Shape insertFromShape = null; // insert from shape
 		int w = 100;
 		int h = 0;
+		int m = 0; // margin
 		if (c != null) {
 			child = layout(c);
 
 			w = child.getWidth();
 			h = child.getHeight();
+		}
+		
+		if (n.getInsertFromNode() != null) {
+			insertIntoShape = new Shape();
+			insertIntoShape.setCssClass("insertQueryBlock");
+			insertIntoShape.setParentAndPosition(outer, 0, 0);
+			m = 10;
+			h += m * 2;
+			w += m * 2;
 		}
 		
 		if (queryBlockLabel != null) {
@@ -103,11 +114,11 @@ public class WorkbenchLayout implements Layout {
 			Shape boxShape = new Shape(); // label shape
 			boxShape.setCssClass("queryBlock" + clazz);
 			if (child == null) {
-				boxShape.setParentAndPosition(outer, 0, 0);
-				outer.setEdgeStartPosition(50, 0);
+				boxShape.setParentAndPosition(outer, m, m);
+				outer.setEdgeStartPosition(50, m);
 			} else {
-				boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 50, 0);
-				outer.setEdgeStartPosition(child.getEdgeStartX(), 0);
+				boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 50 + m, m);
+				outer.setEdgeStartPosition(child.getEdgeStartX() + m, m);
 			}
 			boxShape.setSize(100, 30);
 			boxShape.setLabel(labelText); 
@@ -128,7 +139,7 @@ public class WorkbenchLayout implements Layout {
 			if (child == null) {
 				Shape noTableShape = new Shape(); // label shape
 				noTableShape.setCssClass("tableName" + clazz);
-				noTableShape.setParentAndPosition(outer, 0, 35);
+				noTableShape.setParentAndPosition(outer, m, 35 + m);
 				noTableShape.setSize(100, 10);
 				noTableShape.setLabel("No tables used"); 
 				noTableShape.setTooltip(tooltip);
@@ -136,23 +147,27 @@ public class WorkbenchLayout implements Layout {
 			} else {
 				h += 50; // 30 for the arrow and 20 bottom padding
 				child.connectTo(boxShape, "s");
-				child.setParentAndPosition(outer, 0, 60);
+				child.setParentAndPosition(outer, m, 60 + m);
 			}
 		} else if (child != null) {
-			child.setParentAndPosition(outer, 0, 0);
+			child.setParentAndPosition(outer, m, m);
 		} else {
 			throw new IllegalStateException("drawQueryBlock = false and no child block present");
 		}
 		
 		if (n.getInsertFromNode() != null) {
-			outer.setCssClass("insertQueryBlock");
+			insertIntoShape = new Shape();
+			insertIntoShape.setCssClass("insertQueryBlock");
+			insertIntoShape.setParentAndPosition(outer, 0, 0);
+			// outer.setEdgeStartPosition(50, 0);
 			
 			insertFromShape = layout(n.getInsertFromNode().getQueryNode());
-
-			insertFromShape.connectTo(outer, "sv"); // not really the outer any more
+			insertFromShape.connectTo(insertIntoShape, "sv"); // not really the outer any more
 			insertFromShape.setParentAndPosition(outer, 0, h + 30);
 			
 			w = Math.max(w, insertFromShape.getWidth());
+			insertIntoShape.setSize(w, h);
+			
 			h += 50 + insertFromShape.getHeight();
 		}
 		
@@ -165,42 +180,49 @@ public class WorkbenchLayout implements Layout {
 		List<WindowNode> windowList = windowsNode.getWindows();
 		Node cn = n.getChildNode();
 		
+		Shape outer = new Shape();
+		
 		List<Shape> windowShapes = windowList.stream()
 			.map(c -> layout(c))
 			.collect(Collectors.toList());
 			
 		List<Integer> windowWidths = windowShapes.stream().map(Shape::getWidth).collect(Collectors.toList());
 		List<Integer> windowHeights = windowShapes.stream().map(Shape::getHeight).collect(Collectors.toList());
-		int totalWidth = windowWidths.stream().mapToInt(i -> i).sum() 
+		int totalWindowWidth = windowWidths.stream().mapToInt(i -> i).sum() 
 			+ (windowShapes.size() - 1) * 20 + 20; // 20px padding between, 10px outer margin both side
 		
 		int h = windowHeights.stream().mapToInt(i -> i).max().orElse(0) + 30 + 20 ; // 10px outer margin top and bottom + label + windows
 		
-		Shape outer = new Shape(); // outer shape
-		outer.setCssClass("windowingBorder");
-		outer.setSize(totalWidth, h);
-		outer.setEdgeStartPosition(totalWidth / 2, 0);
+		Shape windowingBorder = new Shape(); // outer shape
+		windowingBorder.setParentAndPosition(outer, 0, 0);
+		windowingBorder.setCssClass("windowingBorder");
+		windowingBorder.setSize(totalWindowWidth, h);
+		windowingBorder.setEdgeStartPosition(totalWindowWidth / 2, 0);
 		
 		int offset = 10;
 		for (Shape ws : windowShapes) {
-			ws.setParentAndPosition(outer, offset, 10);
+			ws.setParentAndPosition(windowingBorder, offset, 10);
 			// qsb.connectTo(connector, "sv"); // , offset + (w / 2), 30 // hrm. how does this work then
 			offset += ws.getWidth() + 20;
 		}
 		
-		Shape windowing = new Shape();
-		windowing.setCssClass("windowing");
-		windowing.setParentAndPosition(outer,  0,  h - 30);
-		windowing.setLabel("windowing");
+		Shape windowingLabel = new Shape();
+		windowingLabel.setCssClass("windowing");
+		windowingLabel.setParentAndPosition(windowingBorder,  0,  h - 30);
+		windowingLabel.setLabel("windowing");
 		// union.setFill(new Color(179, 179, 179)); // #b3b3b3
-		windowing.setSize(totalWidth, 30);
+		windowingLabel.setSize(totalWindowWidth, 30);
 		
 		Shape child = layout(cn);
-		child.connectTo(outer, "sv"); // not really the outer any more
-		child.setParentAndPosition(outer, totalWidth / 2 - child.getEdgeStartX(), 90 + 50);
+		child.connectTo(windowingBorder, "sv"); // not really the outer any more
+		child.setParentAndPosition(windowingBorder, totalWindowWidth / 2 - child.getEdgeStartX(), 90 + 50);
 		
 		// child.setParentAndPosition(outer, /*(totalWidth - child.getWidth()) / 2*/ child.getEdgeStartX() / 2, 90 + 50);
+		int outerWidth = Math.max(totalWindowWidth, child.getWidth());
+		int outerHeight = h + child.getHeight() + 90 + 50;
 		
+		outer.setSize(outerWidth, outerHeight);
+		outer.setEdgeStartPosition(windowingBorder.getEdgeStartX(), windowingBorder.getEdgeStartY());
 		return outer;
 	}
 	
@@ -468,6 +490,7 @@ public class WorkbenchLayout implements Layout {
 			case UNIQUE_KEY: w = 125; break;
 			default: w = 100;
 		}
+		if (n.isInsert()) { w += 50; }
 		int lbsh = n.getAccessType()==AccessTypeEnum.CONST ? 45 : 30; // label box shape height
 		int h = lbsh + 30;
 		Shape outer = new Shape(); // outer shape
@@ -552,8 +575,8 @@ public class WorkbenchLayout implements Layout {
 		Shape labelBoxShape = new Shape(); 
 		labelBoxShape.setParentAndPosition(outer, 0, 0);
 		labelBoxShape.setSize(w, lbsh);
-		labelBoxShape.setCssClass("table " + n.getAccessType().getCssClass());
-		labelBoxShape.setLabel(n.getAccessType().getLabel() + (n.isInsert() ? " insert" : ""));
+		labelBoxShape.setCssClass("table " + n.getAccessType().getCssClass() + (n.isInsert() ? " insert" : ""));
+		labelBoxShape.setLabel(n.getAccessType().getLabel() + (n.isInsert() ? " (Insert)" : ""));
 
 		DecimalFormat df = new DecimalFormat("0.##");
 		String tooltip = 
