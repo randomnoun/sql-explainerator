@@ -29,8 +29,8 @@ import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.layout.Layout;
+import com.randomnoun.common.db.explain.layout.CompatibleLayout;
 import com.randomnoun.common.db.explain.layout.ExplaineratorLayout;
-import com.randomnoun.common.db.explain.layout.WorkbenchLayout;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 /** All the CLI options */
@@ -150,9 +150,9 @@ public class SqlExplaineratorCli {
 			System.exit(1);
 		}
 		if (layoutString.equals("workbench")) {
-			layout = new WorkbenchLayout();
-		} else if (layoutString.equals("explainerator")) {
 			layout = new ExplaineratorLayout();
+		} else if (layoutString.equals("explainerator")) {
+			layout = new CompatibleLayout();
 		} else {
 			System.err.println("Invalid --layout; expected 'workbench' or 'explainerator'");
 			System.exit(1);

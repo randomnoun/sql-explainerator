@@ -33,9 +33,9 @@ import com.randomnoun.common.db.explain.json.WindowsNode;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 
 /** Converts a hierarchy of Nodes into a hierarchy of Shapes */
-public class WorkbenchLayout implements Layout {
+public class ExplaineratorLayout implements Layout {
 
-	Logger logger = Logger.getLogger(WorkbenchLayout.class);
+	Logger logger = Logger.getLogger(ExplaineratorLayout.class);
 	
 	private QueryBlockNode topNode;
 	protected boolean workbenchCompatible = true;
