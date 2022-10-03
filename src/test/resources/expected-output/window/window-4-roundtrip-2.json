@@ -1,0 +1,63 @@
+{
+  "query_block" : {
+    "costInfo" : {
+      "queryCost" : 7.95
+    } ,
+    "ordering_operation" : {
+      "usingFilesort" : false,
+      "windowing" : {
+        "grouping_operation" : {
+          "attached_subqueries" : [ {
+              "query_specification" : {
+                "cacheable" : true,
+                "dependent" : false,
+                "query_block" : {
+                  "costInfo" : {
+                    "queryCost" : 0.35
+                  } ,
+                  "selectId" : 2,
+                  "table" : {
+                    "accessType" : "ALL",
+                    "costInfo" : {
+                      "dataReadPerJoin" : "8",
+                      "evalCost" : 0.1,
+                      "prefixCost" : 0.35,
+                      "readCost" : 0.25
+                    } ,
+                    "filtered" : 100.0,
+                    "rows_examined_per_scan" : 1,
+                    "rows_produced_per_join" : 1,
+                    "tableName" : "justA",
+                    "usedColumns" : [ "c" ]
+                  } 
+                } 
+              } 
+            }  ],
+          "table" : {
+            "accessType" : "ALL",
+            "costInfo" : {
+              "dataReadPerJoin" : "112",
+              "evalCost" : 0.7,
+              "prefixCost" : 0.95,
+              "readCost" : 0.25
+            } ,
+            "filtered" : 100.0,
+            "rows_examined_per_scan" : 7,
+            "rows_produced_per_join" : 7,
+            "tableName" : "testAB",
+            "usedColumns" : [ "id", "c" ]
+          } ,
+          "usingFilesort" : true
+        } ,
+        "windows" : [ {
+            "window" : {
+              "functions" : [ "sum" ],
+              "name" : "w",
+              "usingTemporaryTable" : true
+            } 
+          }  ]
+      } 
+    } ,
+    "selectId" : 1
+  } 
+} 

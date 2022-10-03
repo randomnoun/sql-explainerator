@@ -85,6 +85,7 @@ public class WorkbenchLayout implements Layout {
 		Shape child = null; // child shape
 		Shape insertIntoShape = null;   // insert into shape
 		Shape insertFromShape = null; // insert from shape
+		Shape s = outer;
 		int w = 100;
 		int h = 0;
 		int m = 0; // margin
@@ -99,6 +100,7 @@ public class WorkbenchLayout implements Layout {
 			insertIntoShape = new Shape();
 			insertIntoShape.setCssClass("insertQueryBlock");
 			insertIntoShape.setParentAndPosition(outer, 0, 0);
+			s = insertIntoShape;
 			m = 10;
 			h += m * 2;
 			w += m * 2;
@@ -114,10 +116,10 @@ public class WorkbenchLayout implements Layout {
 			Shape boxShape = new Shape(); // label shape
 			boxShape.setCssClass("queryBlock" + clazz);
 			if (child == null) {
-				boxShape.setParentAndPosition(outer, m, m);
+				boxShape.setParentAndPosition(s, m, m);
 				outer.setEdgeStartPosition(50, m);
 			} else {
-				boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 50 + m, m);
+				boxShape.setParentAndPosition(s, child.getEdgeStartX() - 50 + m, m);
 				outer.setEdgeStartPosition(child.getEdgeStartX() + m, m);
 			}
 			boxShape.setSize(100, 30);
@@ -139,7 +141,7 @@ public class WorkbenchLayout implements Layout {
 			if (child == null) {
 				Shape noTableShape = new Shape(); // label shape
 				noTableShape.setCssClass("tableName" + clazz);
-				noTableShape.setParentAndPosition(outer, m, 35 + m);
+				noTableShape.setParentAndPosition(s, m, 35 + m);
 				noTableShape.setSize(100, 10);
 				noTableShape.setLabel("No tables used"); 
 				noTableShape.setTooltip(tooltip);
@@ -147,7 +149,7 @@ public class WorkbenchLayout implements Layout {
 			} else {
 				h += 50; // 30 for the arrow and 20 bottom padding
 				child.connectTo(boxShape, "s");
-				child.setParentAndPosition(outer, m, 60 + m);
+				child.setParentAndPosition(s, m, 60 + m);
 			}
 		} else if (child != null) {
 			child.setParentAndPosition(outer, m, m);
@@ -387,7 +389,7 @@ public class WorkbenchLayout implements Layout {
 		 *    ___________________  / \ 
 		 *    :                    \ /
 		 *    :                     : bottomArrow
-		 * [     ]  tableMargin  [     ]
+		 * [     ] -tableMargin- [     ]
 		 */
 		List<Shape> tableShapes = qsnList.stream() // reverseStream(qsnList)
 			.map(this::layout)
@@ -492,10 +494,11 @@ public class WorkbenchLayout implements Layout {
 		}
 		if (n.isInsert()) { w += 50; }
 		int lbsh = n.getAccessType()==AccessTypeEnum.CONST ? 45 : 30; // label box shape height
-		int h = lbsh + 30;
+		int h = lbsh;
 		Shape outer = new Shape(); // outer shape
 		
 		if (n.getMaterialisedFromSubquery() == null) {
+			h += 30;
 			if (n.getTableName() != null) {
 				Shape label = new Shape(); // label shape
 				label.setCssClass("tableName");
@@ -515,11 +518,12 @@ public class WorkbenchLayout implements Layout {
 			if (subquery instanceof SharingTemporaryTableWithNode) {
 				// @XXX this isn't from workbench
 				SharingTemporaryTableWithNode sttw = (SharingTemporaryTableWithNode) subquery;
-				
+				/*
 				Shape box = new Shape();
 				box.setCssClass("materialisedFromSubqueryBorder"); // dotted line Shape
 				box.setParentAndPosition(outer, 0, 42);
-				box.setSize(w, h); 
+				box.setSize(w, h);
+				*/ 
 				
 				Shape label = new Shape(); // label shape
 				label.setCssClass("materialisedTableName");
@@ -537,7 +541,7 @@ public class WorkbenchLayout implements Layout {
 				qbShape.traverse(rv);
 				logger.info("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 	
-				h = 80 + qbShape.getHeight() + 20; // 20px padding bottom
+				h = 30 + 80 + qbShape.getHeight() + 20; // 20px padding bottom
 				w = Math.max(w, qbShape.getWidth() + 20); // 10px padding left and right
 				w = Math.max(w, 300);
 	

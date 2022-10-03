@@ -46,7 +46,8 @@ svg.sql g.window > rect {
 
 svg.sql g.insertQueryBlock > rect {
     stroke: #cfcf40; 
-    stroke-width: 2; 
+    stroke-width: 2;
+    pointer-events: none; 
 }
 
 svg.sql g.orderingOperation.hasTempTable > rect { 

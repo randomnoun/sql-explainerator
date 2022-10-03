@@ -63,7 +63,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			  css + 
 			  "</style>\n" +
 			  "</head>\n" +
-			  "<body>\n" +
+			  "<body style=\"padding: 10px;\">\n" +
 			  "<svg width=\"" + w + "\" height=\"" + h + "\" class=\"sql\"" + onload + ">\n" +
 			  "  <defs>\n" + 
 			  "    <marker id=\"arrowhead\" markerWidth=\"12\" markerHeight=\"7\" refX=\"0\" refY=\"3.5\" orient=\"auto\" markerUnits=\"userSpaceOnUse\">\n" +

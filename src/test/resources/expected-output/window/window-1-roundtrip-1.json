@@ -1,0 +1,36 @@
+{
+  "query_block" : {
+    "cost_info" : {
+      "query_cost" : "0.65"
+    } ,
+    "select_id" : 1,
+    "windowing" : {
+      "table" : {
+        "access_type" : "ALL",
+        "cost_info" : {
+          "data_read_per_join" : "64",
+          "eval_cost" : "0.40",
+          "prefix_cost" : "0.65",
+          "read_cost" : "0.25"
+        } ,
+        "filtered" : "100.00",
+        "rows_examined_per_scan" : 4,
+        "rows_produced_per_join" : 4,
+        "table_name" : "w1",
+        "used_columns" : [ "i", "j" ]
+      } ,
+      "windows" : [ {
+          "definition_position" : 1,
+          "functions" : [ "std" ],
+          "name" : "<unnamed window>",
+          "using_temporary_table" : true
+        } , 
+        {
+          "definition_position" : 2,
+          "functions" : [ "variance" ],
+          "last_executed_window" : true,
+          "name" : "<unnamed window>"
+        }  ]
+    } 
+  } 
+} 
