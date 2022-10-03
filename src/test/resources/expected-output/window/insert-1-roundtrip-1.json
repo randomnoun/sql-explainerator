@@ -1,0 +1,58 @@
+{
+  "query_block" : {
+    "cost_info" : {
+      "query_cost" : "0.95"
+    } ,
+    "insert_from" : {
+      "buffer_result" : {
+        "table" : {
+          "access_type" : "ALL",
+          "attached_condition" : "(`sakila`.`testab`.`c` = (\/* select#2 *\/ select `sakila`.`justa`.`c` from `sakila`.`justa` limit 1))",
+          "attached_subqueries" : [ {
+              "cacheable" : true,
+              "dependent" : false,
+              "query_block" : {
+                "cost_info" : {
+                  "query_cost" : "0.35"
+                } ,
+                "select_id" : 2,
+                "table" : {
+                  "access_type" : "ALL",
+                  "cost_info" : {
+                    "data_read_per_join" : "8",
+                    "eval_cost" : "0.10",
+                    "prefix_cost" : "0.35",
+                    "read_cost" : "0.25"
+                  } ,
+                  "filtered" : "100.00",
+                  "rows_examined_per_scan" : 1,
+                  "rows_produced_per_join" : 1,
+                  "table_name" : "justA",
+                  "used_columns" : [ "c" ]
+                } 
+              } 
+            }  ],
+          "cost_info" : {
+            "data_read_per_join" : "15",
+            "eval_cost" : "0.10",
+            "prefix_cost" : "0.95",
+            "read_cost" : "0.85"
+          } ,
+          "filtered" : "14.29",
+          "rows_examined_per_scan" : 7,
+          "rows_produced_per_join" : 0,
+          "table_name" : "testAB",
+          "used_columns" : [ "id", "c" ]
+        } ,
+        "using_temporary_table" : true
+      } 
+    } ,
+    "select_id" : 1,
+    "table" : {
+      "access_type" : "ALL",
+      "insert" : true,
+      "select_id" : 1,
+      "table_name" : "testAB"
+    } 
+  } 
+} 

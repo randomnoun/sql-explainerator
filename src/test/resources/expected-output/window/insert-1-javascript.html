@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+svg text {
+	pointer-events: none;
+}
+svg [data-tooltip-html] {
+    pointer-events: auto;
+}
+
+svg.sql { 
+    font-family: Arial;
+    font-size: 14px;
+}
+svg.sql rect {
+    fill: transparent;
+}       
+svg.sql text {
+    text-anchor: middle; 
+    dominant-baseline: middle;
+    fill: black;
+}
+svg.sql g.queryBlock > rect {
+    stroke: black;
+}
+svg.sql g.queryBlock.topNode > rect {
+	fill: #cccccc; 
+}
+svg.sql g.union > rect { 
+	stroke: black;
+	fill: #b3b3b3; 
+}
+
+svg.sql g.duplicatesRemoval > rect,
+svg.sql g.orderingOperation > rect,
+svg.sql g.groupingOperation > rect { 
+	stroke: #cfcf40; 
+	stroke-width: 2; 
+	rx: 9; 
+	ry: 9; 
+}
+
+svg.sql g.window > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2; 
+    rx: 9; 
+    ry: 9; 
+}
+
+svg.sql g.insertQueryBlock > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2;
+    pointer-events: none; 
+}
+
+svg.sql g.orderingOperation.hasTempTable > rect { 
+	stroke: #bf4040;
+}
+svg.sql g.groupingOperation.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+svg.sql g.window.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+
+
+svg.sql g.table.nonUniqueKey > text,
+svg.sql g.table.uniqueKey > text,
+svg.sql g.table.fullTableScan > text,
+svg.sql g.table.fullIndexScan > text,
+svg.sql g.table.singleRow > text { 
+    fill: white;
+    font-size: 11px; 
+}
+
+svg.sql g.table > rect { 
+    stroke: black; 
+}
+
+svg.sql g.table.nonUniqueKey > rect { 
+	fill: #339933; 
+}
+svg.sql g.table.uniqueKey > rect { 
+	fill: #008000; 
+}
+svg.sql g.table.fullTableScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.fullIndexScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.singleRow > rect { 
+    fill: #4080bf;
+}
+svg.sql g.table.insert > rect { 
+    fill: black;
+}
+
+
+svg.sql g.queryCost > text { 
+	font-size: 11px; 
+} 
+svg.sql g.lhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: start; 
+}
+svg.sql g.rhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: end; 
+}
+svg.sql g.tableName > text { 
+	font-size: 11px; 
+} 
+svg.sql g.tableKey > text { 
+	font-size: 11px; 
+	font-weight: bold; 
+} 
+
+svg.sql g.tempTableName > text { 
+	font-size: 10px; 
+	font-weight: bold; 
+}
+svg.sql g.windowName > text { 
+    font-size: 10px; 
+    font-weight: bold; 
+}
+
+svg.sql g.tooltip div.tooltip {
+	font-size: 11px;
+	padding: 4px; 
+	white-space: pre; 
+	display: inline-block; 
+	background: white; 
+	border: 1px solid black; 
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+svg.sql g.container > rect {
+    stroke: transparent;
+}
+svg.sql g.materialisedFromSubqueryBorder > rect {
+	stroke: #8c8c8c;
+	stroke-dasharray: 4;
+}
+svg.sql g.attachedSubqueries > rect {
+	stroke: black;
+	stroke-dasharray: 2;
+}
+svg.sql g.havingSubqueries > rect {
+    stroke: black;
+    stroke-dasharray: 2;
+}
+
+svg.sql g.windowingBorder > rect {
+	stroke: #8c8c8c;
+    stroke-dasharray: 4;
+}
+svg.sql .windowing > rect {
+	fill: #e8e8e8;
+}
+svg.sql .materialisedTableName > rect {
+	fill: #e8e8e8;
+	
+}
+
+
+svg.sql g.tooltip div.tooltip .tableHeader,
+svg.sql g.tooltip div.tooltip .keyIndexHeader,
+svg.sql g.tooltip div.tooltip .costInfoHeader,
+svg.sql g.tooltip div.tooltip .groupingOperationHeader,
+svg.sql g.tooltip div.tooltip .orderingOperationHeader,
+svg.sql g.tooltip div.tooltip .attachedConditionHeader,
+svg.sql g.tooltip div.tooltip .nestedLoopHeader {
+	font-size: 11px;
+	font-weight: bold;
+} 
+</style>
+</head>
+<body style="padding: 10px;">
+<svg width="100vw" height="100vh" class="sql" onload="initSqlExplain(evt)">
+  <defs>
+    <marker id="arrowhead" markerWidth="12" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 12 3.5, 0 7" />
+    </marker>
+  </defs>
+    <g>
+        <rect x="0" y="5" width="300" height="440" style=""/>
+        <g class="insertQueryBlock">
+            <rect x="0" y="5" width="0" height="0" style=""/>
+            <g class="queryBlock topNode">
+                <rect x="35" y="15" width="100" height="30" style="" data-tooltip-html="Select ID: 1&#xa;Query cost: 0.95&#xa;" />
+                <text x="85" y="30" style="">
+query_block                </text>
+                <g class="lhsQueryCost">
+                    <rect x="35" y="0" width="85" height="10" style=""/>
+                    <text x="35" y="5" style="text-anchor:start;">
+Query cost: 0.95                    </text>
+                </g>
+            </g>
+            <g>
+                <rect x="10" y="75" width="150" height="60" style=""/>
+                <polyline points="85,75 85,57" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                <g class="tableName">
+                    <rect x="10" y="107" width="150" height="14" style=""/>
+                    <text x="85" y="114" style="">
+testAB                    </text>
+                </g>
+                <g class="table fullTableScan insert">
+                    <rect x="10" y="75" width="150" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;testAB&lt;/span&gt;&#xa;  Access Type: ALL&#xa;    Full Table Scan (Insert)&#xa;    Cost Hint: Very High - very costly for large tables (not so much for small ones).&#xa;No usable indexes were found for the table and the optimizer must search every row.&#xa;This could also mean the search range is so broad that the index would be useless.&#xa;  Used Columns: &#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: &lt;/span&gt;&#xa;  Used Key Parts: &#xa;  Possible Keys: &#xa;&#xa;Rows Examined per Scan: null&#xa;Rows Produced per Join: null&#xa;" />
+                    <text x="85" y="90" style="">
+Full Table Scan (Insert)                    </text>
+                </g>
+            </g>
+        </g>
+        <g class="insertQueryBlock">
+            <rect x="0" y="5" width="300" height="160" style=""/>
+        </g>
+        <g>
+            <rect x="0" y="195" width="300" height="230" style=""/>
+            <polyline points="50,195 50,177" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+            <g class="tableName">
+                <rect x="0" y="227" width="100" height="14" style=""/>
+                <text x="50" y="234" style="">
+testAB                </text>
+            </g>
+            <g class="table fullTableScan">
+                <rect x="0" y="195" width="100" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;testAB&lt;/span&gt;&#xa;  Access Type: ALL&#xa;    Full Table Scan&#xa;    Cost Hint: Very High - very costly for large tables (not so much for small ones).&#xa;No usable indexes were found for the table and the optimizer must search every row.&#xa;This could also mean the search range is so broad that the index would be useless.&#xa;  Used Columns: id,&#xa;    c&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: &lt;/span&gt;&#xa;  Used Key Parts: &#xa;  Possible Keys: &#xa;&#xa;&lt;span class=&quot;attachedConditionHeader&quot;&gt;Attached condition:&lt;/span&gt;&#xa;  (`sakila`.`testab`.`c` = (/* select#2 */ select `sakila`.`justa`.`c` from `sakila`.`justa` limit 1))&#xa;&#xa;Rows Examined per Scan: 7&#xa;Rows Produced per Join: 0&#xa;Filtered (ratio of rows produced per rows examined): 14.29%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 0.85&#xa;  Eval: 0.1&#xa;  Prefix: 0.95&#xa;  Data Read: 15" />
+                <text x="50" y="210" style="">
+Full Table Scan                </text>
+            </g>
+            <g class="lhsQueryCost">
+                <rect x="0" y="180" width="50" height="10" style=""/>
+                <text x="0" y="185" style="text-anchor:start;">
+0.95                </text>
+            </g>
+            <g class="rhsQueryCost">
+                <rect x="50" y="180" width="50" height="10" style=""/>
+                <text x="100" y="185" style="text-anchor:end;">
+7 rows                </text>
+            </g>
+            <g>
+                <rect x="150" y="195" width="150" height="230" style=""/>
+                <polyline points="150,210 112,210" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                <g>
+                    <rect x="150" y="195" width="150" height="30" style=""/>
+                    <g class="attachedSubqueries">
+                        <rect x="150" y="195" width="150" height="30" style=""/>
+                        <text x="225" y="210" style="">
+attached_subqueries                        </text>
+                    </g>
+                </g>
+                <g>
+                    <rect x="175" y="245" width="100" height="180" style=""/>
+                    <polyline points="225,285 225,237" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                    <g>
+                        <rect x="175" y="285" width="100" height="140" style=""/>
+                        <g class="queryBlock">
+                            <rect x="175" y="285" width="100" height="30" style="" data-tooltip-html="Select ID: 2&#xa;Query cost: 0.35&#xa;" />
+                            <text x="225" y="300" style="">
+subquery #2                            </text>
+                            <g class="lhsQueryCost">
+                                <rect x="175" y="270" width="50" height="10" style=""/>
+                                <text x="175" y="275" style="text-anchor:start;">
+Query cost: 0.35                                </text>
+                            </g>
+                        </g>
+                        <g>
+                            <rect x="175" y="345" width="100" height="60" style=""/>
+                            <polyline points="225,345 225,327" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                            <g class="tableName">
+                                <rect x="175" y="377" width="100" height="14" style=""/>
+                                <text x="225" y="384" style="">
+justA                                </text>
+                            </g>
+                            <g class="table fullTableScan">
+                                <rect x="175" y="345" width="100" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;justA&lt;/span&gt;&#xa;  Access Type: ALL&#xa;    Full Table Scan&#xa;    Cost Hint: Very High - very costly for large tables (not so much for small ones).&#xa;No usable indexes were found for the table and the optimizer must search every row.&#xa;This could also mean the search range is so broad that the index would be useless.&#xa;  Used Columns: c&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: &lt;/span&gt;&#xa;  Used Key Parts: &#xa;  Possible Keys: &#xa;&#xa;Rows Examined per Scan: 1&#xa;Rows Produced per Join: 1&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 0.25&#xa;  Eval: 0.1&#xa;  Prefix: 0.35&#xa;  Data Read: 8" />
+                                <text x="225" y="360" style="">
+Full Table Scan                                </text>
+                            </g>
+                            <g class="lhsQueryCost">
+                                <rect x="175" y="330" width="50" height="10" style=""/>
+                                <text x="175" y="335" style="text-anchor:start;">
+0.35                                </text>
+                            </g>
+                            <g class="rhsQueryCost">
+                                <rect x="225" y="330" width="50" height="10" style=""/>
+                                <text x="275" y="335" style="text-anchor:end;">
+1 row                                </text>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+<g class="tooltip" visibility="hidden" >
+    <foreignObject style="overflow: visible;">
+        <body xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
+            <div class="tooltip">Tooltip</div>
+        </body>
+    </foreignObject>
+</g>
+</svg>
+<script type="text/ecmascript">
+// this javascript is either
+// - embedded inside the SVG in an SVG <script> tag
+// - embedded inside the HTML in an HTML <script> tag
+//
+// the initSqlExplain() function is called from an 'onload' attribute on the SVG element
+
+// the tooltip code has been adapted from the javascript at
+//   https://github.com/petercollingridge/code-for-blog/blob/master/svg-interaction/tooltip/change_text_dynamic_length.svg?short_path=b59eb3f
+
+function initSqlExplain(e) {
+    svg = e.target.ownerDocument;
+    svgRoot = e.target; // svg.documentElement
+
+    var tooltip = svg.querySelector('g.tooltip');
+    var tooltipFo = tooltip.getElementsByTagName('foreignObject')[0];
+    var tooltipDiv = tooltipFo.getElementsByTagName('div')[0];
+    var triggers = svg.querySelectorAll('[data-tooltip-html]');
+
+    for (var i = 0; i < triggers.length; i++) {
+        triggers[i].addEventListener('mousemove', showTooltip);
+        triggers[i].addEventListener('mouseout', hideTooltip);
+    }
+
+    function showTooltip(evt) {
+        var ctm = svgRoot.getScreenCTM();
+        var x = (evt.clientX - ctm.e + 6) / ctm.a;
+        var y = (evt.clientY - ctm.f + 20) / ctm.d;
+        tooltip.setAttributeNS(null, 'transform', 'translate(' + x + ' ' + y + ')');
+        tooltip.setAttributeNS(null, 'visibility', 'visible');
+
+        // tooltipDiv.innerHTML = '<div class="tooltip">' + evt.target.getAttributeNS(null, 'data-tooltip-html') + '</div>';
+        tooltipDiv.innerHTML = evt.target.getAttributeNS(null, 'data-tooltip-html');
+    }
+
+    function hideTooltip(evt) {
+        tooltip.setAttributeNS(null, 'visibility', 'hidden');
+    }
+}
+
+</script>
+</body>
+</html>

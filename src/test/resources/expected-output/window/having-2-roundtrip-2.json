@@ -1,0 +1,78 @@
+{
+  "query_block" : {
+    "costInfo" : {
+      "queryCost" : 0.95
+    } ,
+    "grouping_operation" : {
+      "attached_subqueries" : [ {
+          "query_specification" : {
+            "cacheable" : true,
+            "dependent" : false,
+            "query_block" : {
+              "costInfo" : {
+                "queryCost" : 0.35
+              } ,
+              "selectId" : 3,
+              "table" : {
+                "accessType" : "ALL",
+                "costInfo" : {
+                  "dataReadPerJoin" : "8",
+                  "evalCost" : 0.1,
+                  "prefixCost" : 0.35,
+                  "readCost" : 0.25
+                } ,
+                "filtered" : 100.0,
+                "rows_examined_per_scan" : 1,
+                "rows_produced_per_join" : 1,
+                "tableName" : "justA",
+                "usedColumns" : [ "c" ]
+              } 
+            } 
+          } 
+        }  ],
+      "table" : {
+        "accessType" : "ALL",
+        "attachedCondition" : "(`sakila`.`testab`.`c` = (\/* select#2 *\/ select `sakila`.`justa`.`c` from `sakila`.`justa` limit 1))",
+        "costInfo" : {
+          "dataReadPerJoin" : "15",
+          "evalCost" : 0.1,
+          "prefixCost" : 0.95,
+          "readCost" : 0.85
+        } ,
+        "filtered" : 14.29,
+        "having_subqueries" : [ {
+            "query_specification" : {
+              "cacheable" : true,
+              "dependent" : false,
+              "query_block" : {
+                "costInfo" : {
+                  "queryCost" : 0.35
+                } ,
+                "selectId" : 2,
+                "table" : {
+                  "accessType" : "ALL",
+                  "costInfo" : {
+                    "dataReadPerJoin" : "8",
+                    "evalCost" : 0.1,
+                    "prefixCost" : 0.35,
+                    "readCost" : 0.25
+                  } ,
+                  "filtered" : 100.0,
+                  "rows_examined_per_scan" : 1,
+                  "rows_produced_per_join" : 1,
+                  "tableName" : "justA",
+                  "usedColumns" : [ "c" ]
+                } 
+              } 
+            } 
+          }  ],
+        "rows_examined_per_scan" : 7,
+        "rows_produced_per_join" : 0,
+        "tableName" : "testAB",
+        "usedColumns" : [ "id", "c" ]
+      } ,
+      "usingFilesort" : false
+    } ,
+    "selectId" : 1
+  } 
+} 
