@@ -38,6 +38,7 @@ public class WorkbenchLayout implements Layout {
 	Logger logger = Logger.getLogger(WorkbenchLayout.class);
 	
 	private QueryBlockNode topNode;
+	protected boolean workbenchCompatible = true;
 	
 	public void setQueryBlockNode(QueryBlockNode topNode) {
 		this.topNode = topNode;

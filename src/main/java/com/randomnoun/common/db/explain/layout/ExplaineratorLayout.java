@@ -11,4 +11,8 @@ public class ExplaineratorLayout extends WorkbenchLayout {
 
 	Logger logger = Logger.getLogger(ExplaineratorLayout.class);
 	
+	public ExplaineratorLayout() {
+		this.workbenchCompatible = false;
+	}
+	
 }
