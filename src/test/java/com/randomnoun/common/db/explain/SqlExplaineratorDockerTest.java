@@ -260,8 +260,8 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 			            fis.close();
 			            
 			            // cost values are slightly different
-			            expected = expected.replaceAll("[0-9]+\\.[0-9]+", "999").trim();
-			            String actual = baos.toString().replaceAll("[0-9]+\\.[0-9]+", "999").trim();
+			            expected = expected.replaceAll("[0-9]+(\\.[0-9]+)?", "999").trim();
+			            String actual = baos.toString().replaceAll("[0-9]+(\\.[0-9]+)?", "999").trim();
 			            
 			            assertEquals("difference in sakila-7g-roundtrip-1.json", expected, actual);
 						
