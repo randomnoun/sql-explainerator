@@ -13,7 +13,7 @@ import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.graph.Shape;
 import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.layout.Layout;
-import com.randomnoun.common.db.explain.layout.ExplaineratorLayout;
+import com.randomnoun.common.db.explain.layout.CompatibleLayout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightShapeVisitor;
@@ -62,7 +62,7 @@ public class SqlExplainerator {
 		// create the layout
 		// RandomnounLayout layout = new RandomnounLayout(qbn);
 		if (layout == null) {
-			 layout = new ExplaineratorLayout();
+			 layout = new CompatibleLayout();
 		}
 		layout.setQueryBlockNode(qbn);
 		s = layout.getLayoutShape();
