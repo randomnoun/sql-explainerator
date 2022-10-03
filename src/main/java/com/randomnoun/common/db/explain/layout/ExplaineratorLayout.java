@@ -38,7 +38,7 @@ public class ExplaineratorLayout implements Layout {
 	Logger logger = Logger.getLogger(ExplaineratorLayout.class);
 	
 	private QueryBlockNode topNode;
-	protected boolean workbenchCompatible = true;
+	protected boolean newLayout = true;
 	
 	public void setQueryBlockNode(QueryBlockNode topNode) {
 		this.topNode = topNode;
@@ -97,7 +97,7 @@ public class ExplaineratorLayout implements Layout {
 			h = child.getHeight();
 		}
 		
-		if (n.getInsertFromNode() != null) {
+		if (n.getInsertFromNode() != null && newLayout) {
 			insertIntoShape = new Shape();
 			insertIntoShape.setCssClass("insertQueryBlock");
 			insertIntoShape.setParentAndPosition(outer, 0, 0);
@@ -158,7 +158,7 @@ public class ExplaineratorLayout implements Layout {
 			throw new IllegalStateException("drawQueryBlock = false and no child block present");
 		}
 		
-		if (n.getInsertFromNode() != null) {
+		if (n.getInsertFromNode() != null && newLayout) {
 			insertIntoShape = new Shape();
 			insertIntoShape.setCssClass("insertQueryBlock");
 			insertIntoShape.setParentAndPosition(outer, 0, 0);
@@ -220,7 +220,6 @@ public class ExplaineratorLayout implements Layout {
 		child.connectTo(windowingBorder, "sv"); // not really the outer any more
 		child.setParentAndPosition(windowingBorder, totalWindowWidth / 2 - child.getEdgeStartX(), 90 + 50);
 		
-		// child.setParentAndPosition(outer, /*(totalWidth - child.getWidth()) / 2*/ child.getEdgeStartX() / 2, 90 + 50);
 		int outerWidth = Math.max(totalWindowWidth, child.getWidth());
 		int outerHeight = h + child.getHeight() + 90 + 50;
 		
@@ -252,7 +251,6 @@ public class ExplaineratorLayout implements Layout {
 		labelShape.setLabel(n.getName()); 
 		
 		outer.setSize(120, 55); // w + 160
-		// outer.setEdgeStartPosition(newEdgeStartX + 100, 0);
 		boxShape.setParentAndPosition(outer, 0, 0);
 		return outer;
 		
@@ -568,7 +566,7 @@ public class ExplaineratorLayout implements Layout {
 					label.setLabel(n.getKey()); 
 					label.setSize(w, 14);
 				}
-			} else {
+			} else if (newLayout) {
 				throw new IllegalStateException("unexpected subquery node " + n.getMaterialisedFromSubquery().getSubquery().getClass() +
 					"; expected SharingTemporaryTableWithNode or QueryBlockNode");
 			}
@@ -648,6 +646,7 @@ public class ExplaineratorLayout implements Layout {
 
 	private Shape layout(OrderingOperationNode n) {
 		Node cn = n.getOrderedNode();
+		if (cn == null) { return new Shape(); }
 		
 		// for reasons I'm not entirely sure of, if cn is a DuplicatesRemovalNode ('DISTINCT'), 
 		// then it's on the lhs of the ORDER shape, otherwise it's underneath
@@ -793,7 +792,7 @@ public class ExplaineratorLayout implements Layout {
 			"Using Filesort: " + n.isUsingFilesort());
 		boxShape.setParentAndPosition(outer, child.getEdgeStartX() - 40, 0);
 		
-		if (n.getHavingSubqueries() != null) {
+		if (n.getHavingSubqueries() != null && newLayout) {
 			Shape qb = layout(n.getHavingSubqueries());
 			qb.setParentAndPosition(outer, w + 50, 5);
 			qb.connectTo(boxShape, "e");

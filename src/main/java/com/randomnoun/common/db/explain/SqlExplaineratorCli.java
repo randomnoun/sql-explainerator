@@ -29,6 +29,7 @@ import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.layout.Layout;
+import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.layout.CompatibleLayout;
 import com.randomnoun.common.db.explain.layout.ExplaineratorLayout;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
@@ -46,7 +47,7 @@ public class SqlExplaineratorCli {
 		options.addOption( Option.builder("h").longOpt( "help" ).desc( "This usage text" ).build() );
 		options.addOption( Option.builder("i").longOpt( "infile" ).desc( "input file, or '-' for stdin; default = stdin" ).hasArg().argName("infile").build() );
 		options.addOption( Option.builder("o").longOpt( "outfile" ).desc( "output file, or '-' for stdout; default = stdout" ).hasArg().argName("outfile").build() );
-		options.addOption( Option.builder("l").longOpt( "layout" ).desc( "layout format (workbench or windowing); default = windowing" ).hasArg().argName("layout").build() );
+		options.addOption( Option.builder("l").longOpt( "layout" ).desc( "layout format (workbench or explainerator); default = explainerator" ).hasArg().argName("layout").build() );
 		options.addOption( Option.builder("f").longOpt( "format" ).desc( "output format (svg or html); default = svg" ).hasArg().argName("format").build() );
 		options.addOption( Option.builder("t").longOpt( "tooltip" ).desc( "tooltip type (none, title, attribute, javascript); default = title" ).hasArg().argName("tooltip").build() );
 		options.addOption( Option.builder("j").longOpt( "jdbc" ).desc( "JDBC connection string" ).hasArg().argName("jdbc").build() );
@@ -144,14 +145,17 @@ public class SqlExplaineratorCli {
 			script = baos.toString();
 		}
 		
+		PlanParser planParser = null;
 		Layout layout = null;
 		if (!(format.equals("svg") || format.equals("html"))) {
 			System.err.println("Invalid --format; expected 'svg' or 'html'");
 			System.exit(1);
 		}
-		if (layoutString.equals("workbench")) {
+		if (layoutString.equals("explainerator")) {
+			planParser = new PlanParser("8.0", true);
 			layout = new ExplaineratorLayout();
-		} else if (layoutString.equals("explainerator")) {
+		} else if (layoutString.equals("workbench")) {
+			planParser = new PlanParser("8.0", false);
 			layout = new CompatibleLayout();
 		} else {
 			System.err.println("Invalid --layout; expected 'workbench' or 'explainerator'");
@@ -195,8 +199,9 @@ public class SqlExplaineratorCli {
 			lcc.init("[SqlExplaineratorCli]", lprops);
 			
 			SqlExplainerator seti = new SqlExplainerator();
+			seti.setPlanParser(planParser);
 			seti.setLayout(layout);
-			seti.parseJson(r, "1.2.3");
+			seti.parseJson(r);
 			
 			seti.setTooltipType(tooltipType);
 			seti.setCss(css);

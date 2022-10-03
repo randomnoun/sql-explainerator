@@ -39,13 +39,19 @@ public class PlanParser {
 
 	private QueryBlockNode topNode;
 	String serverVersion;
+	boolean newLayout = false;
 	
 	public PlanParser() {
-		// nothing to construct
+		// default parser
 	}
-	
-	public void parse(String json, String serverVersion) throws ParseException {
+
+	public PlanParser(String serverVersion, boolean newLayout) {
 		this.serverVersion = serverVersion;
+		this.newLayout = newLayout;
+	}
+
+	
+	public void parse(String json) throws ParseException {
 		JSONParser jp = new JSONParser();
 		JSONObject obj = (JSONObject) jp.parse(json);
 		
@@ -58,8 +64,7 @@ public class PlanParser {
 		this.topNode = n;
 	}
 
-	public void parse(Reader r, String serverVersion) throws ParseException, IOException {
-		this.serverVersion = serverVersion;
+	public void parse(Reader r) throws ParseException, IOException {
 		JSONParser jp = new JSONParser();
 		JSONObject obj = (JSONObject) jp.parse(r);
 		
@@ -123,9 +128,9 @@ public class PlanParser {
 			cn = parseGroupingOperation((JSONObject) obj.get("grouping_operation"));
 		} else if (obj.containsKey("nested_loop")) {
 			cn = parseNestedLoop((JSONArray) obj.get("nested_loop"));
-		} else if (obj.containsKey("windowing")) {
+		} else if (obj.containsKey("windowing") && newLayout) {
 			cn = parseWindowing((JSONObject) obj.get("windowing"));
-		} else if (obj.containsKey("buffer_result")) {
+		} else if (obj.containsKey("buffer_result") && newLayout) {
 			cn = parseBufferResult((JSONObject) obj.get("buffer_result"));
 			
 		} else {
@@ -180,7 +185,7 @@ public class PlanParser {
 		List<QuerySpecificationNode> qsnList = new ArrayList<>();
 		for (Object o : qs) {
 			JSONObject cobj = (JSONObject) o;
-			QuerySpecificationNode cn = parseQuerySpecification((JSONObject) cobj);
+			QuerySpecificationNode cn = parseQuerySpecification(cobj);
 			qsnList.add(cn);
 		}
 		return qsnList;
@@ -225,12 +230,12 @@ public class PlanParser {
 			QueryBlockNode cn = parseQueryBlock((JSONObject) obj.get("query_block"));
 			n.setSubquery(cn);
 			n.addChild(cn);
-		} else if (obj.containsKey("sharing_temporary_table_with")) {
+		} else if (obj.containsKey("sharing_temporary_table_with") && newLayout) {
 			SharingTemporaryTableWithNode sttwn = parseSharingTemporaryTableWithNode((JSONObject) obj.get("sharing_temporary_table_with"));
 			n.setSubquery(sttwn);
 			n.addChild(sttwn);
 			
-		} else {
+		} else if (newLayout) {
 			throw new IllegalArgumentException("expected query_block in query_specification: " + obj.toString());
 		}
 		
@@ -293,7 +298,7 @@ public class PlanParser {
 		// n.attributes.put("costInfo", parseCostInfo((JSONObject) obj.get("cost_info")));
 		
 		Node cn = parseQueryNode(obj);
-		if (cn == null) {
+		if (cn == null && newLayout) {
 			throw new IllegalArgumentException("expected ordering_operation child");
 		} else {
 			n.setOrderedNode(cn);
@@ -321,7 +326,7 @@ public class PlanParser {
 			n.addChild(cn);
 		}
 		
-		if (obj.containsKey("having_subqueries")) {
+		if (obj.containsKey("having_subqueries") && newLayout) {
 			HavingSubqueriesNode sn = new HavingSubqueriesNode();
 			n.setHavingSubqueries(sn);
 			n.addChild(sn);
@@ -404,14 +409,13 @@ public class PlanParser {
 		n.setTableName((String) obj.get("table_name"));
 		n.getAttributes().put("tableName", obj.get("table_name"));
 
-		if (obj.containsKey("insert")) {
+		if (obj.containsKey("insert") && newLayout) {
 			n.setInsert((Boolean) obj.get("insert"));
 			n.getAttributes().put("insert", n.isInsert());
 		}
 		
 		n.getAttributes().put("distinct", obj.get("distinct")); // boolean
 		n.getAttributes().put("usingIndex", obj.get("using_index")); // boolean
-		
 		
 		n.setAccessType(AccessTypeEnum.fromJsonValue((String) obj.get("access_type")));
 		n.getAttributes().put("accessType", obj.get("access_type")); // "ALL", "ref", "eq_ref"

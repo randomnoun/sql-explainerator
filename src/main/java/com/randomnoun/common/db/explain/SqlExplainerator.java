@@ -35,32 +35,38 @@ public class SqlExplainerator {
 	TooltipTypeEnum tooltipType = TooltipTypeEnum.SVG_TITLE;
 	String css;
 	String script;
+	String serverVersion;
+	PlanParser planParser;
 	Layout layout;
 	
 	public SqlExplainerator() {
+		// defaults
 	}
 	
 	// @TODO set options ( alternate css resources )
 
-	public void parseJson(String json, String server_version) throws ParseException {
+	public void parseJson(String json) throws ParseException {
 		// parse the json and create the diagram
-		PlanParser pp = new PlanParser();
-		pp.parse(json, server_version);
-		QueryBlockNode qbn = pp.getTopNode();
+		if (planParser == null) {
+			planParser = new PlanParser(serverVersion, true);
+		}
+		planParser.parse(json);
+		QueryBlockNode qbn = planParser.getTopNode();
 		createDiagram(qbn);
 	}
 
-	public void parseJson(Reader r, String server_version) throws ParseException, IOException {
+	public void parseJson(Reader r) throws ParseException, IOException {
 		// parse the json and create the diagram
-		PlanParser pp = new PlanParser();
-		pp.parse(r, server_version);
-		QueryBlockNode qbn = pp.getTopNode();
+		if (planParser == null) {
+			planParser = new PlanParser(serverVersion, true);
+		}
+		planParser.parse(r);
+		QueryBlockNode qbn = planParser.getTopNode();
 		createDiagram(qbn);
 	}
 
 	private void createDiagram(QueryBlockNode qbn) {
 		// create the layout
-		// RandomnounLayout layout = new RandomnounLayout(qbn);
 		if (layout == null) {
 			 layout = new CompatibleLayout();
 		}
@@ -139,6 +145,22 @@ public class SqlExplainerator {
 
 	public void setLayout(Layout layout) {
 		this.layout = layout;
+	}
+
+	public PlanParser getPlanParser() {
+		return planParser;
+	}
+
+	public void setPlanParser(PlanParser planParser) {
+		this.planParser = planParser;
+	}
+
+	public String getServerVersion() {
+		return serverVersion;
+	}
+
+	public void setServerVersion(String serverVersion) {
+		this.serverVersion = serverVersion;
 	}
 
 

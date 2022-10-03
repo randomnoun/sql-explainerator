@@ -80,9 +80,9 @@ public abstract class Node implements Struct.ToJson {
 					remaining.add(v);
 				}
 			}
-			if (remaining.size() > 0) {
-				throw new IllegalStateException("didn't expect remaining children here");
-			}
+			//if (remaining.size() > 0) {
+			//	throw new IllegalStateException("didn't expect remaining children here");
+			//}
 			s += "}";
 		}
 		return s;
