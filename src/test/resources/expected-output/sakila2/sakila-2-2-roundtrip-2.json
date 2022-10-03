@@ -5,7 +5,7 @@
     } ,
     "ordering_operation" : {
       "duplicates_removal" : {
-        "gouping_operation" : {
+        "grouping_operation" : {
           "nestedLoop" : [ {
               "table" : {
                 "accessType" : "ALL",

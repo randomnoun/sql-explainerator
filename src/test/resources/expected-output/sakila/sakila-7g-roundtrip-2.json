@@ -107,7 +107,7 @@
                 "costInfo" : {
                   "queryCost" : 5691.25
                 } ,
-                "gouping_operation" : {
+                "grouping_operation" : {
                   "nestedLoop" : [ {
                       "table" : {
                         "accessType" : "index",

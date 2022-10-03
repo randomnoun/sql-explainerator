@@ -4,7 +4,7 @@
       "queryCost" : 20.25
     } ,
     "ordering_operation" : {
-      "gouping_operation" : {
+      "grouping_operation" : {
         "table" : {
           "accessType" : "index",
           "costInfo" : {

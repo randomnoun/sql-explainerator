@@ -115,7 +115,7 @@
                             "costInfo" : {
                               "queryCost" : 686.65
                             } ,
-                            "gouping_operation" : {
+                            "grouping_operation" : {
                               "nestedLoop" : [ {
                                   "table" : {
                                     "accessType" : "ALL",
@@ -169,7 +169,7 @@
                             "costInfo" : {
                               "queryCost" : 156086.79
                             } ,
-                            "gouping_operation" : {
+                            "grouping_operation" : {
                               "nestedLoop" : [ {
                                   "table" : {
                                     "accessType" : "ALL",
@@ -206,7 +206,7 @@
                                         "costInfo" : {
                                           "queryCost" : 1814.22
                                         } ,
-                                        "gouping_operation" : {
+                                        "grouping_operation" : {
                                           "nestedLoop" : [ {
                                               "table" : {
                                                 "accessType" : "index",

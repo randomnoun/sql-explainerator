@@ -14,7 +14,6 @@ svg.sql {
     font-size: 14px;
 }
 svg.sql rect {
-    /* stroke: black; */
     fill: transparent;
 }       
 svg.sql text {
@@ -42,11 +41,26 @@ svg.sql g.groupingOperation > rect {
 	ry: 9; 
 }
 
+svg.sql g.window > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2; 
+    rx: 9; 
+    ry: 9; 
+}
+
+svg.sql g.insertQueryBlock > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2;
+    pointer-events: none; 
+}
 
 svg.sql g.orderingOperation.hasTempTable > rect { 
 	stroke: #bf4040;
 }
 svg.sql g.groupingOperation.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+svg.sql g.window.hasTempTable > rect { 
     stroke: #bf8000;
 }
 
@@ -79,6 +93,9 @@ svg.sql g.table.fullIndexScan > rect {
 svg.sql g.table.singleRow > rect { 
     fill: #4080bf;
 }
+svg.sql g.table.insert > rect { 
+    fill: black;
+}
 
 
 svg.sql g.queryCost > text { 
@@ -104,6 +121,10 @@ svg.sql g.tempTableName > text {
 	font-size: 10px; 
 	font-weight: bold; 
 }
+svg.sql g.windowName > text { 
+    font-size: 10px; 
+    font-weight: bold; 
+}
 
 svg.sql g.tooltip div.tooltip {
 	font-size: 11px;
@@ -118,9 +139,25 @@ svg.sql g.tooltip div.tooltip {
 svg.sql g.container > rect {
     stroke: transparent;
 }
-svg.sql g.materialisedSubqueryBorder > rect {
+svg.sql g.materialisedFromSubqueryBorder > rect {
 	stroke: #8c8c8c;
 	stroke-dasharray: 4;
+}
+svg.sql g.attachedSubqueries > rect {
+	stroke: black;
+	stroke-dasharray: 2;
+}
+svg.sql g.havingSubqueries > rect {
+    stroke: black;
+    stroke-dasharray: 2;
+}
+
+svg.sql g.windowingBorder > rect {
+	stroke: #8c8c8c;
+    stroke-dasharray: 4;
+}
+svg.sql .windowing > rect {
+	fill: #e8e8e8;
 }
 svg.sql .materialisedTableName > rect {
 	fill: #e8e8e8;
@@ -140,15 +177,15 @@ svg.sql g.tooltip div.tooltip .nestedLoopHeader {
 } 
 </style>
 </head>
-<body>
-<svg width="300" height="246" class="sql">
+<body style="padding: 10px;">
+<svg width="300" height="266" class="sql">
   <defs>
     <marker id="arrowhead" markerWidth="12" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
       <polygon points="0 0, 12 3.5, 0 7" />
     </marker>
   </defs>
     <g>
-        <rect x="0" y="15" width="275" height="230" style=""/>
+        <rect x="0" y="15" width="275" height="250" style=""/>
         <g class="queryBlock topNode">
             <rect x="162" y="15" width="100" height="30" style="">
                 <title>Select ID: 1
