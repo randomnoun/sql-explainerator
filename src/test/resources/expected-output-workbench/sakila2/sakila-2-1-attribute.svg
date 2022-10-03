@@ -1,0 +1,791 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+  width="1983" height="1376" class="sql">
+  <defs>
+    <style type="text/css"><![CDATA[svg text {
+	pointer-events: none;
+}
+svg [data-tooltip-html] {
+    pointer-events: auto;
+}
+
+svg.sql { 
+    font-family: Arial;
+    font-size: 14px;
+}
+svg.sql rect {
+    fill: transparent;
+}       
+svg.sql text {
+    text-anchor: middle; 
+    dominant-baseline: middle;
+    fill: black;
+}
+svg.sql g.queryBlock > rect {
+    stroke: black;
+}
+svg.sql g.queryBlock.topNode > rect {
+	fill: #cccccc; 
+}
+svg.sql g.union > rect { 
+	stroke: black;
+	fill: #b3b3b3; 
+}
+
+svg.sql g.duplicatesRemoval > rect,
+svg.sql g.orderingOperation > rect,
+svg.sql g.groupingOperation > rect { 
+	stroke: #cfcf40; 
+	stroke-width: 2; 
+	rx: 9; 
+	ry: 9; 
+}
+
+svg.sql g.window > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2; 
+    rx: 9; 
+    ry: 9; 
+}
+
+svg.sql g.insertQueryBlock > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2;
+    pointer-events: none; 
+}
+
+svg.sql g.orderingOperation.hasTempTable > rect { 
+	stroke: #bf4040;
+}
+svg.sql g.groupingOperation.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+svg.sql g.window.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+
+
+svg.sql g.table.nonUniqueKey > text,
+svg.sql g.table.uniqueKey > text,
+svg.sql g.table.fullTableScan > text,
+svg.sql g.table.fullIndexScan > text,
+svg.sql g.table.singleRow > text { 
+    fill: white;
+    font-size: 11px; 
+}
+
+svg.sql g.table > rect { 
+    stroke: black; 
+}
+
+svg.sql g.table.nonUniqueKey > rect { 
+	fill: #339933; 
+}
+svg.sql g.table.uniqueKey > rect { 
+	fill: #008000; 
+}
+svg.sql g.table.fullTableScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.fullIndexScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.singleRow > rect { 
+    fill: #4080bf;
+}
+svg.sql g.table.insert > rect { 
+    fill: black;
+}
+
+
+svg.sql g.queryCost > text { 
+	font-size: 11px; 
+} 
+svg.sql g.lhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: start; 
+}
+svg.sql g.rhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: end; 
+}
+svg.sql g.tableName > text { 
+	font-size: 11px; 
+} 
+svg.sql g.tableKey > text { 
+	font-size: 11px; 
+	font-weight: bold; 
+} 
+
+svg.sql g.tempTableName > text { 
+	font-size: 10px; 
+	font-weight: bold; 
+}
+svg.sql g.windowName > text { 
+    font-size: 10px; 
+    font-weight: bold; 
+}
+
+svg.sql g.tooltip div.tooltip {
+	font-size: 11px;
+	padding: 4px; 
+	white-space: pre; 
+	display: inline-block; 
+	background: white; 
+	border: 1px solid black; 
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+svg.sql g.container > rect {
+    stroke: transparent;
+}
+svg.sql g.materialisedFromSubqueryBorder > rect {
+	stroke: #8c8c8c;
+	stroke-dasharray: 4;
+}
+svg.sql g.attachedSubqueries > rect {
+	stroke: black;
+	stroke-dasharray: 2;
+}
+svg.sql g.havingSubqueries > rect {
+    stroke: black;
+    stroke-dasharray: 2;
+}
+
+svg.sql g.windowingBorder > rect {
+	stroke: #8c8c8c;
+    stroke-dasharray: 4;
+}
+svg.sql .windowing > rect {
+	fill: #e8e8e8;
+}
+svg.sql .materialisedTableName > rect {
+	fill: #e8e8e8;
+	
+}
+
+
+svg.sql g.tooltip div.tooltip .tableHeader,
+svg.sql g.tooltip div.tooltip .keyIndexHeader,
+svg.sql g.tooltip div.tooltip .costInfoHeader,
+svg.sql g.tooltip div.tooltip .groupingOperationHeader,
+svg.sql g.tooltip div.tooltip .orderingOperationHeader,
+svg.sql g.tooltip div.tooltip .attachedConditionHeader,
+svg.sql g.tooltip div.tooltip .nestedLoopHeader {
+	font-size: 11px;
+	font-weight: bold;
+} 
+    ]]></style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 12 3.5, 0 7" />
+    </marker>
+  </defs>
+    <g>
+        <rect x="0" y="15" width="1395" height="1360" style=""/>
+        <g class="queryBlock topNode">
+            <rect x="1285" y="15" width="100" height="30" style="" data-tooltip-html="Select ID: 1&#xa;Query cost: 3025.49&#xa;" />
+            <text x="1335" y="30" style="">
+query_block            </text>
+            <g class="lhsQueryCost">
+                <rect x="1285" y="0" width="697" height="10" style=""/>
+                <text x="1285" y="5" style="text-anchor:start;">
+Query cost: 3025.49                </text>
+            </g>
+        </g>
+        <g>
+            <rect x="0" y="75" width="1395" height="1280" style=""/>
+            <polyline points="1335,75 1335,57" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+            <g class="orderingOperation">
+                <rect x="1295" y="75" width="80" height="40" style="" data-tooltip-html="&lt;span class=&quot;orderingOperationHeader&quot;&gt;Ordering operation&lt;/span&gt;&#xa;&#xa;Using Filesort: false" />
+                <text x="1335" y="95" style="">
+ORDER                </text>
+            </g>
+            <g>
+                <rect x="0" y="75" width="1715" height="1280" style=""/>
+                <polyline points="1235,95 1283,95" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                <g class="duplicatesRemoval">
+                    <rect x="1155" y="75" width="80" height="40" style="" data-tooltip-html="Duplicates removal&#xa;&#xa;Using Temporary Table: true&#xa;Using Filesort: false" />
+                    <text x="1195" y="95" style="">
+DISTINCT                    </text>
+                    <g class="tempTableName">
+                        <rect x="1155" y="120" width="80" height="10" style=""/>
+                        <text x="1155" y="125" style="text-anchor:start;">
+tmp table                        </text>
+                    </g>
+                </g>
+                <g>
+                    <rect x="1155" y="75" width="80" height="55" style=""/>
+                </g>
+                <g>
+                    <rect x="0" y="175" width="1715" height="1180" style=""/>
+                    <polyline points="1195,175 1195,142" style="stroke:#000000; stroke-width:1.060239842524815;" marker-end="url(#arrowhead)"/>
+                    <g>
+                        <rect x="0" y="285" width="100" height="60" style=""/>
+                        <polyline points="50,285 50,205 170,205" style="stroke:#000000; stroke-width:1.0000069802830271; fill: none;" marker-end="url(#arrowhead)"/>
+                        <g class="tableName">
+                            <rect x="0" y="317" width="100" height="14" style=""/>
+                            <text x="50" y="324" style="">
+sto                            </text>
+                        </g>
+                        <g class="tableKey">
+                            <rect x="0" y="331" width="100" height="14" style=""/>
+                            <text x="50" y="338" style="">
+PRIMARY                            </text>
+                        </g>
+                        <g class="table fullIndexScan">
+                            <rect x="0" y="285" width="100" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;sto&lt;/span&gt;&#xa;  Access Type: index&#xa;    Full Index Scan&#xa;    Cost Hint: High - especially for large indexes&#xa;  Used Columns: store_id,&#xa;    address_id&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: PRIMARY&lt;/span&gt;&#xa;  Used Key Parts: store_id&#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_address_id&#xa;&#xa;Rows Examined per Scan: 2&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 0.25&#xa;  Eval: 0.2&#xa;  Prefix: 0.45&#xa;  Data Read: 32" />
+                            <text x="50" y="300" style="">
+Full Index Scan                            </text>
+                        </g>
+                        <g class="lhsQueryCost">
+                            <rect x="0" y="270" width="50" height="10" style=""/>
+                            <text x="0" y="275" style="text-anchor:start;">
+0.45                            </text>
+                        </g>
+                        <g class="rhsQueryCost">
+                            <rect x="50" y="270" width="50" height="10" style=""/>
+                            <text x="100" y="275" style="text-anchor:end;">
+2 rows                            </text>
+                        </g>
+                    </g>
+                    <g>
+                        <rect x="150" y="285" width="125" height="60" style=""/>
+                        <polyline points="212,285 212,247" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                        <g class="tableName">
+                            <rect x="150" y="317" width="125" height="14" style=""/>
+                            <text x="212" y="324" style="">
+adr                            </text>
+                        </g>
+                        <g class="tableKey">
+                            <rect x="150" y="331" width="125" height="14" style=""/>
+                            <text x="212" y="338" style="">
+PRIMARY                            </text>
+                        </g>
+                        <g class="table uniqueKey">
+                            <rect x="150" y="285" width="125" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;adr&lt;/span&gt;&#xa;  Access Type: eq_ref&#xa;    Unique Key Lookup&#xa;    Cost Hint: Low - The optimizer is able to find an index that it can use to retrieve required records.&#xa;Fast because the index search leads directly to the page with all the row data&#xa;  Used Columns: address_id,&#xa;    city_id&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: PRIMARY&lt;/span&gt;&#xa;  Ref.:sakila.sto.address_id&#xa;  Used Key Parts: address_id&#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_city_id&#xa;&#xa;&lt;span class=&quot;attachedConditionHeader&quot;&gt;Attached condition:&lt;/span&gt;&#xa;  (`sakila`.`adr`.`city_id` is not null)&#xa;&#xa;Rows Examined per Scan: 1&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 1.7&#xa;  Eval: 0.2&#xa;  Prefix: 2.35&#xa;  Data Read: 1K" />
+                            <text x="212" y="300" style="">
+Unique Key Lookup                            </text>
+                        </g>
+                        <g class="lhsQueryCost">
+                            <rect x="150" y="270" width="62" height="10" style=""/>
+                            <text x="150" y="275" style="text-anchor:start;">
+1.9                            </text>
+                        </g>
+                        <g class="rhsQueryCost">
+                            <rect x="212" y="270" width="62" height="10" style=""/>
+                            <text x="274" y="275" style="text-anchor:end;">
+1 row                            </text>
+                        </g>
+                    </g>
+                    <g>
+                        <rect x="325" y="285" width="125" height="60" style=""/>
+                        <polyline points="387,285 387,247" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                        <g class="tableName">
+                            <rect x="325" y="317" width="125" height="14" style=""/>
+                            <text x="387" y="324" style="">
+cit                            </text>
+                        </g>
+                        <g class="tableKey">
+                            <rect x="325" y="331" width="125" height="14" style=""/>
+                            <text x="387" y="338" style="">
+PRIMARY                            </text>
+                        </g>
+                        <g class="table uniqueKey">
+                            <rect x="325" y="285" width="125" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;cit&lt;/span&gt;&#xa;  Access Type: eq_ref&#xa;    Unique Key Lookup&#xa;    Cost Hint: Low - The optimizer is able to find an index that it can use to retrieve required records.&#xa;Fast because the index search leads directly to the page with all the row data&#xa;  Used Columns: city_id,&#xa;    city,&#xa;    country_id&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: PRIMARY&lt;/span&gt;&#xa;  Ref.:sakila.adr.city_id&#xa;  Used Key Parts: city_id&#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_country_id&#xa;&#xa;Rows Examined per Scan: 1&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 1.25&#xa;  Eval: 0.2&#xa;  Prefix: 3.8&#xa;  Data Read: 432" />
+                            <text x="387" y="300" style="">
+Unique Key Lookup                            </text>
+                        </g>
+                        <g class="lhsQueryCost">
+                            <rect x="325" y="270" width="62" height="10" style=""/>
+                            <text x="325" y="275" style="text-anchor:start;">
+1.45                            </text>
+                        </g>
+                        <g class="rhsQueryCost">
+                            <rect x="387" y="270" width="62" height="10" style=""/>
+                            <text x="449" y="275" style="text-anchor:end;">
+1 row                            </text>
+                        </g>
+                    </g>
+                    <g>
+                        <rect x="500" y="285" width="125" height="60" style=""/>
+                        <polyline points="562,285 562,247" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                        <g class="tableName">
+                            <rect x="500" y="317" width="125" height="14" style=""/>
+                            <text x="562" y="324" style="">
+cou                            </text>
+                        </g>
+                        <g class="tableKey">
+                            <rect x="500" y="331" width="125" height="14" style=""/>
+                            <text x="562" y="338" style="">
+PRIMARY                            </text>
+                        </g>
+                        <g class="table uniqueKey">
+                            <rect x="500" y="285" width="125" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;cou&lt;/span&gt;&#xa;  Access Type: eq_ref&#xa;    Unique Key Lookup&#xa;    Cost Hint: Low - The optimizer is able to find an index that it can use to retrieve required records.&#xa;Fast because the index search leads directly to the page with all the row data&#xa;  Used Columns: country_id,&#xa;    country&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: PRIMARY&lt;/span&gt;&#xa;  Ref.:sakila.cit.country_id&#xa;  Used Key Parts: country_id&#xa;  Possible Keys: PRIMARY&#xa;&#xa;Rows Examined per Scan: 1&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 0.5&#xa;  Eval: 0.2&#xa;  Prefix: 4.5&#xa;  Data Read: 416" />
+                            <text x="562" y="300" style="">
+Unique Key Lookup                            </text>
+                        </g>
+                        <g class="lhsQueryCost">
+                            <rect x="500" y="270" width="62" height="10" style=""/>
+                            <text x="500" y="275" style="text-anchor:start;">
+0.7                            </text>
+                        </g>
+                        <g class="rhsQueryCost">
+                            <rect x="562" y="270" width="62" height="10" style=""/>
+                            <text x="624" y="275" style="text-anchor:end;">
+1 row                            </text>
+                        </g>
+                    </g>
+                    <g>
+                        <rect x="675" y="285" width="1040" height="1070" style=""/>
+                        <polyline points="1195,285 1195,247" style="stroke:#000000; stroke-width:1.0301129409793803;" marker-end="url(#arrowhead)"/>
+                        <g class="materialisedFromSubqueryBorder">
+                            <rect x="675" y="285" width="1040" height="1070" style=""/>
+                        </g>
+                        <g>
+                            <rect x="685" y="370" width="1020" height="940" style=""/>
+                            <g>
+                                <rect x="685" y="370" width="1020" height="940" style=""/>
+                                <g>
+                                    <rect x="685" y="370" width="1020" height="60" style=""/>
+                                    <g class="union">
+                                        <rect x="685" y="370" width="1020" height="30" style=""/>
+                                        <text x="1195" y="385" style="">
+UNION                                        </text>
+                                    </g>
+                                </g>
+                                <g>
+                                    <rect x="685" y="420" width="670" height="890" style=""/>
+                                    <polyline points="1280,460 1280,442" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                                    <g>
+                                        <rect x="685" y="460" width="670" height="850" style=""/>
+                                        <g class="queryBlock">
+                                            <rect x="1230" y="460" width="100" height="30" style="" data-tooltip-html="Select ID: 4&#xa;Query cost: 156086.79&#xa;" />
+                                            <text x="1280" y="475" style="">
+query_block #4                                            </text>
+                                            <g class="lhsQueryCost">
+                                                <rect x="1230" y="445" width="335" height="10" style=""/>
+                                                <text x="1230" y="450" style="text-anchor:start;">
+Query cost: 156086.79                                                </text>
+                                            </g>
+                                        </g>
+                                        <g>
+                                            <rect x="685" y="520" width="670" height="770" style=""/>
+                                            <polyline points="1280,520 1280,502" style="stroke:#000000; stroke-width:4.0;" marker-end="url(#arrowhead)"/>
+                                            <g class="groupingOperation hasTempTable">
+                                                <rect x="1240" y="520" width="80" height="40" style="" data-tooltip-html="&lt;span class=&quot;groupingOperationHeader&quot;&gt;Grouping operation&lt;/span&gt;&#xa;&#xa;Using Temporary Table: true&#xa;Using Filesort: false" />
+                                                <text x="1280" y="540" style="">
+GROUP                                                </text>
+                                            </g>
+                                            <g>
+                                                <rect x="685" y="610" width="670" height="590" style=""/>
+                                                <polyline points="1280,610 1280,572" style="stroke:#000000; stroke-width:4.0;" marker-end="url(#arrowhead)"/>
+                                                <g>
+                                                    <rect x="685" y="720" width="100" height="60" style=""/>
+                                                    <polyline points="735,720 735,640 953,640" style="stroke:#000000; stroke-width:1.004174209250271; fill: none;" marker-end="url(#arrowhead)"/>
+                                                    <g class="tableName">
+                                                        <rect x="685" y="752" width="100" height="14" style=""/>
+                                                        <text x="735" y="759" style="">
+customer                                                        </text>
+                                                    </g>
+                                                    <g class="table fullTableScan">
+                                                        <rect x="685" y="720" width="100" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;customer&lt;/span&gt;&#xa;  Access Type: ALL&#xa;    Full Table Scan&#xa;    Cost Hint: Very High - very costly for large tables (not so much for small ones).&#xa;No usable indexes were found for the table and the optimizer must search every row.&#xa;This could also mean the search range is so broad that the index would be useless.&#xa;  Used Columns: customer_id,&#xa;    store_id,&#xa;    first_name,&#xa;    last_name,&#xa;    email,&#xa;    address_id,&#xa;    active,&#xa;    create_date,&#xa;    last_update&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: &lt;/span&gt;&#xa;  Used Key Parts: &#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_store_id&#xa;&#xa;Rows Examined per Scan: 599&#xa;Rows Produced per Join: 599&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 1.25&#xa;  Eval: 59.9&#xa;  Prefix: 61.15&#xa;  Data Read: 341K" />
+                                                        <text x="735" y="735" style="">
+Full Table Scan                                                        </text>
+                                                    </g>
+                                                    <g class="lhsQueryCost">
+                                                        <rect x="685" y="705" width="50" height="10" style=""/>
+                                                        <text x="685" y="710" style="text-anchor:start;">
+61.15                                                        </text>
+                                                    </g>
+                                                    <g class="rhsQueryCost">
+                                                        <rect x="735" y="705" width="50" height="10" style=""/>
+                                                        <text x="785" y="710" style="text-anchor:end;">
+599 rows                                                        </text>
+                                                    </g>
+                                                </g>
+                                                <g>
+                                                    <rect x="835" y="720" width="320" height="480" style=""/>
+                                                    <polyline points="995,720 995,682" style="stroke:#000000; stroke-width:1.0001745070756802;" marker-end="url(#arrowhead)"/>
+                                                    <g class="materialisedFromSubqueryBorder">
+                                                        <rect x="835" y="720" width="320" height="480" style=""/>
+                                                    </g>
+                                                    <g>
+                                                        <rect x="845" y="805" width="300" height="350" style=""/>
+                                                        <g>
+                                                            <rect x="845" y="805" width="300" height="350" style=""/>
+                                                            <g class="groupingOperation">
+                                                                <rect x="1030" y="805" width="80" height="40" style="" data-tooltip-html="&lt;span class=&quot;groupingOperationHeader&quot;&gt;Grouping operation&lt;/span&gt;&#xa;&#xa;Using Filesort: false" />
+                                                                <text x="1070" y="825" style="">
+GROUP                                                                </text>
+                                                            </g>
+                                                            <g>
+                                                                <rect x="845" y="895" width="300" height="170" style=""/>
+                                                                <polyline points="1070,895 1070,857" style="stroke:#000000; stroke-width:1.111705469284428;" marker-end="url(#arrowhead)"/>
+                                                                <g>
+                                                                    <rect x="845" y="1005" width="100" height="60" style=""/>
+                                                                    <polyline points="895,1005 895,925 1028,925" style="stroke:#000000; stroke-width:1.004174209250271; fill: none;" marker-end="url(#arrowhead)"/>
+                                                                    <g class="tableName">
+                                                                        <rect x="845" y="1037" width="100" height="14" style=""/>
+                                                                        <text x="895" y="1044" style="">
+customer                                                                        </text>
+                                                                    </g>
+                                                                    <g class="tableKey">
+                                                                        <rect x="845" y="1051" width="100" height="14" style=""/>
+                                                                        <text x="895" y="1058" style="">
+PRIMARY                                                                        </text>
+                                                                    </g>
+                                                                    <g class="table fullIndexScan">
+                                                                        <rect x="845" y="1005" width="100" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;customer&lt;/span&gt;&#xa;  Access Type: index&#xa;    Full Index Scan&#xa;    Cost Hint: High - especially for large indexes&#xa;  Used Columns: customer_id&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: PRIMARY&lt;/span&gt;&#xa;  Used Key Parts: customer_id&#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_store_id,&#xa;    idx_fk_address_id,&#xa;    idx_last_name&#xa;&#xa;Rows Examined per Scan: 599&#xa;Rows Produced per Join: 599&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 1.25&#xa;  Eval: 59.9&#xa;  Prefix: 61.15&#xa;  Data Read: 341K" />
+                                                                        <text x="895" y="1020" style="">
+Full Index Scan                                                                        </text>
+                                                                    </g>
+                                                                    <g class="lhsQueryCost">
+                                                                        <rect x="845" y="990" width="50" height="10" style=""/>
+                                                                        <text x="845" y="995" style="text-anchor:start;">
+61.15                                                                        </text>
+                                                                    </g>
+                                                                    <g class="rhsQueryCost">
+                                                                        <rect x="895" y="990" width="50" height="10" style=""/>
+                                                                        <text x="945" y="995" style="text-anchor:end;">
+599 rows                                                                        </text>
+                                                                    </g>
+                                                                </g>
+                                                                <g>
+                                                                    <rect x="995" y="1005" width="150" height="60" style=""/>
+                                                                    <polyline points="1070,1005 1070,967" style="stroke:#000000; stroke-width:1.0001745070756802;" marker-end="url(#arrowhead)"/>
+                                                                    <g class="tableName">
+                                                                        <rect x="995" y="1037" width="150" height="14" style=""/>
+                                                                        <text x="1070" y="1044" style="">
+rental                                                                        </text>
+                                                                    </g>
+                                                                    <g class="tableKey">
+                                                                        <rect x="995" y="1051" width="150" height="14" style=""/>
+                                                                        <text x="1070" y="1058" style="">
+idx_fk_customer_id                                                                        </text>
+                                                                    </g>
+                                                                    <g class="table nonUniqueKey">
+                                                                        <rect x="995" y="1005" width="150" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;rental&lt;/span&gt;&#xa;  Access Type: ref&#xa;    Non-Unique Key Lookup&#xa;    Cost Hint: Low-medium - Low if number of matching rows is small, higher as the number of rows increases&#xa;  Used Columns: rental_id,&#xa;    customer_id&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: idx_fk_customer_id&lt;/span&gt;&#xa;  Ref.:sakila.customer.customer_id&#xa;  Used Key Parts: customer_id&#xa;  Possible Keys: idx_fk_customer_id&#xa;&#xa;Rows Examined per Scan: 26&#xa;Rows Produced per Join: 16004&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 152.57&#xa;  Eval: 1600.5&#xa;  Prefix: 1814.22&#xa;  Data Read: 500K" />
+                                                                        <text x="1070" y="1020" style="">
+Non-Unique Key Lookup                                                                        </text>
+                                                                    </g>
+                                                                    <g class="lhsQueryCost">
+                                                                        <rect x="995" y="990" width="75" height="10" style=""/>
+                                                                        <text x="995" y="995" style="text-anchor:start;">
+1753.07                                                                        </text>
+                                                                    </g>
+                                                                    <g class="rhsQueryCost">
+                                                                        <rect x="1070" y="990" width="75" height="10" style=""/>
+                                                                        <text x="1145" y="995" style="text-anchor:end;">
+26 rows                                                                        </text>
+                                                                    </g>
+                                                                </g>
+                                                                <g>
+                                                                <path fill="white" stroke="black" d="M 1070,895 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 1814.22" />
+                                                                <text x="1070" y="920" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+                                                                <text x="1070" y="930" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                                                                    <g class="queryCost">
+                                                                        <rect x="1030" y="880" width="40" height="10" style=""/>
+                                                                        <text x="1030" y="885" style="text-anchor:start;">
+1814.22                                                                        </text>
+                                                                    </g>
+                                                                    <g class="queryCost">
+                                                                        <rect x="1080" y="885" width="25" height="10" style=""/>
+                                                                        <text x="1080" y="890" style="text-anchor:start;">
+16K rows                                                                        </text>
+                                                                    </g>
+                                                                </g>
+                                                            </g>
+                                                        </g>
+                                                    </g>
+                                                    <g class="materialisedTableName">
+                                                        <rect x="835" y="752" width="320" height="20" style=""/>
+                                                        <text x="995" y="762" style="">
+rental_cus (materialised)                                                        </text>
+                                                    </g>
+                                                    <g class="tableKey">
+                                                        <rect x="835" y="772" width="320" height="14" style=""/>
+                                                        <text x="995" y="779" style="">
+&lt;auto_key0&gt;                                                        </text>
+                                                    </g>
+                                                    <g class="table nonUniqueKey">
+                                                        <rect x="835" y="720" width="320" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;rental_cus&lt;/span&gt;&#xa;  Access Type: ref&#xa;    Non-Unique Key Lookup&#xa;    Cost Hint: Low-medium - Low if number of matching rows is small, higher as the number of rows increases&#xa;  Used Columns: customer_id,&#xa;    count(rental.rental_id)&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: &amp;lt;auto_key0&amp;gt;&lt;/span&gt;&#xa;  Ref.:sakila.customer.customer_id&#xa;  Used Key Parts: customer_id&#xa;  Possible Keys: &amp;lt;auto_key0&amp;gt;&#xa;&#xa;Rows Examined per Scan: 26&#xa;Rows Produced per Join: 16004&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 4001&#xa;  Eval: 1600.4&#xa;  Prefix: 5662.55&#xa;  Data Read: 250K" />
+                                                        <text x="995" y="735" style="">
+Non-Unique Key Lookup                                                        </text>
+                                                    </g>
+                                                    <g class="lhsQueryCost">
+                                                        <rect x="835" y="705" width="160" height="10" style=""/>
+                                                        <text x="835" y="710" style="text-anchor:start;">
+5601.4                                                        </text>
+                                                    </g>
+                                                    <g class="rhsQueryCost">
+                                                        <rect x="995" y="705" width="160" height="10" style=""/>
+                                                        <text x="1155" y="710" style="text-anchor:end;">
+26 rows                                                        </text>
+                                                    </g>
+                                                </g>
+                                                <g>
+                                                    <rect x="1205" y="720" width="150" height="60" style=""/>
+                                                    <polyline points="1280,720 1280,682" style="stroke:#000000; stroke-width:1.0001745070756802;" marker-end="url(#arrowhead)"/>
+                                                    <g class="tableName">
+                                                        <rect x="1205" y="752" width="150" height="14" style=""/>
+                                                        <text x="1280" y="759" style="">
+pay                                                        </text>
+                                                    </g>
+                                                    <g class="tableKey">
+                                                        <rect x="1205" y="766" width="150" height="14" style=""/>
+                                                        <text x="1280" y="773" style="">
+idx_fk_customer_id                                                        </text>
+                                                    </g>
+                                                    <g class="table nonUniqueKey">
+                                                        <rect x="1205" y="720" width="150" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;pay&lt;/span&gt;&#xa;  Access Type: ref&#xa;    Non-Unique Key Lookup&#xa;    Cost Hint: Low-medium - Low if number of matching rows is small, higher as the number of rows increases&#xa;  Used Columns: payment_id,&#xa;    customer_id,&#xa;    amount&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: idx_fk_customer_id&lt;/span&gt;&#xa;  Ref.:sakila.customer.customer_id&#xa;  Used Key Parts: customer_id&#xa;  Possible Keys: idx_fk_customer_id&#xa;&#xa;Rows Examined per Scan: 26&#xa;Rows Produced per Join: 429783&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 107445.88&#xa;  Eval: 42978.35&#xa;  Prefix: 156086.79&#xa;  Data Read: 9M" />
+                                                        <text x="1280" y="735" style="">
+Non-Unique Key Lookup                                                        </text>
+                                                    </g>
+                                                    <g class="lhsQueryCost">
+                                                        <rect x="1205" y="705" width="75" height="10" style=""/>
+                                                        <text x="1205" y="710" style="text-anchor:start;">
+150424.23                                                        </text>
+                                                    </g>
+                                                    <g class="rhsQueryCost">
+                                                        <rect x="1280" y="705" width="75" height="10" style=""/>
+                                                        <text x="1355" y="710" style="text-anchor:end;">
+26 rows                                                        </text>
+                                                    </g>
+                                                </g>
+                                                <g>
+                                                <path fill="white" stroke="black" d="M 995,610 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 5662.55" />
+                                                <text x="995" y="635" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+                                                <text x="995" y="645" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                                                    <polyline points="1025,640 1238,640" style="stroke:#000000; stroke-width:1.0001745070756802;" marker-end="url(#arrowhead)"/>
+                                                    <g class="queryCost">
+                                                        <rect x="955" y="595" width="40" height="10" style=""/>
+                                                        <text x="955" y="600" style="text-anchor:start;">
+5662.55                                                        </text>
+                                                    </g>
+                                                    <g class="queryCost">
+                                                        <rect x="1030" y="625" width="25" height="10" style=""/>
+                                                        <text x="1030" y="630" style="text-anchor:start;">
+16K rows                                                        </text>
+                                                    </g>
+                                                </g>
+                                                <g>
+                                                <path fill="white" stroke="black" d="M 1280,610 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 156086.79" />
+                                                <text x="1280" y="635" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+                                                <text x="1280" y="645" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                                                    <g class="queryCost">
+                                                        <rect x="1240" y="595" width="40" height="10" style=""/>
+                                                        <text x="1240" y="600" style="text-anchor:start;">
+156086.79                                                        </text>
+                                                    </g>
+                                                    <g class="queryCost">
+                                                        <rect x="1290" y="600" width="25" height="10" style=""/>
+                                                        <text x="1290" y="605" style="text-anchor:start;">
+429.78K rows                                                        </text>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g>
+                                    <rect x="1375" y="420" width="300" height="470" style=""/>
+                                    <polyline points="1600,460 1600,442" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                                    <g>
+                                        <rect x="1375" y="460" width="300" height="430" style=""/>
+                                        <g class="queryBlock">
+                                            <rect x="1550" y="460" width="100" height="30" style="" data-tooltip-html="Select ID: 3&#xa;Query cost: 686.65&#xa;" />
+                                            <text x="1600" y="475" style="">
+query_block #3                                            </text>
+                                            <g class="lhsQueryCost">
+                                                <rect x="1550" y="445" width="150" height="10" style=""/>
+                                                <text x="1550" y="450" style="text-anchor:start;">
+Query cost: 686.65                                                </text>
+                                            </g>
+                                        </g>
+                                        <g>
+                                            <rect x="1375" y="520" width="300" height="350" style=""/>
+                                            <polyline points="1600,520 1600,502" style="stroke:#000000; stroke-width:1.0124667854865956;" marker-end="url(#arrowhead)"/>
+                                            <g class="groupingOperation hasTempTable">
+                                                <rect x="1560" y="520" width="80" height="40" style="" data-tooltip-html="&lt;span class=&quot;groupingOperationHeader&quot;&gt;Grouping operation&lt;/span&gt;&#xa;&#xa;Using Temporary Table: true&#xa;Using Filesort: false" />
+                                                <text x="1600" y="540" style="">
+GROUP                                                </text>
+                                            </g>
+                                            <g>
+                                                <rect x="1375" y="610" width="300" height="170" style=""/>
+                                                <polyline points="1600,610 1600,572" style="stroke:#000000; stroke-width:1.0124667854865956;" marker-end="url(#arrowhead)"/>
+                                                <g>
+                                                    <rect x="1375" y="720" width="100" height="60" style=""/>
+                                                    <polyline points="1425,720 1425,640 1558,640" style="stroke:#000000; stroke-width:1.004174209250271; fill: none;" marker-end="url(#arrowhead)"/>
+                                                    <g class="tableName">
+                                                        <rect x="1375" y="752" width="100" height="14" style=""/>
+                                                        <text x="1425" y="759" style="">
+cus                                                        </text>
+                                                    </g>
+                                                    <g class="table fullTableScan">
+                                                        <rect x="1375" y="720" width="100" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;cus&lt;/span&gt;&#xa;  Access Type: ALL&#xa;    Full Table Scan&#xa;    Cost Hint: Very High - very costly for large tables (not so much for small ones).&#xa;No usable indexes were found for the table and the optimizer must search every row.&#xa;This could also mean the search range is so broad that the index would be useless.&#xa;  Used Columns: customer_id,&#xa;    store_id,&#xa;    first_name&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: &lt;/span&gt;&#xa;  Used Key Parts: &#xa;  Possible Keys: PRIMARY,&#xa;    idx_fk_store_id&#xa;&#xa;&lt;span class=&quot;attachedConditionHeader&quot;&gt;Attached condition:&lt;/span&gt;&#xa;  (`sakila`.`cus`.`first_name` like 'a%')&#xa;&#xa;Rows Examined per Scan: 599&#xa;Rows Produced per Join: 66&#xa;Filtered (ratio of rows produced per rows examined): 11.11%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 54.5&#xa;  Eval: 6.65&#xa;  Prefix: 61.15&#xa;  Data Read: 37K" />
+                                                        <text x="1425" y="735" style="">
+Full Table Scan                                                        </text>
+                                                    </g>
+                                                    <g class="lhsQueryCost">
+                                                        <rect x="1375" y="705" width="50" height="10" style=""/>
+                                                        <text x="1375" y="710" style="text-anchor:start;">
+61.15                                                        </text>
+                                                    </g>
+                                                    <g class="rhsQueryCost">
+                                                        <rect x="1425" y="705" width="50" height="10" style=""/>
+                                                        <text x="1475" y="710" style="text-anchor:end;">
+599 rows                                                        </text>
+                                                    </g>
+                                                </g>
+                                                <g>
+                                                    <rect x="1525" y="720" width="150" height="60" style=""/>
+                                                    <polyline points="1600,720 1600,682" style="stroke:#000000; stroke-width:1.0001745070756802;" marker-end="url(#arrowhead)"/>
+                                                    <g class="tableName">
+                                                        <rect x="1525" y="752" width="150" height="14" style=""/>
+                                                        <text x="1600" y="759" style="">
+pay                                                        </text>
+                                                    </g>
+                                                    <g class="tableKey">
+                                                        <rect x="1525" y="766" width="150" height="14" style=""/>
+                                                        <text x="1600" y="773" style="">
+idx_fk_customer_id                                                        </text>
+                                                    </g>
+                                                    <g class="table nonUniqueKey">
+                                                        <rect x="1525" y="720" width="150" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;pay&lt;/span&gt;&#xa;  Access Type: ref&#xa;    Non-Unique Key Lookup&#xa;    Cost Hint: Low-medium - Low if number of matching rows is small, higher as the number of rows increases&#xa;  Used Columns: payment_id,&#xa;    customer_id,&#xa;    amount&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: idx_fk_customer_id&lt;/span&gt;&#xa;  Ref.:sakila.cus.customer_id&#xa;  Used Key Parts: customer_id&#xa;  Possible Keys: idx_fk_customer_id&#xa;&#xa;Rows Examined per Scan: 26&#xa;Rows Produced per Join: 1787&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 446.79&#xa;  Eval: 178.72&#xa;  Prefix: 686.65&#xa;  Data Read: 41K" />
+                                                        <text x="1600" y="735" style="">
+Non-Unique Key Lookup                                                        </text>
+                                                    </g>
+                                                    <g class="lhsQueryCost">
+                                                        <rect x="1525" y="705" width="75" height="10" style=""/>
+                                                        <text x="1525" y="710" style="text-anchor:start;">
+625.51                                                        </text>
+                                                    </g>
+                                                    <g class="rhsQueryCost">
+                                                        <rect x="1600" y="705" width="75" height="10" style=""/>
+                                                        <text x="1675" y="710" style="text-anchor:end;">
+26 rows                                                        </text>
+                                                    </g>
+                                                </g>
+                                                <g>
+                                                <path fill="white" stroke="black" d="M 1600,610 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 686.65" />
+                                                <text x="1600" y="635" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+                                                <text x="1600" y="645" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                                                    <g class="queryCost">
+                                                        <rect x="1560" y="595" width="40" height="10" style=""/>
+                                                        <text x="1560" y="600" style="text-anchor:start;">
+686.65                                                        </text>
+                                                    </g>
+                                                    <g class="queryCost">
+                                                        <rect x="1610" y="600" width="25" height="10" style=""/>
+                                                        <text x="1610" y="605" style="text-anchor:start;">
+1.79K rows                                                        </text>
+                                                    </g>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                        <g class="materialisedTableName">
+                            <rect x="675" y="317" width="1040" height="20" style=""/>
+                            <text x="1195" y="327" style="">
+B (materialised)                            </text>
+                        </g>
+                        <g class="tableKey">
+                            <rect x="675" y="337" width="1040" height="14" style=""/>
+                            <text x="1195" y="344" style="">
+&lt;auto_key1&gt;                            </text>
+                        </g>
+                        <g class="table nonUniqueKey">
+                            <rect x="675" y="285" width="1040" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;B&lt;/span&gt;&#xa;  Access Type: ref&#xa;    Non-Unique Key Lookup&#xa;    Cost Hint: Low-medium - Low if number of matching rows is small, higher as the number of rows increases&#xa;  Used Columns: store_id,&#xa;    sales&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: &amp;lt;auto_key1&amp;gt;&lt;/span&gt;&#xa;  Ref.:sakila.sto.store_id&#xa;  Used Key Parts: store_id&#xa;  Possible Keys: &amp;lt;auto_key1&amp;gt;&#xa;&#xa;Rows Examined per Scan: 4315&#xa;Rows Produced per Join: 8631&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 2157.85&#xa;  Eval: 863.14&#xa;  Prefix: 3025.49&#xa;  Data Read: 202K" />
+                            <text x="1195" y="300" style="">
+Non-Unique Key Lookup                            </text>
+                        </g>
+                        <g class="lhsQueryCost">
+                            <rect x="675" y="270" width="520" height="10" style=""/>
+                            <text x="675" y="275" style="text-anchor:start;">
+3020.99                            </text>
+                        </g>
+                        <g class="rhsQueryCost">
+                            <rect x="1195" y="270" width="520" height="10" style=""/>
+                            <text x="1715" y="275" style="text-anchor:end;">
+4.32K rows                            </text>
+                        </g>
+                    </g>
+                    <g>
+                    <path fill="white" stroke="black" d="M 212,175 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 2.35" />
+                    <text x="212" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+                    <text x="212" y="210" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                        <polyline points="242,205 345,205" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                        <g class="queryCost">
+                            <rect x="172" y="160" width="40" height="10" style=""/>
+                            <text x="172" y="165" style="text-anchor:start;">
+2.35                            </text>
+                        </g>
+                        <g class="queryCost">
+                            <rect x="247" y="190" width="25" height="10" style=""/>
+                            <text x="247" y="195" style="text-anchor:start;">
+2 rows                            </text>
+                        </g>
+                    </g>
+                    <g>
+                    <path fill="white" stroke="black" d="M 387,175 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 3.8" />
+                    <text x="387" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+                    <text x="387" y="210" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                        <polyline points="417,205 520,205" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                        <g class="queryCost">
+                            <rect x="347" y="160" width="40" height="10" style=""/>
+                            <text x="347" y="165" style="text-anchor:start;">
+3.8                            </text>
+                        </g>
+                        <g class="queryCost">
+                            <rect x="422" y="190" width="25" height="10" style=""/>
+                            <text x="422" y="195" style="text-anchor:start;">
+2 rows                            </text>
+                        </g>
+                    </g>
+                    <g>
+                    <path fill="white" stroke="black" d="M 562,175 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 4.5" />
+                    <text x="562" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+                    <text x="562" y="210" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                        <polyline points="592,205 1153,205" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                        <g class="queryCost">
+                            <rect x="522" y="160" width="40" height="10" style=""/>
+                            <text x="522" y="165" style="text-anchor:start;">
+4.5                            </text>
+                        </g>
+                        <g class="queryCost">
+                            <rect x="597" y="190" width="25" height="10" style=""/>
+                            <text x="597" y="195" style="text-anchor:start;">
+2 rows                            </text>
+                        </g>
+                    </g>
+                    <g>
+                    <path fill="white" stroke="black" d="M 1195,175 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 3025.49" />
+                    <text x="1195" y="200" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+                    <text x="1195" y="210" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                        <g class="queryCost">
+                            <rect x="1155" y="160" width="40" height="10" style=""/>
+                            <text x="1155" y="165" style="text-anchor:start;">
+3025.49                            </text>
+                        </g>
+                        <g class="queryCost">
+                            <rect x="1205" y="165" width="25" height="10" style=""/>
+                            <text x="1205" y="170" style="text-anchor:start;">
+8.63K rows                            </text>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+<g class="tooltip" visibility="hidden" >
+    <foreignObject style="overflow: visible;">
+        <body xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
+            <div class="tooltip">Tooltip</div>
+        </body>
+    </foreignObject>
+</g>
+</svg>

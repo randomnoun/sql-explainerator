@@ -1,0 +1,25 @@
+{
+  "query_block" : {
+    "costInfo" : {
+      "queryCost" : 0.95
+    } ,
+    "grouping_operation" : {
+      "table" : {
+        "accessType" : "ALL",
+        "costInfo" : {
+          "dataReadPerJoin" : "112",
+          "evalCost" : 0.7,
+          "prefixCost" : 0.95,
+          "readCost" : 0.25
+        } ,
+        "filtered" : 100.0,
+        "rows_examined_per_scan" : 7,
+        "rows_produced_per_join" : 7,
+        "tableName" : "testAB",
+        "usedColumns" : [ "id", "c" ]
+      } ,
+      "usingFilesort" : false
+    } ,
+    "selectId" : 1
+  } 
+} 

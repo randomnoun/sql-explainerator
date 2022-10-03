@@ -1,0 +1,317 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1"
+  width="100vw" height="100vh" class="sql" onload="initSqlExplain(evt)">
+  <defs>
+    <style type="text/css"><![CDATA[svg text {
+	pointer-events: none;
+}
+svg [data-tooltip-html] {
+    pointer-events: auto;
+}
+
+svg.sql { 
+    font-family: Arial;
+    font-size: 14px;
+}
+svg.sql rect {
+    fill: transparent;
+}       
+svg.sql text {
+    text-anchor: middle; 
+    dominant-baseline: middle;
+    fill: black;
+}
+svg.sql g.queryBlock > rect {
+    stroke: black;
+}
+svg.sql g.queryBlock.topNode > rect {
+	fill: #cccccc; 
+}
+svg.sql g.union > rect { 
+	stroke: black;
+	fill: #b3b3b3; 
+}
+
+svg.sql g.duplicatesRemoval > rect,
+svg.sql g.orderingOperation > rect,
+svg.sql g.groupingOperation > rect { 
+	stroke: #cfcf40; 
+	stroke-width: 2; 
+	rx: 9; 
+	ry: 9; 
+}
+
+svg.sql g.window > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2; 
+    rx: 9; 
+    ry: 9; 
+}
+
+svg.sql g.insertQueryBlock > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2;
+    pointer-events: none; 
+}
+
+svg.sql g.orderingOperation.hasTempTable > rect { 
+	stroke: #bf4040;
+}
+svg.sql g.groupingOperation.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+svg.sql g.window.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+
+
+svg.sql g.table.nonUniqueKey > text,
+svg.sql g.table.uniqueKey > text,
+svg.sql g.table.fullTableScan > text,
+svg.sql g.table.fullIndexScan > text,
+svg.sql g.table.singleRow > text { 
+    fill: white;
+    font-size: 11px; 
+}
+
+svg.sql g.table > rect { 
+    stroke: black; 
+}
+
+svg.sql g.table.nonUniqueKey > rect { 
+	fill: #339933; 
+}
+svg.sql g.table.uniqueKey > rect { 
+	fill: #008000; 
+}
+svg.sql g.table.fullTableScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.fullIndexScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.singleRow > rect { 
+    fill: #4080bf;
+}
+svg.sql g.table.insert > rect { 
+    fill: black;
+}
+
+
+svg.sql g.queryCost > text { 
+	font-size: 11px; 
+} 
+svg.sql g.lhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: start; 
+}
+svg.sql g.rhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: end; 
+}
+svg.sql g.tableName > text { 
+	font-size: 11px; 
+} 
+svg.sql g.tableKey > text { 
+	font-size: 11px; 
+	font-weight: bold; 
+} 
+
+svg.sql g.tempTableName > text { 
+	font-size: 10px; 
+	font-weight: bold; 
+}
+svg.sql g.windowName > text { 
+    font-size: 10px; 
+    font-weight: bold; 
+}
+
+svg.sql g.tooltip div.tooltip {
+	font-size: 11px;
+	padding: 4px; 
+	white-space: pre; 
+	display: inline-block; 
+	background: white; 
+	border: 1px solid black; 
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+svg.sql g.container > rect {
+    stroke: transparent;
+}
+svg.sql g.materialisedFromSubqueryBorder > rect {
+	stroke: #8c8c8c;
+	stroke-dasharray: 4;
+}
+svg.sql g.attachedSubqueries > rect {
+	stroke: black;
+	stroke-dasharray: 2;
+}
+svg.sql g.havingSubqueries > rect {
+    stroke: black;
+    stroke-dasharray: 2;
+}
+
+svg.sql g.windowingBorder > rect {
+	stroke: #8c8c8c;
+    stroke-dasharray: 4;
+}
+svg.sql .windowing > rect {
+	fill: #e8e8e8;
+}
+svg.sql .materialisedTableName > rect {
+	fill: #e8e8e8;
+	
+}
+
+
+svg.sql g.tooltip div.tooltip .tableHeader,
+svg.sql g.tooltip div.tooltip .keyIndexHeader,
+svg.sql g.tooltip div.tooltip .costInfoHeader,
+svg.sql g.tooltip div.tooltip .groupingOperationHeader,
+svg.sql g.tooltip div.tooltip .orderingOperationHeader,
+svg.sql g.tooltip div.tooltip .attachedConditionHeader,
+svg.sql g.tooltip div.tooltip .nestedLoopHeader {
+	font-size: 11px;
+	font-weight: bold;
+} 
+    ]]></style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 12 3.5, 0 7" />
+    </marker>
+  </defs>
+    <g>
+        <rect x="0" y="15" width="275" height="250" style=""/>
+        <g class="queryBlock topNode">
+            <rect x="162" y="15" width="100" height="30" style="" data-tooltip-html="Select ID: 1&#xa;Query cost: 5.1&#xa;" />
+            <text x="212" y="30" style="">
+query_block            </text>
+            <g class="lhsQueryCost">
+                <rect x="162" y="0" width="137" height="10" style=""/>
+                <text x="162" y="5" style="text-anchor:start;">
+Query cost: 5.10                </text>
+            </g>
+        </g>
+        <g>
+            <rect x="0" y="75" width="275" height="170" style=""/>
+            <polyline points="212,75 212,57" style="stroke:#000000; stroke-width:4.0;" marker-end="url(#arrowhead)"/>
+            <g>
+                <rect x="0" y="185" width="100" height="60" style=""/>
+                <polyline points="50,185 50,105 170,105" style="stroke:#000000; stroke-width:4.0; fill: none;" marker-end="url(#arrowhead)"/>
+                <g class="tableName">
+                    <rect x="0" y="217" width="100" height="14" style=""/>
+                    <text x="50" y="224" style="">
+stf                    </text>
+                </g>
+                <g class="table fullTableScan">
+                    <rect x="0" y="185" width="100" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;stf&lt;/span&gt;&#xa;  Access Type: ALL&#xa;    Full Table Scan&#xa;    Cost Hint: Very High - very costly for large tables (not so much for small ones).&#xa;No usable indexes were found for the table and the optimizer must search every row.&#xa;This could also mean the search range is so broad that the index would be useless.&#xa;  Used Columns: first_name,&#xa;    last_name,&#xa;    address_id&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: &lt;/span&gt;&#xa;  Used Key Parts: &#xa;  Possible Keys: &#xa;&#xa;Rows Examined per Scan: 2&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 3&#xa;  Eval: 0.2&#xa;  Prefix: 3.2&#xa;  Data Read: 1K" />
+                    <text x="50" y="200" style="">
+Full Table Scan                    </text>
+                </g>
+                <g class="lhsQueryCost">
+                    <rect x="0" y="170" width="50" height="10" style=""/>
+                    <text x="0" y="175" style="text-anchor:start;">
+3.2                    </text>
+                </g>
+                <g class="rhsQueryCost">
+                    <rect x="50" y="170" width="50" height="10" style=""/>
+                    <text x="100" y="175" style="text-anchor:end;">
+2 rows                    </text>
+                </g>
+            </g>
+            <g>
+                <rect x="150" y="185" width="125" height="60" style=""/>
+                <polyline points="212,185 212,147" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                <g class="tableName">
+                    <rect x="150" y="217" width="125" height="14" style=""/>
+                    <text x="212" y="224" style="">
+adr                    </text>
+                </g>
+                <g class="tableKey">
+                    <rect x="150" y="231" width="125" height="14" style=""/>
+                    <text x="212" y="238" style="">
+PRIMARY                    </text>
+                </g>
+                <g class="table uniqueKey">
+                    <rect x="150" y="185" width="125" height="30" style="" data-tooltip-html="&lt;span class=&quot;tableHeader&quot;&gt;adr&lt;/span&gt;&#xa;  Access Type: eq_ref&#xa;    Unique Key Lookup&#xa;    Cost Hint: Low - The optimizer is able to find an index that it can use to retrieve required records.&#xa;Fast because the index search leads directly to the page with all the row data&#xa;  Used Columns: address_id,&#xa;    address,&#xa;    district,&#xa;    city_id,&#xa;    postal_code&#xa;&#xa;&lt;span class=&quot;keyIndexHeader&quot;&gt;Key/Index: PRIMARY&lt;/span&gt;&#xa;  Ref.:sakila.stf.address_id&#xa;  Used Key Parts: address_id&#xa;  Possible Keys: PRIMARY&#xa;&#xa;Rows Examined per Scan: 1&#xa;Rows Produced per Join: 2&#xa;Filtered (ratio of rows produced per rows examined): 100%&#xa;  Hint: 100% is best, &amp;lt;= 1% is worst&#xa;  A low value means the query examines a lot of rows that are not returned.&#xa;&lt;span class=&quot;costInfoHeader&quot;&gt;Cost Info&lt;/span&gt;&#xa;  Read: 1.7&#xa;  Eval: 0.2&#xa;  Prefix: 5.1&#xa;  Data Read: 1K" />
+                    <text x="212" y="200" style="">
+Unique Key Lookup                    </text>
+                </g>
+                <g class="lhsQueryCost">
+                    <rect x="150" y="170" width="62" height="10" style=""/>
+                    <text x="150" y="175" style="text-anchor:start;">
+1.9                    </text>
+                </g>
+                <g class="rhsQueryCost">
+                    <rect x="212" y="170" width="62" height="10" style=""/>
+                    <text x="274" y="175" style="text-anchor:end;">
+1 row                    </text>
+                </g>
+            </g>
+            <g>
+            <path fill="white" stroke="black" d="M 212,75 l 30 30 l -30 30 l -30 -30 l 30 -30" data-tooltip-html="&lt;span class=&quot;nestedLoopHeader&quot;&gt;nested_loop&lt;/span&gt;&#xa;&#xa;Prefix Cost: 5.1" />
+            <text x="212" y="100" font-size="10px" dominant-baseline="middle" text-anchor="middle">nested</text>
+            <text x="212" y="110" font-size="10px" dominant-baseline="middle" text-anchor="middle">loop</text>
+                <g class="queryCost">
+                    <rect x="172" y="60" width="40" height="10" style=""/>
+                    <text x="172" y="65" style="text-anchor:start;">
+5.1                    </text>
+                </g>
+                <g class="queryCost">
+                    <rect x="222" y="65" width="25" height="10" style=""/>
+                    <text x="222" y="70" style="text-anchor:start;">
+2 rows                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+<g class="tooltip" visibility="hidden" >
+    <foreignObject style="overflow: visible;">
+        <body xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
+            <div class="tooltip">Tooltip</div>
+        </body>
+    </foreignObject>
+</g>
+    <script type="text/ecmascript"><![CDATA[
+// this javascript is either
+// - embedded inside the SVG in an SVG <script> tag
+// - embedded inside the HTML in an HTML <script> tag
+//
+// the initSqlExplain() function is called from an 'onload' attribute on the SVG element
+
+// the tooltip code has been adapted from the javascript at
+//   https://github.com/petercollingridge/code-for-blog/blob/master/svg-interaction/tooltip/change_text_dynamic_length.svg?short_path=b59eb3f
+
+function initSqlExplain(e) {
+    svg = e.target.ownerDocument;
+    svgRoot = e.target; // svg.documentElement
+
+    var tooltip = svg.querySelector('g.tooltip');
+    var tooltipFo = tooltip.getElementsByTagName('foreignObject')[0];
+    var tooltipDiv = tooltipFo.getElementsByTagName('div')[0];
+    var triggers = svg.querySelectorAll('[data-tooltip-html]');
+
+    for (var i = 0; i < triggers.length; i++) {
+        triggers[i].addEventListener('mousemove', showTooltip);
+        triggers[i].addEventListener('mouseout', hideTooltip);
+    }
+
+    function showTooltip(evt) {
+        var ctm = svgRoot.getScreenCTM();
+        var x = (evt.clientX - ctm.e + 6) / ctm.a;
+        var y = (evt.clientY - ctm.f + 20) / ctm.d;
+        tooltip.setAttributeNS(null, 'transform', 'translate(' + x + ' ' + y + ')');
+        tooltip.setAttributeNS(null, 'visibility', 'visible');
+
+        // tooltipDiv.innerHTML = '<div class="tooltip">' + evt.target.getAttributeNS(null, 'data-tooltip-html') + '</div>';
+        tooltipDiv.innerHTML = evt.target.getAttributeNS(null, 'data-tooltip-html');
+    }
+
+    function hideTooltip(evt) {
+        tooltip.setAttributeNS(null, 'visibility', 'hidden');
+    }
+}
+
+    ]]></script>
+</svg>

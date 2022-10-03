@@ -1,0 +1,11 @@
+{
+  "query_block" : {
+    "costInfo" : {
+      "queryCost" : 7.95
+    } ,
+    "ordering_operation" : {
+      "usingFilesort" : false
+    } ,
+    "selectId" : 1
+  } 
+} 

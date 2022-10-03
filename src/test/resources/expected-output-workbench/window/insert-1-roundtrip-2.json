@@ -1,0 +1,14 @@
+{
+  "query_block" : {
+    "costInfo" : {
+      "queryCost" : 0.95
+    } ,
+    "insert_from" : {
+      } ,
+    "selectId" : 1,
+    "table" : {
+      "accessType" : "ALL",
+      "tableName" : "testAB"
+    } 
+  } 
+} 
