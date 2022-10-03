@@ -17,7 +17,7 @@ import org.json.simple.parser.ParseException;
 import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.graph.Shape;
-import com.randomnoun.common.db.explain.layout.WindowingLayout;
+import com.randomnoun.common.db.explain.layout.ExplaineratorLayout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightShapeVisitor;
@@ -96,7 +96,7 @@ public abstract class SqlExplaineratorTestBase extends TestCase {
 		pp.parse(json, "1.2.3");
 		
 		// diagram attempts
-		WindowingLayout layout = new WindowingLayout();
+		ExplaineratorLayout layout = new ExplaineratorLayout();
 		layout.setQueryBlockNode(pp.getTopNode());
 		Shape b = layout.getLayoutShape();
 		

@@ -7,8 +7,8 @@ import org.apache.log4j.Logger;
  * but also handles windowing blocks
  * 
  */
-public class WindowingLayout extends WorkbenchLayout {
+public class ExplaineratorLayout extends WorkbenchLayout {
 
-	Logger logger = Logger.getLogger(WindowingLayout.class);
+	Logger logger = Logger.getLogger(ExplaineratorLayout.class);
 	
 }

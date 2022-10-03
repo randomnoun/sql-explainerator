@@ -25,7 +25,7 @@ usage: SqlExplaineratorCli [options]
  -h,--help                  This usage text
  -i,--infile <infile>       input file, or '-' for stdin; default = stdin
  -o,--outfile <outfile>     output file, or '-' for stdout; default = stdout
- -l,--layout <layout>       layout format (workbench or windowing); default = windowing
+ -l,--layout <layout>       layout format (workbench or explainerator); default = explainerator
  -f,--format <format>       output format (svg or html); default = svg
  -t,--tooltip <tooltip>     tooltip type (none, title, attribute, javascript); default = title
  -j,--jdbc <jdbc>           JDBC connection string
@@ -38,8 +38,7 @@ usage: SqlExplaineratorCli [options]
 
 This command will convert a MySQL JSON execution plan into an SVG diagram.
 There are two layout methods: 'workbench' which will try to mimic the diagrams generated from MySQL
-Workbench, or 'windowing', which also adds support for window functions. Or at least it will once
-I've written that bit.
+Workbench, or 'explainerator', which adds support for inserts, 'having' clauses, and window functions.
 
 The execution plan can be supplied via stdin or --infile (Example 1), or can be retrieved from a
 MySQL server (Example 2).

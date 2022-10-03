@@ -29,7 +29,7 @@ import com.randomnoun.common.StreamUtil;
 import com.randomnoun.common.Text;
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.layout.Layout;
-import com.randomnoun.common.db.explain.layout.WindowingLayout;
+import com.randomnoun.common.db.explain.layout.ExplaineratorLayout;
 import com.randomnoun.common.db.explain.layout.WorkbenchLayout;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
@@ -105,7 +105,7 @@ public class SqlExplaineratorCli {
 		boolean help = line.hasOption("help");
 		String infile = line.getOptionValue("infile");
 		String outfile = line.getOptionValue("outfile");
-		String layoutString = line.getOptionValue("layout", "randomnoun");
+		String layoutString = line.getOptionValue("layout", "explainerator");
 		String format = line.getOptionValue("format", "svg");
 		
 		String tooltipString = line.getOptionValue("tooltip");
@@ -151,10 +151,10 @@ public class SqlExplaineratorCli {
 		}
 		if (layoutString.equals("workbench")) {
 			layout = new WorkbenchLayout();
-		} else if (layoutString.equals("windowing")) {
-			layout = new WindowingLayout();
+		} else if (layoutString.equals("explainerator")) {
+			layout = new ExplaineratorLayout();
 		} else {
-			System.err.println("Invalid --layout; expected 'workbench' or 'windowing'");
+			System.err.println("Invalid --layout; expected 'workbench' or 'explainerator'");
 			System.exit(1);
 		}
 		
