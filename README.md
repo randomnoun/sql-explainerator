@@ -43,7 +43,9 @@ The Workbench output is for comparison, and was created by taking some screensho
 
 ## How do I use it ? 
 
-Usage text:
+If you're running this from Java code, take a look at the [SimpleTest](https://github.com/randomnoun/sql-explainerator/blob/main/src/test/java/com/randomnoun/common/db/explain/SimpleTest.java)  
+
+If you're running this from the command-line:
 ```
 C:\util\java> java -jar sql-explainerator-0.0.1-with-dependencies.jar --help
 usage: SqlExplaineratorCli [options]
@@ -87,16 +89,21 @@ connection string and any credentials required to connect, e.g.:
     --sql "SELECT 1 fROM DUAL" --outfile plan.svg
 ```
 
-And some example command-lines:
+And some example command-lines (new-lines added for readability):
 
 ```
-C:\util\java> java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 --sql "SELECT 1 fROM DUAL" --outfile plan.svg
+C:\util\java> java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar 
+  --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 
+  --sql "SELECT 1 fROM DUAL" --outfile plan.svg
 ```
 
 ```
-C:\util\java>"c:\Program Files\MySQL\MySQL Server 8.0\bin\mysql" --user=root --password=abc123 --silent --raw --skip-column-names --execute "EXPLAIN FORMAT=JSON SELECT 1 FROM DUAL" sakila > plan.json
+C:\util\java>"c:\Program Files\MySQL\MySQL Server 8.0\bin\mysql" 
+  --user=root --password=abc123 --silent --raw --skip-column-names 
+  --execute "EXPLAIN FORMAT=JSON SELECT 1 FROM DUAL" sakila > plan.json
 
-C:\util\java>java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar --infile plan.json --outfile plan.svg
+C:\util\java>java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar 
+  --infile plan.json --outfile plan.svg
 ```
 
 ## Where can I get it ? 
