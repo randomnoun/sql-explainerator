@@ -1,0 +1,77 @@
+{
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "1663.12"
+    },
+    "ordering_operation": {
+      "using_temporary_table": true,
+      "using_filesort": true,
+      "grouping_operation": {
+        "using_filesort": false,
+        "nested_loop": [
+          {
+            "table": {
+              "table_name": "flm",
+              "access_type": "index",
+              "possible_keys": [
+                "PRIMARY",
+                "idx_title"
+              ],
+              "key": "idx_title",
+              "used_key_parts": [
+                "title"
+              ],
+              "key_length": "514",
+              "rows_examined_per_scan": 1000,
+              "rows_produced_per_join": 1000,
+              "filtered": "100.00",
+              "using_index": true,
+              "cost_info": {
+                "read_cost": "12.00",
+                "eval_cost": "100.00",
+                "prefix_cost": "112.00",
+                "data_read_per_join": "539K"
+              },
+              "used_columns": [
+                "film_id",
+                "title"
+              ]
+            }
+          },
+          {
+            "table": {
+              "table_name": "fim_act",
+              "access_type": "ref",
+              "possible_keys": [
+                "idx_fk_film_id"
+              ],
+              "key": "idx_fk_film_id",
+              "used_key_parts": [
+                "film_id"
+              ],
+              "key_length": "2",
+              "ref": [
+                "sakila.flm.film_id"
+              ],
+              "rows_examined_per_scan": 5,
+              "rows_produced_per_join": 5478,
+              "filtered": "100.00",
+              "using_index": true,
+              "cost_info": {
+                "read_cost": "1003.28",
+                "eval_cost": "547.84",
+                "prefix_cost": "1663.12",
+                "data_read_per_join": "85K"
+              },
+              "used_columns": [
+                "actor_id",
+                "film_id"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}

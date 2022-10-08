@@ -1,0 +1,7 @@
+/* could put this in a theme later
+   see https://books.sonatype.com/mvnref-book/reference/site-generation-sect-site-appearance.html
+*/
+a.externalLink[href^=https] {
+    background: url(../images/internet-web-browser.png) right center no-repeat;
+    padding-right: 18px;
+}

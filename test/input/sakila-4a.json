@@ -1,0 +1,41 @@
+{
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "20.25"
+    },
+    "ordering_operation": {
+      "using_temporary_table": true,
+      "using_filesort": true,
+      "grouping_operation": {
+        "using_filesort": false,
+        "table": {
+          "table_name": "actor",
+          "access_type": "index",
+          "possible_keys": [
+            "idx_actor_last_name"
+          ],
+          "key": "idx_actor_last_name",
+          "used_key_parts": [
+            "last_name"
+          ],
+          "key_length": "182",
+          "rows_examined_per_scan": 200,
+          "rows_produced_per_join": 200,
+          "filtered": "100.00",
+          "using_index": true,
+          "cost_info": {
+            "read_cost": "0.25",
+            "eval_cost": "20.00",
+            "prefix_cost": "20.25",
+            "data_read_per_join": "73K"
+          },
+          "used_columns": [
+            "actor_id",
+            "last_name"
+          ]
+        }
+      }
+    }
+  }
+}
