@@ -1,0 +1,50 @@
+{
+  "query_block" : {
+    "costInfo" : {
+      "queryCost" : 1757.3
+    } ,
+    "grouping_operation" : {
+      "nestedLoop" : [ {
+          "table" : {
+            "accessType" : "ALL",
+            "costInfo" : {
+              "dataReadPerJoin" : "1K",
+              "evalCost" : 0.2,
+              "prefixCost" : 3.2,
+              "readCost" : 3.0
+            } ,
+            "filtered" : 100.0,
+            "possibleKeys" : [ "PRIMARY" ],
+            "rows_examined_per_scan" : 2,
+            "rows_produced_per_join" : 2,
+            "tableName" : "stf",
+            "usedColumns" : [ "staff_id", "first_name", "last_name" ]
+          } 
+        } , 
+        {
+          "table" : {
+            "accessType" : "ref",
+            "attachedCondition" : "((month(`sakila`.`pay`.`payment_date`) = 8) and (year(`sakila`.`pay`.`payment_date`) = 2005))",
+            "costInfo" : {
+              "dataReadPerJoin" : "377K",
+              "evalCost" : 1608.6,
+              "prefixCost" : 1757.3,
+              "readCost" : 145.5
+            } ,
+            "filtered" : 100.0,
+            "key" : "idx_fk_staff_id",
+            "keyLength" : 1,
+            "possibleKeys" : [ "idx_fk_staff_id" ],
+            "ref" : [ "sakila.stf.staff_id" ],
+            "rows_examined_per_scan" : 8043,
+            "rows_produced_per_join" : 16086,
+            "tableName" : "pay",
+            "usedColumns" : [ "payment_id", "staff_id", "amount", "payment_date" ],
+            "usedKeyParts" : [ "staff_id" ]
+          } 
+        }  ],
+      "usingFilesort" : false
+    } ,
+    "selectId" : 1
+  } 
+} 

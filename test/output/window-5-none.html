@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+svg text {
+	pointer-events: none;
+}
+svg [data-tooltip-html] {
+    pointer-events: auto;
+}
+
+svg.sql { 
+    font-family: Arial;
+    font-size: 14px;
+}
+svg.sql rect {
+    fill: transparent;
+}       
+svg.sql text {
+    text-anchor: middle; 
+    dominant-baseline: middle;
+    fill: black;
+}
+svg.sql g.queryBlock > rect {
+    stroke: black;
+}
+svg.sql g.queryBlock.topNode > rect {
+	fill: #cccccc; 
+}
+svg.sql g.union > rect { 
+	stroke: black;
+	fill: #b3b3b3; 
+}
+
+svg.sql g.duplicatesRemoval > rect,
+svg.sql g.orderingOperation > rect,
+svg.sql g.groupingOperation > rect { 
+	stroke: #cfcf40; 
+	stroke-width: 2; 
+	rx: 9; 
+	ry: 9; 
+}
+
+svg.sql g.window > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2; 
+    rx: 9; 
+    ry: 9; 
+}
+
+svg.sql g.insertQueryBlock > rect {
+    stroke: #cfcf40; 
+    stroke-width: 2;
+    pointer-events: none; 
+}
+
+svg.sql g.orderingOperation.hasTempTable > rect { 
+	stroke: #bf4040;
+}
+svg.sql g.groupingOperation.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+svg.sql g.window.hasTempTable > rect { 
+    stroke: #bf8000;
+}
+
+
+svg.sql g.table.nonUniqueKey > text,
+svg.sql g.table.uniqueKey > text,
+svg.sql g.table.fullTableScan > text,
+svg.sql g.table.fullIndexScan > text,
+svg.sql g.table.singleRow > text { 
+    fill: white;
+    font-size: 11px; 
+}
+
+svg.sql g.table > rect { 
+    stroke: black; 
+}
+
+svg.sql g.table.nonUniqueKey > rect { 
+	fill: #339933; 
+}
+svg.sql g.table.uniqueKey > rect { 
+	fill: #008000; 
+}
+svg.sql g.table.fullTableScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.fullIndexScan > rect { 
+	fill: #bf4040; 
+}
+svg.sql g.table.singleRow > rect { 
+    fill: #4080bf;
+}
+svg.sql g.table.insert > rect { 
+    fill: black;
+}
+
+
+svg.sql g.queryCost > text { 
+	font-size: 11px; 
+} 
+svg.sql g.lhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: start; 
+}
+svg.sql g.rhsQueryCost > text { 
+	font-size: 11px; 
+	text-anchor: end; 
+}
+svg.sql g.tableName > text { 
+	font-size: 11px; 
+} 
+svg.sql g.tableKey > text { 
+	font-size: 11px; 
+	font-weight: bold; 
+} 
+
+svg.sql g.tempTableName > text { 
+	font-size: 10px; 
+	font-weight: bold; 
+}
+svg.sql g.windowName > text { 
+    font-size: 10px; 
+    font-weight: bold; 
+}
+
+svg.sql g.tooltip div.tooltip {
+	font-size: 11px;
+	padding: 4px; 
+	white-space: pre; 
+	display: inline-block; 
+	background: white; 
+	border: 1px solid black; 
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+svg.sql g.container > rect {
+    stroke: transparent;
+}
+svg.sql g.materialisedFromSubqueryBorder > rect {
+	stroke: #8c8c8c;
+	stroke-dasharray: 4;
+}
+svg.sql g.attachedSubqueries > rect {
+	stroke: black;
+	stroke-dasharray: 2;
+}
+svg.sql g.havingSubqueries > rect {
+    stroke: black;
+    stroke-dasharray: 2;
+}
+
+svg.sql g.windowingBorder > rect {
+	stroke: #8c8c8c;
+    stroke-dasharray: 4;
+}
+svg.sql .windowing > rect {
+	fill: #e8e8e8;
+}
+svg.sql .materialisedTableName > rect {
+	fill: #e8e8e8;
+	
+}
+
+
+svg.sql g.tooltip div.tooltip .tableHeader,
+svg.sql g.tooltip div.tooltip .keyIndexHeader,
+svg.sql g.tooltip div.tooltip .costInfoHeader,
+svg.sql g.tooltip div.tooltip .groupingOperationHeader,
+svg.sql g.tooltip div.tooltip .orderingOperationHeader,
+svg.sql g.tooltip div.tooltip .attachedConditionHeader,
+svg.sql g.tooltip div.tooltip .nestedLoopHeader {
+	font-size: 11px;
+	font-weight: bold;
+} 
+</style>
+</head>
+<body style="padding: 10px;">
+<svg width="141" height="401" class="sql">
+  <defs>
+    <marker id="arrowhead" markerWidth="12" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 12 3.5, 0 7" />
+    </marker>
+  </defs>
+    <g>
+        <rect x="0" y="15" width="140" height="385" style=""/>
+        <g class="queryBlock topNode">
+            <rect x="20" y="15" width="100" height="30" style=""/>
+            <text x="70" y="30" style="">
+query_block            </text>
+            <g class="lhsQueryCost">
+                <rect x="20" y="0" width="70" height="10" style=""/>
+                <text x="20" y="5" style="text-anchor:start;">
+Query cost: 18.95                </text>
+            </g>
+        </g>
+        <g>
+            <rect x="0" y="75" width="140" height="305" style=""/>
+            <polyline points="70,75 70,57" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+            <g class="windowingBorder">
+                <rect x="0" y="75" width="140" height="105" style=""/>
+                <g>
+                    <rect x="10" y="85" width="120" height="55" style=""/>
+                    <g class="window">
+                        <rect x="10" y="85" width="120" height="40" style=""/>
+                        <text x="70" y="105" style="">
+window                        </text>
+                        <g class="windowName">
+                            <rect x="10" y="130" width="120" height="10" style=""/>
+                            <text x="70" y="135" style="">
+aWindow                            </text>
+                        </g>
+                    </g>
+                </g>
+                <g class="windowing">
+                    <rect x="0" y="150" width="140" height="30" style=""/>
+                    <text x="70" y="165" style="">
+windowing                    </text>
+                </g>
+                <g>
+                    <rect x="20" y="215" width="100" height="60" style=""/>
+                    <polyline points="70,215 70,192" style="stroke:#000000; stroke-width:1.0;" marker-end="url(#arrowhead)"/>
+                    <g class="tableName">
+                        <rect x="20" y="247" width="100" height="14" style=""/>
+                        <text x="70" y="254" style="">
+threeCol                        </text>
+                    </g>
+                    <g class="table fullTableScan">
+                        <rect x="20" y="215" width="100" height="30" style=""/>
+                        <text x="70" y="230" style="">
+Full Table Scan                        </text>
+                    </g>
+                    <g class="lhsQueryCost">
+                        <rect x="20" y="200" width="50" height="10" style=""/>
+                        <text x="20" y="205" style="text-anchor:start;">
+1.95                        </text>
+                    </g>
+                    <g class="rhsQueryCost">
+                        <rect x="70" y="200" width="50" height="10" style=""/>
+                        <text x="120" y="205" style="text-anchor:end;">
+17 rows                        </text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+<g class="tooltip" visibility="hidden" >
+    <foreignObject style="overflow: visible;">
+        <body xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
+            <div class="tooltip">Tooltip</div>
+        </body>
+    </foreignObject>
+</g>
+</svg>
+</body>
+</html>

@@ -1,0 +1,3 @@
+INSERT INTO testAB
+SELECT * FROM testAB
+WHERE c = (SELECT c FROM justA LIMIT 1);

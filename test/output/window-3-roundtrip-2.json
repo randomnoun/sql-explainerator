@@ -1,0 +1,37 @@
+{
+  "query_block" : {
+    "costInfo" : {
+      "queryCost" : 35.95
+    } ,
+    "selectId" : 1,
+    "windowing" : {
+      "grouping_operation" : {
+        "buffer_result" : {
+          "query_block" : {
+            "table" : {
+              "accessType" : "ALL",
+              "costInfo" : {
+                "dataReadPerJoin" : "272",
+                "evalCost" : 1.7,
+                "prefixCost" : 1.95,
+                "readCost" : 0.25
+              } ,
+              "filtered" : 100.0,
+              "rows_examined_per_scan" : 17,
+              "rows_produced_per_join" : 17,
+              "tableName" : "threeCol",
+              "usedColumns" : [ "j", "k" ]
+            } 
+          } 
+        } ,
+        "usingFilesort" : true
+      } ,
+      "windows" : [ {
+          "window" : {
+            "functions" : [ "sum" ],
+            "name" : "<unnamed window>"
+          } 
+        }  ]
+    } 
+  } 
+} 
