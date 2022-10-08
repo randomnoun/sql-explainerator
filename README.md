@@ -26,21 +26,10 @@ Both the SVG and HTML contain javascript to display the tooltips, but you can pr
 
 The Workbench output is for comparison, and was created by taking some screenshots of Workbench 8.0.30 running against MySQL Server 8.0.27, both on Windows. The :poop: symbol represents particularly shithouse output. 
 
-| SQL | SVG | HTML | Workbench | The reason that's interesting |
-| Input SQL | JSON | SVG output | HTML Output | Workbench | Blurb |
-|--|:--:|:--:|:--:|:--:|--|
-| sakila-1 | x x x | simple SELECT  |
-| sakila-4a | x x x | grouping, ordering |
-| sakila-6a | x x x | joined tables |
-| sakila-6b | x x x | joined tables, grouping | 
-| sakila-7g | x x x | joined subqueries |
-| having-1 |  x x x | group by, having subquery |
-| having-2 |  x x x | subquery + having subquery |
-| insert-1 |  x x x | insert into  |
-| window-1 |  x x x | window function |
-| window-3 |  x x x | grouped window function |
-| window-4 |  x x x | named windows, subqueries |
-| window-5 |  x x x | window partitions |
+| Name | HTML | SVG | from SQL | with JSON | Workbench | Blurb |
+|--|:--:|:--:|:--:|:--:|:--:|--|
+| sakila-1 | [HTML](https://randomnoun.github.io/sql-explainerator/test/output/sakila-1-javascript.html) |  [SVG](https://randomnoun.github.io/sql-explainerator/test/output/sakila-1-javascript.svg) | [SQL](https://randomnoun.github.io/sql-explainerator/test/input/sakila-1.sql) [JSON](https://randomnoun.github.io/sql-explainerator/test/input/sakila-1.json) | PNG | simple SELECT |
+
 
 ## How do I use it ? 
 

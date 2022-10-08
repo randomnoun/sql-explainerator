@@ -223,6 +223,7 @@
                 </dependencies>
             </plugin>
             
+            <!--
             <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>site-maven-plugin</artifactId>
@@ -240,7 +241,17 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
 
+		
+		    <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-scm-publish-plugin</artifactId>
+              <version>3.0.0</version>
+              <configuration>
+                <scmBranch>gh-pages</scmBranch>
+              </configuration>
+            </plugin>
 		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -304,7 +315,7 @@
        <site>
             <id>gh-pages</id>
             <name>github site</name>
-            <url>git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git?gh-pages#</url>
+            <url>scm:git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git</url>
         </site>
     </distributionManagement>
 
