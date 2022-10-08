@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd">
+  
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.9</version>
+  </skin>
+
+	<!-- remove maven image hopefully -->
+	<poweredBy>
+      <logo /><!--  name="Maven" href="https://maven.apache.org/" img="https://maven.apache.org/images/logos/maven-feather.png" -->
+    </poweredBy>
+  
+	<body>   
+		<menu name="Overview">
+	      <item name="Javadoc" href="apidocs/index.html?allpackages-index.html" />
+	      <!--  for now
+	      <item name="Coverage (combined)" href="jacoco-combined/index.html" />
+          <item name="Coverage (unit)" href="jacoco-surefire/index.html" />
+          <item name="Coverage (integration)" href="jacoco-failsafe/index.html" />
+          <item name="Checkstyle" href="checkstyle.html" />
+           -->
+	      	
+	    </menu>
+		<!-- no parent or submodules in this project 
+    	<menu ref="parent" />
+		<menu ref="modules" />
+		-->
+		<menu ref="reports"/>
+		
+	</body>
+
+</project>

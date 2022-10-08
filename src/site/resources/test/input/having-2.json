@@ -1,0 +1,85 @@
+{
+  "query_block": {
+    "select_id": 1,
+    "cost_info": {
+      "query_cost": "0.95"
+    },
+    "grouping_operation": {
+      "using_filesort": false,
+      "table": {
+        "table_name": "testAB",
+        "access_type": "ALL",
+        "rows_examined_per_scan": 7,
+        "rows_produced_per_join": 0,
+        "filtered": "14.29",
+        "cost_info": {
+          "read_cost": "0.85",
+          "eval_cost": "0.10",
+          "prefix_cost": "0.95",
+          "data_read_per_join": "15"
+        },
+        "used_columns": [
+          "id",
+          "c"
+        ],
+        "attached_condition": "(`sakila`.`testab`.`c` = (/* select#2 */ select `sakila`.`justa`.`c` from `sakila`.`justa` limit 1))",
+        "attached_subqueries": [
+          {
+            "dependent": false,
+            "cacheable": true,
+            "query_block": {
+              "select_id": 2,
+              "cost_info": {
+                "query_cost": "0.35"
+              },
+              "table": {
+                "table_name": "justA",
+                "access_type": "ALL",
+                "rows_examined_per_scan": 1,
+                "rows_produced_per_join": 1,
+                "filtered": "100.00",
+                "cost_info": {
+                  "read_cost": "0.25",
+                  "eval_cost": "0.10",
+                  "prefix_cost": "0.35",
+                  "data_read_per_join": "8"
+                },
+                "used_columns": [
+                  "c"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "having_subqueries": [
+        {
+          "dependent": false,
+          "cacheable": true,
+          "query_block": {
+            "select_id": 3,
+            "cost_info": {
+              "query_cost": "0.35"
+            },
+            "table": {
+              "table_name": "justA",
+              "access_type": "ALL",
+              "rows_examined_per_scan": 1,
+              "rows_produced_per_join": 1,
+              "filtered": "100.00",
+              "cost_info": {
+                "read_cost": "0.25",
+                "eval_cost": "0.10",
+                "prefix_cost": "0.35",
+                "data_read_per_join": "8"
+              },
+              "used_columns": [
+                "c"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

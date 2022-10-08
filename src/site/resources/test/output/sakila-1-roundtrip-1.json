@@ -1,0 +1,22 @@
+{
+  "query_block" : {
+    "cost_info" : {
+      "query_cost" : "20.25"
+    } ,
+    "select_id" : 1,
+    "table" : {
+      "access_type" : "ALL",
+      "cost_info" : {
+        "data_read_per_join" : "73K",
+        "eval_cost" : "20.00",
+        "prefix_cost" : "20.25",
+        "read_cost" : "0.25"
+      } ,
+      "filtered" : "100.00",
+      "rows_examined_per_scan" : 200,
+      "rows_produced_per_join" : 200,
+      "table_name" : "actor",
+      "used_columns" : [ "first_name", "last_name" ]
+    } 
+  } 
+} 

@@ -192,6 +192,56 @@
 		<finalName>sql-explainerator</finalName>
 
 		<plugins>
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-readme</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>README.md</sourceFile>
+                            <destinationFile>src/site/markdown/index.md</destinationFile>
+                        </configuration>                    
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.9.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-markdown</artifactId>
+                        <version>1.9</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.12</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>site</phase>
+                        <configuration>
+                            <message>Creating site for ${project.version}</message>
+                            <server>gitlab-dev-randomnoun</server>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -246,6 +296,17 @@
 			</plugin>
 
 		</plugins>
+
 	</build>
+	
+	
+    <distributionManagement>
+       <site>
+            <id>gh-pages</id>
+            <name>github site</name>
+            <url>git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git?gh-pages#</url>
+        </site>
+    </distributionManagement>
+
 
 </project>

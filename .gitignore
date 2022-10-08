@@ -2,6 +2,7 @@
 /.settings/
 /.classpath
 /.project
-/src/test/java/com/randomnoun/common/db/explain/SqlExplaineratorOtherTest.java
-/src/test/resources/expected-output/other/
 /src/test/resources/other/
+
+# is copied from README.md
+/src/site/markdown/index.md
