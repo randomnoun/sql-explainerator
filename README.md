@@ -4,7 +4,7 @@
 
 It attempts to recreate the type of diagrams you get from the 'visual explain' pane in [MySQL Workbench](https://www.mysql.com/products/workbench/), and looks like this:
 
-![](https://raw.githubusercontent.com/randomnoun/sql-explainerator/master/src/site/readme/sakila-7g.png)
+![](https://raw.githubusercontent.com/randomnoun/sql-explainerator/master/src/site/resources/img/sakila-7g.png)
 
 The images are in SVG form, although you can also generate HTML output which wraps the SVG.
 
@@ -15,6 +15,32 @@ Because diagrams are easier to comprehend than the tabular or JSON 'explain' out
 And becaue it's in java, so I might be able to hook it into a running app server to generate these things on the fly rather than having to start up MySQL Workbench and cut and paste SQL across in order to click the explain query button on that.
 
 And, of course, because I'm a man, and apparently I live for explaining things.
+
+## Can I see some pictures ?
+
+Sure.
+
+Here's some examples of the sort of output it generates. 
+
+Both the SVG and HTML contain javascript to display the tooltips, but you can produce output without the javascript, if that's your bag.
+
+The Workbench output is for comparison, and was created by taking some screenshots of Workbench 8.0.30 running against MySQL Server 8.0.27, both on Windows. The :poop: symbol represents particularly shithouse output. 
+
+| SQL | SVG | HTML | Workbench | The reason that's interesting |
+| Input SQL | JSON | SVG output | HTML Output | Workbench | Blurb |
+|--|:--:|:--:|:--:|:--:|--|
+| sakila-1 | x x x | simple SELECT  |
+| sakila-4a | x x x | grouping, ordering |
+| sakila-6a | x x x | joined tables |
+| sakila-6b | x x x | joined tables, grouping | 
+| sakila-7g | x x x | joined subqueries |
+| having-1 |  x x x | group by, having subquery |
+| having-2 |  x x x | subquery + having subquery |
+| insert-1 |  x x x | insert into  |
+| window-1 |  x x x | window function |
+| window-3 |  x x x | grouped window function |
+| window-4 |  x x x | named windows, subqueries |
+| window-5 |  x x x | window partitions |
 
 ## How do I use it ? 
 
@@ -76,7 +102,7 @@ C:\util\java>java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar --
 
 ## Where can I get it ? 
 
-TBD
+Hold your horses, it'll be in maven central soon.
 
 ## What databases can I run this on ?
 
