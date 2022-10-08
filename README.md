@@ -26,8 +26,7 @@ Both the SVG and HTML contain javascript to display the tooltips, but you can pr
 
 The Workbench output is for comparison, and was created by taking some screenshots of Workbench 8.0.30 running against MySQL Server 8.0.27, both on Windows. The :poop: symbol represents particularly shithouse output. 
 
-|      | sql-explainerator || input ||  |  |
-| Name | HTML | SVG | SQL | JSON | Workbench | Blurb |
+| Name | Output<br/>HTML | Output<br/>SVG | Input<br/>SQL | Input<br/>JSON | Workbench<br/>Comparison | Blurb |
 |--|:--:|:--:|:--:|:--:|:--:|--|
 | sakila-1 | [HTML](https://randomnoun.github.io/sql-explainerator/test/output/sakila-1-javascript.html) |  [SVG](https://randomnoun.github.io/sql-explainerator/test/output/sakila-1-javascript.svg) | [SQL](https://randomnoun.github.io/sql-explainerator/test/input/sakila-1.sql) | [JSON](https://randomnoun.github.io/sql-explainerator/test/input/sakila-1.json) | PNG | simple SELECT |
 
