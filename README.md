@@ -134,6 +134,10 @@ Well, MySQL Workbench exists, but that's not so easy to use from within a webapp
 
 But yes, you'd imagine this would already exist somewhere, wouldn't you.
 
+## Don't you normally crap on about your git projects on the blog ?
+
+[Indeed I do](http://www.randomnoun.com/wp/2022/10/09/make-a-new-plan-stan/).
+
 ## Futher reading
 
 * MariaDB EXPLAIN is not MySQL EXPLAIN: https://mariadb.com/kb/en/explain-format-json-differences/
