@@ -6,7 +6,7 @@ It attempts to recreate the type of diagrams you get from the 'visual explain' p
 
 ![](https://raw.githubusercontent.com/randomnoun/sql-explainerator/master/src/site/resources/img/sakila-7g.png)
 
-The images are in SVG form, although you can also generate HTML output which wraps the SVG.
+The images are SVG, although you can also generate HTML output which wraps the SVG.
 
 ## Why would anyone want to do that  ?
 
