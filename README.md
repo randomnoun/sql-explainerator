@@ -108,7 +108,21 @@ C:\util\java>java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar
 
 ## Where can I get it ? 
 
-Hold your horses, it'll be in maven central soon.
+It's available in maven with the groupId:artifactId of at `com.randomnoun.db:sql-explainerator`.
+
+There's a `sql-explainerator-0.0.2-with-dependencies.jar` which has all the maven dependencies baked in if you're calling this from a CLI. 
+
+You can add it to your pom.xml using the snippet:
+
+```
+<dependency>
+  <groupId>com.randomnoun.db</groupId>
+  <artifactId>sql-explainerator</artifactId>
+  <version>0.0.2</version>
+</dependency>
+```
+
+but maybe check what the [latest version is up on central](https://search.maven.org/search?q=a:sql-explainerator).
 
 ## What databases can I run this on ?
 
