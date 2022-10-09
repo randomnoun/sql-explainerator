@@ -138,7 +138,7 @@ But yes, you'd imagine this would already exist somewhere, wouldn't you.
 
 [Indeed I do](http://www.randomnoun.com/wp/2022/10/09/make-a-new-plan-stan/).
 
-## Futher reading
+## Further reading
 
 * MariaDB EXPLAIN is not MySQL EXPLAIN: https://mariadb.com/kb/en/explain-format-json-differences/
 * More of that: https://mariadb.com/kb/en/differences-between-the-mysql-and-mariadb-query-optimizer/
