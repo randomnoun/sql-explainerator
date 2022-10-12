@@ -139,6 +139,10 @@ svg.sql g.materialisedFromSubqueryBorder > rect {
 	stroke: #8c8c8c;
 	stroke-dasharray: 4;
 }
+svg.sql g.selectListSubqueries > rect {
+    stroke: black;
+    stroke-dasharray: 2;
+}
 svg.sql g.attachedSubqueries > rect {
 	stroke: black;
 	stroke-dasharray: 2;

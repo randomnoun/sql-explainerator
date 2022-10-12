@@ -27,6 +27,7 @@ import com.randomnoun.common.db.explain.json.Node;
 import com.randomnoun.common.db.explain.json.OrderingOperationNode;
 import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
+import com.randomnoun.common.db.explain.json.SelectListSubqueriesNode;
 import com.randomnoun.common.db.explain.json.SharingTemporaryTableWithNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
@@ -101,6 +102,18 @@ public class PlanParser {
 		if (obj.containsKey("insert_from")) {
 			n.setInsertFromNode(parseInsertFromNode((JSONObject) obj.get("insert_from")));
 			n.getAttributes().put("insert_from",  n.getInsertFromNode());
+		}
+		if (obj.containsKey("select_list_subqueries")) {
+			SelectListSubqueriesNode sn = new SelectListSubqueriesNode();
+			n.setSelectListSubqueriesNode(sn);
+			n.addChild(sn);
+			JSONArray qs = (JSONArray) obj.get("select_list_subqueries");
+			for (Object o : qs) {
+				JSONObject cobj = (JSONObject) o;
+				QuerySpecificationNode qsn = parseQuerySpecification(cobj);
+				sn.addQuerySpecification(qsn);
+				sn.addChild(qsn);
+			}
 		}
 		
 		return n;

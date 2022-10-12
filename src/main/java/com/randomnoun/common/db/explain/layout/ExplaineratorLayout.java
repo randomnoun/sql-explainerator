@@ -24,6 +24,7 @@ import com.randomnoun.common.db.explain.json.Node;
 import com.randomnoun.common.db.explain.json.OrderingOperationNode;
 import com.randomnoun.common.db.explain.json.QueryBlockNode;
 import com.randomnoun.common.db.explain.json.QuerySpecificationNode;
+import com.randomnoun.common.db.explain.json.SelectListSubqueriesNode;
 import com.randomnoun.common.db.explain.json.SharingTemporaryTableWithNode;
 import com.randomnoun.common.db.explain.json.TableNode;
 import com.randomnoun.common.db.explain.json.UnionResultNode;
@@ -107,6 +108,7 @@ public class ExplaineratorLayout implements Layout {
 			w += m * 2;
 		}
 		
+		Shape boxShape = null;
 		if (queryBlockLabel != null) {
 			String labelText = queryBlockLabel + (topNode || n.getSelectId() == null ? "" : " #" + n.getSelectId()); // n.selectId == null || n.selectId == 1
 			String clazz = (topNode ? " topNode" : ""); // n.selectId == null || n.selectId == 1
@@ -114,7 +116,7 @@ public class ExplaineratorLayout implements Layout {
 			  (n.getCostInfo() == null ? "" :"Query cost: " + n.getCostInfo().getQueryCost() + "\n");
 			
 			h += 30;
-			Shape boxShape = new Shape(); // label shape
+			boxShape = new Shape(); // label shape
 			boxShape.setCssClass("queryBlock" + clazz);
 			if (child == null) {
 				boxShape.setParentAndPosition(s, m, m);
@@ -157,6 +159,16 @@ public class ExplaineratorLayout implements Layout {
 		} else {
 			throw new IllegalStateException("drawQueryBlock = false and no child block present");
 		}
+		
+		// @TODO select list subqueries without label ?
+		if (queryBlockLabel != null && n.getSelectListSubqueriesNode() != null) {
+			Shape qb = layout(n.getSelectListSubqueriesNode());
+			qb.setParentAndPosition(outer, w + 50, 0);
+			qb.connectTo(boxShape, "e");
+			w = w + 50 + qb.getWidth();
+			h = Math.max(h, qb.getHeight());
+		}
+		
 		
 		if (n.getInsertFromNode() != null && newLayout) {
 			insertIntoShape = new Shape();
@@ -334,6 +346,47 @@ public class ExplaineratorLayout implements Layout {
 		
 		return outer;
 	}
+	
+	private Shape layout(SelectListSubqueriesNode n) {
+		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
+		
+		Shape outer = new Shape(); // outer shape
+		Shape connector = new Shape(); // connector shape
+		
+		List<Shape> qsShapes = reverseStream(qsnList)
+			.map(c -> layout(c, "subquery"))
+			.collect(Collectors.toList());
+		
+		List<Integer> tableWidths = qsShapes.stream().map(Shape::getWidth).collect(Collectors.toList());
+		List<Integer> tableHeights = qsShapes.stream().map(Shape::getHeight).collect(Collectors.toList());
+		int totalWidth = tableWidths.stream().mapToInt(i -> i).sum() 
+			+ (qsShapes.size() - 1) * 50; // 50px padding
+		int maxHeight = tableHeights.stream().mapToInt(i -> i).max().orElse(0);
+
+		int w = Math.max(totalWidth, 150);
+		
+		outer.setSize(w,  50 + maxHeight);
+		
+		connector.setParentAndPosition(outer, 0, 0);
+		connector.setSize(w,  30); 
+		
+		Shape attachedSubqueries = new Shape();
+		attachedSubqueries.setCssClass("selectListSubqueries");
+		attachedSubqueries.setParentAndPosition(connector,  0,  0);
+		attachedSubqueries.setLabel("select_list_subqueries");
+		attachedSubqueries.setSize(w, 30);
+		int offset = (w - totalWidth) / 2;
+		for (Shape qsShape : qsShapes) {
+			qsShape.setParentAndPosition(outer, offset, 50);
+			int sw = qsShape.getWidth();
+			qsShape.connectTo(connector, "sv"); // south port, vertical line
+			offset += sw + 50;
+		}
+		outer.setEdgeStartPosition(0, 15);
+		
+		return outer;
+	}
+	
 	
 	private Shape layout(HavingSubqueriesNode n) {
 		List<QuerySpecificationNode> qsnList = n.getQuerySpecifications();
