@@ -47,7 +47,7 @@ If you're running this from Java code, take a look at the [SimpleTest](https://g
 
 If you're running this from the command-line:
 ```
-C:\util\java> java -jar sql-explainerator-0.0.1-with-dependencies.jar --help
+C:\util\java> java -jar sql-explainerator-0.0.3-cli.jar --help
 usage: SqlExplaineratorCli [options]
  -h,--help                  This usage text
  -i,--infile <infile>       input file, or '-' for stdin; default = stdin
@@ -92,7 +92,7 @@ connection string and any credentials required to connect, e.g.:
 And some example command-lines (new-lines added for readability):
 
 ```
-C:\util\java> java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar 
+C:\util\java> java -jar sql-explainerator-0.0.3-SNAPSHOT-cli.jar 
   --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 
   --sql "SELECT 1 fROM DUAL" --outfile plan.svg
 ```
@@ -102,7 +102,7 @@ C:\util\java>"c:\Program Files\MySQL\MySQL Server 8.0\bin\mysql"
   --user=root --password=abc123 --silent --raw --skip-column-names 
   --execute "EXPLAIN FORMAT=JSON SELECT 1 FROM DUAL" sakila > plan.json
 
-C:\util\java>java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar 
+C:\util\java>java -jar sql-explainerator-0.0.3-SNAPSHOT-cli.jar 
   --infile plan.json --outfile plan.svg
 ```
 
@@ -110,7 +110,7 @@ C:\util\java>java -jar sql-explainerator-0.0.1-SNAPSHOT-with-dependencies.jar
 
 It's available in maven with the groupId:artifactId of `com.randomnoun.db:sql-explainerator`.
 
-There's a `sql-explainerator-0.0.2-with-dependencies.jar` which has all the maven dependencies baked in if you're calling this from a CLI. 
+There's a `sql-explainerator-0.0.3-cli.jar` which has all the maven dependencies baked in if you're calling this from a CLI. 
 
 You can add it to your pom.xml using the snippet:
 
@@ -118,7 +118,7 @@ You can add it to your pom.xml using the snippet:
 <dependency>
   <groupId>com.randomnoun.db</groupId>
   <artifactId>sql-explainerator</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
 </dependency>
 ```
 

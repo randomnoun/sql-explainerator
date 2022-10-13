@@ -332,7 +332,7 @@
                                 </transformer>
                             </transformers>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <shadedClassifierName>with-dependencies</shadedClassifierName>
+                            <shadedClassifierName>cli</shadedClassifierName>
                             <filters>
                                 <!-- see http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar -->
                                 <filter>
