@@ -136,7 +136,7 @@ But yes, you'd imagine this would already exist somewhere, wouldn't you.
 
 ## Don't you normally crap on about your git projects on the blog ?
 
-[Indeed I do](http://www.randomnoun.com/wp/2022/10/09/make-a-new-plan-stan/).
+[Indeed I do](http://www.randomnoun.com/wp/2022/10/14/make-a-new-plan-stan/).
 
 ## Further reading
 
