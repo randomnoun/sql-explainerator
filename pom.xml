@@ -22,11 +22,6 @@
         </dependency>
         <dependency>
             <groupId>com.randomnoun.common</groupId>
-            <artifactId>common-public</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.randomnoun.common</groupId>
             <artifactId>log4j-one</artifactId>
             <version>1.0.0</version>
         </dependency>
@@ -126,14 +121,6 @@
                 <exclusion>
                     <groupId>xalan</groupId>
                     <artifactId>xalan</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.java.dev.jna</groupId>
-                    <artifactId>jna</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.java.dev.jna</groupId>
-                    <artifactId>platform</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>javax.mail</groupId>
