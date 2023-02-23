@@ -6,6 +6,8 @@ It attempts to recreate the type of diagrams you get from the 'visual explain' p
 
 ![](https://raw.githubusercontent.com/randomnoun/sql-explainerator/master/src/site/resources/img/sakila-7g.png)
 
+The goal being to maximise the number of green boxes ( which correspond to index lookups = fast = good ) and reduce the number of red boxes ( which correspond to table scans = slow = bad ).
+
 The images are SVG, although you can also generate HTML output which wraps the SVG.
 
 ## Why would anyone want to do that  ?
