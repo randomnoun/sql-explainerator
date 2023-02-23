@@ -8,6 +8,8 @@ It attempts to recreate the type of diagrams you get from the 'visual explain' p
 
 The goal being to maximise the number of green boxes ( which correspond to index lookups = fast = good ) and reduce the number of red boxes ( which correspond to table scans = slow = bad ).
 
+You won't be able to get rid of all the table scans, but that's OK if the number of records in the table is smallish. The number of records are included in the diagram, and you can get more information by hovering the mouse over the boxes.
+
 The images are SVG, although you can also generate HTML output which wraps the SVG.
 
 ## Why would anyone want to do that  ?
