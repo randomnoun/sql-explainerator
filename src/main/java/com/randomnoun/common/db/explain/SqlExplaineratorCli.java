@@ -82,7 +82,7 @@ public class SqlExplaineratorCli {
 		  "\n" + 
 		  "  SqlExplaineratorCli --infile plan.json --outfile plan.svg\n" +
 		  "or\n" +
-		  "  cat plan.json | SqlPlainToImageCli > plan.svg\n" +
+		  "  cat plan.json | SqlExplaineratorCli > plan.svg\n" +
 		  "\n" +
 		  "\n" +
 		  "Example 2: To generate the diagram from an SQL statement, you will need to also supply a JDBC connection string and any credentials required to connect, e.g.:\n" +

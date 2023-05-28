@@ -83,7 +83,7 @@ then to generate the SVG diagram, supply this JSON as input to SqlExplaineratorC
 
   SqlExplaineratorCli --infile plan.json --outfile plan.svg
 or
-  cat plan.json | SqlPlainToImageCli > plan.svg
+  cat plan.json | SqlExplaineratorCli > plan.svg
 
 
 Example 2: To generate the diagram from an SQL statement, you will need to also supply a JDBC
