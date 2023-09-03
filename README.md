@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/com.randomnoun.db/sql-explainerator.svg)](https://search.maven.org/artifact/com.randomnoun.db/sql-explainerator)
+
 # sql-explainerator
 
 **sql-explainerator**  converts query execution plans ( the output from an 'EXPLAIN' statement ) into pretty diagrams
