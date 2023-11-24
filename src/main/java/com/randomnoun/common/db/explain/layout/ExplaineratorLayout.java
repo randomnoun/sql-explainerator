@@ -591,7 +591,7 @@ public class ExplaineratorLayout implements Layout {
 	
 				RangeShapeVisitor rv = new RangeShapeVisitor();
 				qbShape.traverse(rv);
-				logger.info("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
+				logger.debug("materialised subquery range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 	
 				h = 30 + 80 + qbShape.getHeight() + 20; // 20px padding bottom
 				w = Math.max(w, qbShape.getWidth() + 20); // 10px padding left and right
