@@ -16,9 +16,9 @@ import com.randomnoun.common.db.explain.graph.Shape;
  * 
  * @author knoxg
  */
-public class SvgShapeVisitor extends ShapeVisitor {
+public class SvgWriterShapeVisitor extends ShapeVisitor {
 	
-	Logger logger = Logger.getLogger(SvgShapeVisitor.class);
+	Logger logger = Logger.getLogger(SvgWriterShapeVisitor.class);
 	
 	boolean asHtml = false;
 	TooltipTypeEnum tooltipType = TooltipTypeEnum.SVG_TITLE;
@@ -28,7 +28,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 	int indent = 0;
 	PrintWriter pw;
 	
-	public SvgShapeVisitor(PrintWriter pw, boolean asHtml, TooltipTypeEnum tooltipType, String css, String script) {
+	public SvgWriterShapeVisitor(PrintWriter pw, boolean asHtml, TooltipTypeEnum tooltipType, String css, String script) {
 		this.pw = pw;
 		this.asHtml = asHtml;
 		this.tooltipType = tooltipType;
@@ -43,7 +43,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 			// get range
 			RangeShapeVisitor rv = new RangeShapeVisitor();
 			b.traverse(rv);
-			logger.info("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
+			logger.debug("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 
 			if (css==null) { css = getResource("/svg.css"); }
 			
@@ -94,7 +94,7 @@ public class SvgShapeVisitor extends ShapeVisitor {
 	}
 
 	private String getResource(String resourceName) {
-		InputStream is = SvgShapeVisitor.class.getResourceAsStream(resourceName);
+		InputStream is = SvgWriterShapeVisitor.class.getResourceAsStream(resourceName);
 		try {
 			return new String(StreamUtil.getByteArray(is));
 		} catch (IOException e) {
