@@ -23,17 +23,17 @@ public class SimpleTest extends TestCase {
 		InputStream is = SqlExplainerator.class.getResourceAsStream("/sakila/sakila-1.json");
 		Reader r = new InputStreamReader(is);
 
-		SqlExplainerator seti = new SqlExplainerator();
-		seti.setPlanParser(new PlanParser("8.0", true));
-		seti.setLayout(new ExplaineratorLayout());
-		seti.parseJson(r);
+		SqlExplainerator se = new SqlExplainerator();
+		se.setPlanParser(new PlanParser("8.0", true));
+		se.setLayout(new ExplaineratorLayout());
+		se.parseJson(r);
 		
-		seti.setTooltipType(TooltipTypeEnum.ATTRIBUTE_JS);
-		seti.setCss(null);    // default css
-		seti.setScript(null); // default javascript
+		se.setTooltipType(TooltipTypeEnum.ATTRIBUTE_JS);
+		se.setCss(null);    // default css
+		se.setScript(null); // default javascript
 		
-		seti.writeSvg(new PrintWriter(System.out));
-		seti.writeHtml(new PrintWriter(System.out));
+		se.writeSvg(new PrintWriter(System.out));
+		se.writeHtml(new PrintWriter(System.out));
 	}
 
 }

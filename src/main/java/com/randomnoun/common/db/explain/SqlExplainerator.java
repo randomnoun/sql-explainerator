@@ -17,7 +17,7 @@ import com.randomnoun.common.db.explain.layout.CompatibleLayout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightShapeVisitor;
-import com.randomnoun.common.db.explain.visitor.SvgShapeVisitor;
+import com.randomnoun.common.db.explain.visitor.SvgWriterShapeVisitor;
 
 /** Class used to convert sql execution plans ( from 'EXPLAIN' statements ) into diagrams.
  * 
@@ -94,7 +94,7 @@ public class SqlExplainerator {
 	public void writeSvg(Writer w) {
 		if (s==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 		PrintWriter pw = new PrintWriter(w);
-	    SvgShapeVisitor sbv = new SvgShapeVisitor(pw, false, tooltipType, css, script);
+	    SvgWriterShapeVisitor sbv = new SvgWriterShapeVisitor(pw, false, tooltipType, css, script);
 		s.traverse(sbv);
 		pw.flush();
 	}
@@ -110,7 +110,7 @@ public class SqlExplainerator {
 	public void writeHtml(Writer w) {
 		if (s==null) { throw new IllegalStateException("call parseJson() before generating diagram"); }
 	    PrintWriter pw = new PrintWriter(w);
-	    SvgShapeVisitor sbv = new SvgShapeVisitor(pw, true, tooltipType, css, script);
+	    SvgWriterShapeVisitor sbv = new SvgWriterShapeVisitor(pw, true, tooltipType, css, script);
 		s.traverse(sbv);
 		pw.flush();
 	}

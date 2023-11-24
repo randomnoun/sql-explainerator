@@ -22,7 +22,7 @@ import com.randomnoun.common.db.explain.layout.ExplaineratorLayout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
 import com.randomnoun.common.db.explain.visitor.RangeShapeVisitor;
 import com.randomnoun.common.db.explain.visitor.ReweightShapeVisitor;
-import com.randomnoun.common.db.explain.visitor.SvgShapeVisitor;
+import com.randomnoun.common.db.explain.visitor.SvgWriterShapeVisitor;
 import com.randomnoun.common.log4j.Log4jCliConfiguration;
 
 import junit.framework.TestCase;
@@ -122,7 +122,7 @@ public abstract class SqlExplaineratorTestBase extends TestCase {
 
 				StringWriter sw = new StringWriter();
 				PrintWriter pw = new PrintWriter(sw);
-				SvgShapeVisitor sbv = new SvgShapeVisitor(pw, true, tooltipType, null, null); // TooltipTypeEnum.SVG_TITLE
+				SvgWriterShapeVisitor sbv = new SvgWriterShapeVisitor(pw, true, tooltipType, null, null); // TooltipTypeEnum.SVG_TITLE
 				b.traverse(sbv);
 				pw.flush();
 
@@ -141,7 +141,7 @@ public abstract class SqlExplaineratorTestBase extends TestCase {
 
 				sw = new StringWriter();
 				pw = new PrintWriter(sw);
-				sbv = new SvgShapeVisitor(pw, false, tooltipType, null, null);
+				sbv = new SvgWriterShapeVisitor(pw, false, tooltipType, null, null);
 				b.traverse(sbv);
 				pw.flush();
 

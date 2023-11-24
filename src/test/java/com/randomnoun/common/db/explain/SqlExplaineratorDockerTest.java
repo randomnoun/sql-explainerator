@@ -60,6 +60,8 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 
 	static Logger logger = Logger.getLogger(SqlExplaineratorDockerTest.class);
 	
+	public final static int MAX_RETRY_COUNT = 200;
+	
 	// per-class setup/teardown
 	@BeforeClass
     public static void setUpClass() throws DockerException, InterruptedException, DockerCertificateException, ClassNotFoundException, SQLException, UnknownHostException, ParseException {
@@ -182,7 +184,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 				conn = DriverManager.getConnection(url, "root", "abc123"); // "testuser", "testpass"
 			} catch (SQLException e) {
 				logger.error("Connection failure: " + e.getMessage());
-				if (retryCount == 20) {
+				if (retryCount == MAX_RETRY_COUNT) {
 					throw e;
 				}
 				try { 
