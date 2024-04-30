@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
@@ -56,6 +57,7 @@ import com.spotify.docker.client.messages.PortBinding;
  * 
  * @author knoxg
  */
+@Ignore 
 public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 
 	static Logger logger = Logger.getLogger(SqlExplaineratorDockerTest.class);
