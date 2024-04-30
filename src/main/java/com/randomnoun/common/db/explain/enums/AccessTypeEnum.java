@@ -21,13 +21,16 @@ public enum AccessTypeEnum {
 	  "Low-medium - Low if number of matching rows is small, higher as the number of rows increases"), // green
 	
 	UNIQUE_KEY("eq_ref", "uniqueKey", "Unique Key Lookup",  
-	  "Low - The optimizer is able to find an index that it can use to retrieve required records.\n" +
+	  "Low - The optimizer is able to find an index that it can use to retrieve required records.\n" + // green
 	  "Fast because the index search leads directly to the page with all the row data"),
 	
 	CONST("const", "singleRow", "Single Row\n(constant)",  
-	  "Very low cost"); // blue
+	  "Very low cost"),  // blue
+	
+	RANGE("range", "range", "Index Range Scan",  
+	  "Medium - partial index scan"),  // orange
 
-	; // green
+	; 
 	
 	
 	private String jsonValue;
