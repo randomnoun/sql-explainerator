@@ -7,7 +7,7 @@
     <parent>
         <artifactId>parent-pom</artifactId>
         <groupId>com.randomnoun.build</groupId>
-        <version>1.26</version>
+        <version>1.30</version>
     </parent>
 
     <packaging>jar</packaging>
