@@ -70,7 +70,8 @@ svg.sql g.table.nonUniqueKey > text,
 svg.sql g.table.uniqueKey > text,
 svg.sql g.table.fullTableScan > text,
 svg.sql g.table.fullIndexScan > text,
-svg.sql g.table.singleRow > text { 
+svg.sql g.table.singleRow > text,
+svg.sql g.table.range > text { 
     fill: white;
     font-size: 11px; 
 }
@@ -93,6 +94,9 @@ svg.sql g.table.fullIndexScan > rect {
 }
 svg.sql g.table.singleRow > rect { 
     fill: #4080bf;
+}
+svg.sql g.table.range > rect { 
+    fill: #bf8000;
 }
 svg.sql g.table.insert > rect { 
     fill: black;
