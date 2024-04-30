@@ -166,7 +166,7 @@
         <connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git</connection>
         <developerConnection>scm:git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git</developerConnection>
         <url>http://gitlab.dev.randomnoun/randomnoun/sql-explainerator</url>
-        <tag>sql-explainerator-0.0.1</tag>
+        <tag>sql-explainerator-0.0.4</tag>
     </scm>
     <organization>
         <name>randomnoun</name>
