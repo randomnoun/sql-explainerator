@@ -138,6 +138,12 @@ public class SvgWriterShapeVisitor extends ShapeVisitor {
 			sb.append(is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 25) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">nested</text>\n");
 			sb.append(is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 35) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">loop</text>\n");
 
+		} else if (b.getShape().equals("hashJoin")) {
+			sb.append(is + "<path fill=\"white\" stroke=\"black\" d=\"M " + (x + 30) + "," + y + " l 30 30 l -30 30 l -30 -30 l 30 -30\"");
+			sb.append(getTooltipSvg(b, is, "path"));
+			sb.append(is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 25) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">hash</text>\n");
+			sb.append(is + "<text x=\"" + (x + 30) + "\" y=\"" + (y + 35) + "\" font-size=\"10px\" dominant-baseline=\"middle\" text-anchor=\"middle\">join</text>\n");
+		
 		}
 		
 		if (b.getLabel() != null) {

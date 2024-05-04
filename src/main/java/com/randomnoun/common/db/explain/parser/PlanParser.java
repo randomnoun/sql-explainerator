@@ -448,6 +448,11 @@ public class PlanParser {
 		n.setUsedColumns(parseNameList((JSONArray) obj.get("used_columns")));
 		n.getAttributes().put("usedColumns", n.getUsedColumns());
 		
+		if (obj.containsKey("using_join_buffer")) { // missing or "hash join", others ?
+			n.setJoinBuffer((String) obj.get("using_join_buffer"));
+			n.getAttributes().put("using_join_buffer", n.getJoinBuffer());
+		}
+		
 		if (obj.containsKey("key_length")) {
 			n.setKeyLength(Long.parseLong((String) obj.get("key_length")));
 			n.getAttributes().put("keyLength", n.getKeyLength()); 

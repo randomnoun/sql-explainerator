@@ -476,7 +476,8 @@ public class ExplaineratorLayout implements Layout {
 			Shape tabelShape = tableShapes.get(i);
 			Shape diamond = new Shape(); 
 			qsn = n.getTables().get(i);
-			diamond.setShape("nestedLoop");
+			boolean isHashJoin = "hash join".equals(qsn.getJoinBuffer());
+			diamond.setShape(isHashJoin ? "hashJoin" : "nestedLoop");
 			diamond.setSize(diamondWidth, diamondWidth); // diamond
 			diamond.setParentAndPosition(outer, tabelShape.getPosX() + tabelShape.getEdgeStartX() - diamondWidth / 2, topArrow); // centered above table beneath it
 			diamond.setTooltip("<span class=\"nestedLoopHeader\">nested_loop</span>\n\n" +

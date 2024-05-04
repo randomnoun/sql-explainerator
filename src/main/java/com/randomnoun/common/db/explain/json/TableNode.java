@@ -16,6 +16,7 @@ public class TableNode extends Node {
 	private List<String> usedColumns;
 	private List<String> refs;
 	private Long keyLength;
+	private String joinBuffer;
 	private Long rowsExaminedPerScan;
 	private Long rowsProducedPerJoin;
 	private Double filtered;
@@ -166,6 +167,14 @@ public class TableNode extends Node {
 		this.insertFrom = insertFrom;
 	}
 
+	public void setJoinBuffer(String joinBuffer) {
+		// only join buffer I've seen so far is 'hash join'
+		this.joinBuffer = joinBuffer;
+	}
+	
+	public String getJoinBuffer() { 
+		return joinBuffer;
+	}
 
 
 }
