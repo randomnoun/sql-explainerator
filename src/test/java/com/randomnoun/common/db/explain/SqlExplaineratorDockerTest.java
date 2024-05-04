@@ -31,7 +31,6 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
@@ -57,12 +56,14 @@ import com.spotify.docker.client.messages.PortBinding;
  * 
  * @author knoxg
  */
-@Ignore 
+/* @Ignore */ 
 public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 
 	static Logger logger = Logger.getLogger(SqlExplaineratorDockerTest.class);
 	
-	public final static int MAX_RETRY_COUNT = 200;
+	// 1 sec between retries
+	// note latest ( 8.0.37 ) container takes six minutes (!) before it starts listening for connections
+	public final static int MAX_RETRY_COUNT = 10 * 60; 
 	
 	// per-class setup/teardown
 	@BeforeClass
@@ -103,7 +104,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 		final String[] ports = { "3306" };
 		for (String port : ports) {
 		    List<PortBinding> hostPorts = new ArrayList<>();
-		    hostPorts.add(PortBinding.of("0.0.0.0", 13306));
+		    hostPorts.add(PortBinding.of("127.0.0.1", 13306)); // was 0.0.0.0
 		    portBindings.put(port, hostPorts);
 		}
 		
@@ -113,14 +114,15 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 
 		// Create container with exposed ports
 		final ContainerConfig containerConfig = ContainerConfig.builder()
-			.image("mysql:8.0.30")
+			.image("mysql:8.0.37")
 			.hostConfig(hostConfig)
 		    .env(
 		      // "MYSQL_HOST=localhost", // see https://stackoverflow.com/questions/39664141/docker-mysql-container-root-password-mysqld-listens-port-0
 		      "MYSQL_ROOT_PASSWORD=abc123", 
 		      "MYSQL_DATABASE=sakila",
 		      "MYSQL_USER=testuser",  // this user doesn't have SUPER permissions ( required for triggers )
-		      "MYSQL_PASSWORD=testpass")
+		      "MYSQL_PASSWORD=testpass",
+		      "MYSQL_INITDB_SKIP_TZINFO=Y")
 		    .exposedPorts(ports)
 		    .cmd("--default-authentication-plugin=mysql_native_password")
 		    .build();
@@ -131,7 +133,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 			creation = docker.createContainer(containerConfig);
 		} catch (ImageNotFoundException infe) {
 			logger.info("Image not found; pulling");
-			docker.pull("mysql:8.0.30");
+			docker.pull("mysql:8.0.37");
 			creation = docker.createContainer(containerConfig);
 		}
 		containerId = creation.id();
