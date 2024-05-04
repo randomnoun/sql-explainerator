@@ -21,3 +21,10 @@
 ## Updates
 
 * Added support for range index nodes
+
+# 1.0.0
+
+## Updates
+
+* hash join support
+* increase timeout on docker tests
