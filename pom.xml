@@ -157,10 +157,6 @@
 
     </dependencies>
 
-    <ciManagement>
-        <system>bamboo</system>
-        <url>https://bamboo.dev.randomnoun:8085/browse/RANDOMNOUN-EXPLAINTOIMAGE</url>
-    </ciManagement>
     <inceptionYear>2022-07-22</inceptionYear>
     <scm>
         <connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git</connection>
