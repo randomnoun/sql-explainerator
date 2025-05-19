@@ -286,11 +286,4 @@ Full Table Scan                        </text>
             </g>
         </g>
     </g>
-<g class="tooltip" visibility="hidden" >
-    <foreignObject style="overflow: visible;">
-        <body xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0;">
-            <div class="tooltip">Tooltip</div>
-        </body>
-    </foreignObject>
-</g>
 </svg>
