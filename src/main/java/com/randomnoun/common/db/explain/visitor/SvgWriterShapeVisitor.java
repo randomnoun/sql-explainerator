@@ -45,7 +45,7 @@ public class SvgWriterShapeVisitor extends ShapeVisitor {
 			b.traverse(rv);
 			logger.debug("range [" + rv.getMinX() + ", " + rv.getMinY() + "] - [" + rv.getMaxX() + ", " + rv.getMaxY() + "]");
 
-			if (css==null) { css = getResource("/svg.css"); }
+			if (css == null) { css = getResource("/svg.css"); }
 			
 			// add 1 to max as 1px lines on the border have 0.5px of that line outside the max co-ordinates
 			// js tooltips take up entire width/height as the tooltips can extend outside the svg
@@ -252,15 +252,15 @@ public class SvgWriterShapeVisitor extends ShapeVisitor {
 		if (indent==4) {
 			// close off SVG and HTML elements
 			
-			s += "<g class=\"tooltip\" visibility=\"hidden\" >\n" +
-			  "    <foreignObject style=\"overflow: visible;\">\n" +
-			  "        <body xmlns=\"http://www.w3.org/1999/xhtml\" style=\"margin: 0; padding: 0;\">\n" +
-			  "            <div class=\"tooltip\">Tooltip</div>\n" +
-			  "        </body>\n" +
-		      "    </foreignObject>\n" +
-			  "</g>\n";
-			
 			if (tooltipType == TooltipTypeEnum.ATTRIBUTE_JS) {
+				// maybe the javascript should create this element ( the body tag can cause issues with containing doc )
+				s += "<g class=\"tooltip\" visibility=\"hidden\" >\n" +
+				  "    <foreignObject style=\"overflow: visible;\">\n" +
+				  "        <body xmlns=\"http://www.w3.org/1999/xhtml\" style=\"margin: 0; padding: 0;\">\n" +
+				  "            <div class=\"tooltip\">Tooltip</div>\n" +
+				  "        </body>\n" +
+			      "    </foreignObject>\n" +
+				  "</g>\n";
 				if (script == null) { script = getResource("/svg.js"); }
 			} else {
 				script = null;
