@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.randomnoun.db</groupId>
     <artifactId>sql-explainerator</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <parent>
         <artifactId>parent-pom</artifactId>
@@ -180,7 +180,7 @@
         <connection>scm:git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git</connection>
         <developerConnection>scm:git:http://gitlab.dev.randomnoun/randomnoun/sql-explainerator.git</developerConnection>
         <url>http://gitlab.dev.randomnoun/randomnoun/sql-explainerator</url>
-        <tag>sql-explainerator-1.0.2</tag>
+        <tag>sql-explainerator-1.0.1</tag>
     </scm>
     <organization>
         <name>randomnoun</name>
