@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.json.simple.parser.ParseException;
+import org.junit.jupiter.api.Test;
 
 public class SqlExplaineratorWindowTest extends SqlExplaineratorTestBase {
 
 	Logger logger = Logger.getLogger(SqlExplaineratorWindowTest.class);
 	
+	@Test
 	public void testWindowFunctions() throws IOException, ParseException {
 		testParser("window/window-1");
 		testSvg("window/window-1");
@@ -27,7 +29,7 @@ public class SqlExplaineratorWindowTest extends SqlExplaineratorTestBase {
 
 	}
 	
-	
+	@Test
 	public void testHavingFunctions() throws IOException, ParseException {
 		testParser("window/having-1");
 		testSvg("window/having-1");
@@ -36,6 +38,7 @@ public class SqlExplaineratorWindowTest extends SqlExplaineratorTestBase {
 		testSvg("window/having-2");
 	}
 	
+	@Test
 	public void testInsertFunctions() throws IOException, ParseException {
 		testParser("window/insert-1");
 		testSvg("window/insert-1");
