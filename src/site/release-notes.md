@@ -1,4 +1,3 @@
 ## Updates
 
-* hash join support
-* increase timeout on docker tests
+* mariadb upgrade, junit 5 upgrade, docker client upgrade
