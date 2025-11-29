@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 
 import com.google.common.base.Optional;
 import com.google.common.net.HostAndPort;
@@ -43,7 +43,7 @@ public abstract class AbstractDockerTest {
 	protected static String containerId;
 	protected static Connection conn;
 	
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
 		// remove the container if it's still around
 		logger.info("cleanup");
@@ -121,6 +121,7 @@ public abstract class AbstractDockerTest {
 
 	// similar sort of thing as DefaultDockerClient.fromEnv(), except it's not from the env
 	static DefaultDockerClient.Builder partialBuilder(String uri, String dockerCerts) throws DockerCertificateException {
+		/*
 		String endpoint = uri;
 		Path dockerCertPath = Paths.get(dockerCerts);
 		DefaultDockerClient.Builder builder = DefaultDockerClient.builder();
@@ -140,7 +141,9 @@ public abstract class AbstractDockerTest {
 	    if (certs.isPresent()) {
 	      builder.dockerCertificates(certs.get());
 	    }
-
+	    */
+		
+		DefaultDockerClient.Builder builder = DefaultDockerClient.builder().uri("npipe:////./pipe/docker_engine");
 	    return builder;
 	}
 

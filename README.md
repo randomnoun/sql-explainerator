@@ -91,7 +91,7 @@ or
 Example 2: To generate the diagram from an SQL statement, you will need to also supply a JDBC
 connection string and any credentials required to connect, e.g.:
 
-  SqlExplaineratorCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \
+  SqlExplaineratorCli --jdbc jdbc:mariadb://localhost/sakila --username root --password abc123 \
     --sql "SELECT 1 fROM DUAL" --outfile plan.svg
 ```
 
@@ -99,7 +99,7 @@ And some example command-lines (new-lines added for readability):
 
 ```
 C:\util\java> java -jar sql-explainerator-1.0.0-SNAPSHOT-cli.jar 
-  --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 
+  --jdbc jdbc:mariadb://localhost/sakila --username root --password abc123 
   --sql "SELECT 1 fROM DUAL" --outfile plan.svg
 ```
 

@@ -1,6 +1,6 @@
 package com.randomnoun.common.db.explain;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,9 +29,9 @@ import javax.script.ScriptException;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
@@ -66,7 +66,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 	public final static int MAX_RETRY_COUNT = 10 * 60; 
 	
 	// per-class setup/teardown
-	@BeforeClass
+	@BeforeAll
     public static void setUpClass() throws DockerException, InterruptedException, DockerCertificateException, ClassNotFoundException, SQLException, UnknownHostException, ParseException {
 
 		String hostname = InetAddress.getLocalHost().getHostName();
@@ -90,7 +90,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 		}
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
     	AbstractDockerTest.tearDownClass();
     }
@@ -114,7 +114,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 
 		// Create container with exposed ports
 		final ContainerConfig containerConfig = ContainerConfig.builder()
-			.image("mysql:8.0.37")
+			.image("mysql:8.0.44")
 			.hostConfig(hostConfig)
 		    .env(
 		      // "MYSQL_HOST=localhost", // see https://stackoverflow.com/questions/39664141/docker-mysql-container-root-password-mysqld-listens-port-0
@@ -133,7 +133,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 			creation = docker.createContainer(containerConfig);
 		} catch (ImageNotFoundException infe) {
 			logger.info("Image not found; pulling");
-			docker.pull("mysql:8.0.37");
+			docker.pull("mysql:8.0.44");
 			creation = docker.createContainer(containerConfig);
 		}
 		containerId = creation.id();
@@ -174,7 +174,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
     
     @SuppressWarnings("java:S2925") // allow Thread.sleep() in test classes
     public static Connection getMysqlConnection(DockerClient docker, String containerId) throws SQLException {
-		String url = "jdbc:mysql://" + docker.getHost() + ":13306/sakila";
+		String url = "jdbc:mariadb://" + docker.getHost() + ":13306/sakila";
 		logger.info("Connecting to " + url);
 		
 		int retryCount = 0;
@@ -204,7 +204,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
     }
 
 
-	@Test
+    @Test
 	public void testSqlExplaineratorCli() throws DockerCertificateException, DockerException, InterruptedException, IOException, SQLException, ScriptException, ParseException {
 		String hostname = InetAddress.getLocalHost().getHostName();
 		System.out.println("Running on " + hostname);
@@ -238,7 +238,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 			});
 		}
 
-		String url = "jdbc:mysql://" + docker.getHost() + ":13306/sakila";
+		String url = "jdbc:mariadb://" + docker.getHost() + ":13306/sakila";
 		
 		sqlFilename = "/sakila/sakila-7g.sql";
 		try (InputStream is = this.getClass().getResourceAsStream(sqlFilename);
@@ -269,7 +269,7 @@ public class SqlExplaineratorDockerTest extends AbstractDockerTest {
 			            expected = expected.replaceAll("[0-9]+(\\.[0-9]+)?", "999").trim();
 			            String actual = baos.toString().replaceAll("[0-9]+(\\.[0-9]+)?", "999").trim();
 			            
-			            assertEquals("difference in sakila-7g-roundtrip-1.json", expected, actual);
+			            assertEquals(expected, actual, "difference in sakila-7g-roundtrip-1.json");
 						
 					} catch (Exception e) {
 						throw new RuntimeException("Exception in main", e);

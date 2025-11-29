@@ -87,7 +87,7 @@ public class SqlExplaineratorCli {
 		  "\n" +
 		  "Example 2: To generate the diagram from an SQL statement, you will need to also supply a JDBC connection string and any credentials required to connect, e.g.:\n" +
 		  "\n" +
-		  "  SqlExplaineratorCli --jdbc jdbc:mysql://localhost/sakila --username root --password abc123 \\\n" +
+		  "  SqlExplaineratorCli --jdbc jdbc:mariadb://localhost/sakila --username root --password abc123 \\\n" +
 		  "    --sql \"SELECT 1 fROM DUAL\" --outfile plan.svg" +
 		  "\n";
 	

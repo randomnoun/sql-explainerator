@@ -7,16 +7,16 @@ import java.io.PrintWriter;
 import java.io.Reader;
 
 import org.json.simple.parser.ParseException;
+import org.junit.jupiter.api.Test;
 
 import com.randomnoun.common.db.explain.enums.TooltipTypeEnum;
 import com.randomnoun.common.db.explain.layout.ExplaineratorLayout;
 import com.randomnoun.common.db.explain.parser.PlanParser;
 
-import junit.framework.TestCase;
-
 /** Simple test */
-public class SimpleTest extends TestCase {
+public class SimpleTest {
 
+	@Test
 	public void testExplainerator() throws IOException, ParseException {
 		
 		// simple test input

@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.json.simple.parser.ParseException;
+import org.junit.jupiter.api.Test;
 
 public class SqlExplaineratorSaqilaTest extends SqlExplaineratorTestBase {
 
 	Logger logger = Logger.getLogger(SqlExplaineratorSaqilaTest.class);
 	
+	@Test
 	public void testSakilaExamQuestions() throws IOException, ParseException {
 		testParser("sakila/sakila-1");
 		testSvg("sakila/sakila-1");
@@ -29,6 +31,7 @@ public class SqlExplaineratorSaqilaTest extends SqlExplaineratorTestBase {
 		testSvg("sakila/sakila-7g");
 	}
 	
+	@Test
 	public void testSakila2() throws IOException, ParseException {
 		testParser("sakila2/sakila-2-1");
 		testSvg("sakila2/sakila-2-1");

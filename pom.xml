@@ -7,7 +7,7 @@
     <parent>
         <artifactId>parent-pom</artifactId>
         <groupId>com.randomnoun.build</groupId>
-        <version>1.30</version>
+        <version>1.37</version>
     </parent>
 
     <packaging>jar</packaging>
@@ -16,20 +16,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.randomnoun.common</groupId>
             <artifactId>log4j-one</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <!-- spotify's DockerClient uses slf4j, pipe that to log4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>2.0.2</version>
+            <artifactId>slf4j-reload4j</artifactId>
+            <version>2.0.17</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -60,14 +55,14 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>1.8.0</version>
+            <version>3.5.6</version>
         </dependency>
 
         <!-- going to run database tests in docker containers now -->
         <dependency>
             <groupId>com.spotify</groupId>
             <artifactId>docker-client</artifactId>
-            <version>7.0.2</version>
+            <version>8.16.0</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -80,7 +75,7 @@
         <dependency>
             <groupId>com.randomnoun.common</groupId>
             <artifactId>common-public</artifactId>
-            <version>1.0.10</version>
+            <version>1.0.35</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -153,7 +148,30 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
+            <exclusions>
+            	<exclusion>
+            		<groupId>junit</groupId>
+            		<artifactId>junit</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
+        
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+
 
     </dependencies>
 
@@ -271,7 +289,11 @@
                 </executions>
             </plugin>
 
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -354,6 +376,17 @@
 
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.junit</groupId>
+            <artifactId>junit-bom</artifactId>
+            <version>5.14.1</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <distributionManagement>
         <site>

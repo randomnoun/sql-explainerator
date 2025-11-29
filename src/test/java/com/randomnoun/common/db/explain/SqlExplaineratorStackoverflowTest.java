@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.json.simple.parser.ParseException;
+import org.junit.jupiter.api.Test;
 
 public class SqlExplaineratorStackoverflowTest extends SqlExplaineratorTestBase {
 
 	Logger logger = Logger.getLogger(SqlExplaineratorStackoverflowTest.class);
 	
+	@Test
 	public void testStackoverflowQuestions() throws IOException, ParseException {
 		testParser("stackoverflow/q-68136518");
 		testSvg("stackoverflow/q-68136518");
