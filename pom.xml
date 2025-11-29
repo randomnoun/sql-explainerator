@@ -13,6 +13,10 @@
     <packaging>jar</packaging>
     <name>sql-explainerator</name>
     <url>http://www.randomnoun.com/maven.html</url>
+    
+    <properties>
+        <github.release.targetCommitish>main</github.release.targetCommitish>
+    </properties>
 
     <dependencies>
         <dependency>
